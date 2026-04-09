@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>飛輪操盤系統 Mobile</title>
+  <title>飛輪操盤系統 Mobile V2</title>
   <style>
     :root{
       --bg:#07111f;
@@ -20,20 +20,38 @@
       --sky:#38bdf8;
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;padding:0;background:
-      radial-gradient(circle at 20% 0%, rgba(34,211,238,.15), transparent 24%),
-      radial-gradient(circle at 100% 20%, rgba(167,139,250,.12), transparent 20%),
-      linear-gradient(180deg,var(--bg),var(--bg2));
-      color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;}
+    html,body{
+      margin:0;padding:0;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(34,211,238,.15), transparent 24%),
+        radial-gradient(circle at 100% 20%, rgba(167,139,250,.12), transparent 20%),
+        linear-gradient(180deg,var(--bg),var(--bg2));
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;
+    }
     body{min-height:100vh;padding:14px 14px 28px;}
     .shell{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-    .glass{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.28);backdrop-filter:blur(14px)}
+    .glass{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:0 14px 40px rgba(0,0,0,.28);
+      backdrop-filter:blur(14px)
+    }
     .hero{padding:18px}
-    .pill{display:inline-flex;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;letter-spacing:.16em;border:1px solid rgba(34,211,238,.25);background:rgba(34,211,238,.1);color:#9beaf5}
+    .pill{
+      display:inline-flex;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;
+      letter-spacing:.16em;border:1px solid rgba(34,211,238,.25);
+      background:rgba(34,211,238,.1);color:#9beaf5
+    }
     h1{margin:10px 0 0;font-size:28px;line-height:1.1}
     p{margin:8px 0 0;color:var(--muted);line-height:1.6}
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .stats .box,.mini,.king .stat{background:rgba(2,6,23,.55);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:12px}
+    .stats .box,.mini,.king .stat,.signal-box{
+      background:rgba(2,6,23,.55);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;padding:12px
+    }
     .label{font-size:12px;color:var(--muted);margin-bottom:6px}
     .value{font-weight:900;font-size:20px;line-height:1.15}
     .mono{font-variant-numeric:tabular-nums}
@@ -41,24 +59,33 @@
     .section h2{margin:0 0 12px;font-size:18px}
     .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     button,.btn-link{
-      appearance:none;border:none;border-radius:16px;padding:14px 14px;font-weight:900;font-size:15px;cursor:pointer;
-      color:#04111f;background:linear-gradient(180deg,#63f3ff,#2ed8ea);box-shadow:0 6px 18px rgba(34,211,238,.24);
+      appearance:none;border:none;border-radius:16px;padding:14px 14px;font-weight:900;
+      font-size:15px;cursor:pointer;color:#04111f;
+      background:linear-gradient(180deg,#63f3ff,#2ed8ea);
+      box-shadow:0 6px 18px rgba(34,211,238,.24);
     }
-    button.secondary{background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.28);box-shadow:none}
-    button.dark{background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(255,255,255,.08);box-shadow:none}
+    button.secondary{
+      background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.28);box-shadow:none
+    }
+    button.dark{
+      background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(255,255,255,.08);box-shadow:none
+    }
     input,textarea,select{
-      width:100%;background:rgba(2,6,23,.72);border:1px solid rgba(148,163,184,.18);color:white;border-radius:16px;
-      padding:13px 14px;font-size:16px;outline:none;
+      width:100%;background:rgba(2,6,23,.72);border:1px solid rgba(148,163,184,.18);
+      color:white;border-radius:16px;padding:13px 14px;font-size:16px;outline:none;
     }
-    input:focus,textarea:focus,select:focus{border-color:rgba(34,211,238,.8);box-shadow:0 0 0 3px rgba(34,211,238,.12)}
+    input:focus,textarea:focus,select:focus{
+      border-color:rgba(34,211,238,.8);box-shadow:0 0 0 3px rgba(34,211,238,.12)
+    }
     textarea{min-height:88px;resize:vertical}
     .stack{display:flex;flex-direction:column;gap:10px}
-    .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 11px;font-size:12px;font-weight:900}
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 11px;
+      font-size:12px;font-weight:900
+    }
     .chip.ok{background:rgba(52,211,153,.16);color:#b6f6df;border:1px solid rgba(52,211,153,.25)}
     .chip.warn{background:rgba(251,191,36,.16);color:#fde7a5;border:1px solid rgba(251,191,36,.22)}
     .chip.danger{background:rgba(251,113,133,.14);color:#fecdd6;border:1px solid rgba(251,113,133,.22)}
-    .bar{height:12px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.06)}
-    .bar > div{height:100%}
     .balance{display:flex;border-radius:999px;overflow:hidden;height:14px;background:rgba(255,255,255,.06)}
     .balance .attack{background:linear-gradient(90deg,#38bdf8,#22d3ee)}
     .balance .defense{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
@@ -70,20 +97,48 @@
     .king .value{font-size:18px}
     .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
     .actions button,.actions .btn-link{padding:12px 10px;font-size:13px;text-align:center;text-decoration:none}
-    .actions .btn-link{display:flex;align-items:center;justify-content:center;background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.28);box-shadow:none}
+    .actions .btn-link{
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.28);box-shadow:none
+    }
     .cool{font-size:13px;font-weight:900}
     .cool.ok{color:#86efac}.cool.warn{color:#fde68a}.cool.danger{color:#fda4af}
     .note{font-size:12px;line-height:1.55;color:var(--muted)}
     .summary{font-size:14px;line-height:1.7;color:#def7ff}
-    .hidden{display:none!important}
+    .decision{
+      border-radius:18px;padding:12px 14px;font-size:14px;font-weight:900;line-height:1.6
+    }
+    .decision.harvest{
+      background:rgba(251,113,133,.14);
+      border:1px solid rgba(251,113,133,.25);
+      color:#ffd1d8;
+    }
+    .decision.watch{
+      background:rgba(251,191,36,.12);
+      border:1px solid rgba(251,191,36,.22);
+      color:#fde7a5;
+    }
+    .decision.add{
+      background:rgba(52,211,153,.14);
+      border:1px solid rgba(52,211,153,.22);
+      color:#b6f6df;
+    }
+    .decision.idle{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      color:#e2e8f0;
+    }
+    .dev-positive{color:#fecdd3 !important}
+    .dev-mid{color:#fde68a !important}
+    .dev-low{color:#86efac !important}
   </style>
 </head>
 <body>
   <div class="shell">
     <section class="glass hero">
-      <div class="pill">FLYWHEEL MOBILE · COMMAND</div>
+      <div class="pill">FLYWHEEL MOBILE · DEVIATION COMMAND</div>
       <h1>飛輪操盤系統</h1>
-      <p>手機精簡版。保留你最重要的：同步、乖離收割、觸發加碼、冷卻倒數、攻守比例、鉅亨快捷。</p>
+      <p>手機強化版。這版主打：自動算 20MA、即時乖離、收割訊號、10 日觸發加碼、冷卻倒數、攻守比例。</p>
     </section>
 
     <section class="glass section stats">
@@ -234,15 +289,6 @@ function getCooldownRemaining(dateStr){
   return Math.max(0, 5 - passed);
 }
 
-function getRankTitle(totalAssets){
-  if (totalAssets < 1500000) return '新手指揮官';
-  if (totalAssets < 3000000) return '飛輪操盤官';
-  if (totalAssets < 5000000) return '資產領主';
-  if (totalAssets < 8000000) return '多引擎統帥';
-  if (totalAssets < 10000000) return '巡航元帥';
-  return '千萬飛輪君主';
-}
-
 function getPhaseText(totalAssets){
   if(totalAssets < 3000000) return '基礎累積期';
   if(totalAssets < 8000000) return '穩定成長期';
@@ -262,7 +308,6 @@ function resetMonthlyIfNeeded(){
 
 function setSync(text, ok=true){
   const badge = safeEl('syncBadge');
-  const inline = text;
   safeSetText('syncBadge', text);
   if(badge) badge.style.color = ok ? '#67e8f9' : '#fda4af';
 }
@@ -284,7 +329,10 @@ function appendTodayValue(code){
   const today = prompt('輸入今天淨值');
   if(!today) return;
   const num = Number(today);
-  if(Number.isNaN(num) || num <= 0){ alert('請輸入正確數字'); return; }
+  if(Number.isNaN(num) || num <= 0){
+    alert('請輸入正確數字');
+    return;
+  }
   const el = safeEl(code + '_prices');
   if(!el) return;
   let arr = parsePrices(el.value);
@@ -292,6 +340,31 @@ function appendTodayValue(code){
   if(arr.length > 20) arr = arr.slice(arr.length - 20);
   el.value = arr.join(' ');
   updateVisuals();
+}
+
+function getDeviationDecision(deviation, cooldownRemain){
+  if(cooldownRemain !== null && cooldownRemain > 0){
+    return { cls:'watch', text:`🔒 冷卻中，暫不收割` };
+  }
+  if(deviation >= 20){
+    return { cls:'harvest', text:`🚨 乖離過大，優先收割 20%` };
+  }
+  if(deviation >= 15){
+    return { cls:'harvest', text:`🔴 達收割區，建議收割 20%` };
+  }
+  if(deviation >= 10){
+    return { cls:'watch', text:`🟠 達收割區，建議收割 10%` };
+  }
+  if(deviation >= 5){
+    return { cls:'watch', text:`🟡 接近收割區，先觀察` };
+  }
+  return { cls:'idle', text:`⚪ 未到收割區，維持紀律` };
+}
+
+function getDevClass(dev){
+  if(dev >= 15) return 'value mono dev-positive';
+  if(dev >= 5) return 'value mono dev-mid';
+  return 'value mono dev-low';
 }
 
 function ensureKingCards(){
@@ -330,13 +403,15 @@ function ensureKingCards(){
 
         <div id="cooldown_${k.code}" class="cool warn">未設定收割日</div>
 
+        <div class="decision idle" id="decision_${k.code}">等待判讀</div>
+
         <div class="stat-grid">
+          <div class="stat"><div class="label">目前淨值</div><div id="nav_${k.code}" class="value mono">—</div></div>
           <div class="stat"><div class="label">20MA</div><div id="ma_${k.code}" class="value mono">—</div></div>
           <div class="stat"><div class="label">乖離</div><div id="dev_${k.code}" class="value mono">—</div></div>
           <div class="stat"><div class="label">10日跌幅</div><div id="chg10_${k.code}" class="value mono">—</div></div>
           <div class="stat"><div class="label">觸發狀態</div><div id="trigger_${k.code}" class="value" style="font-size:16px">—</div></div>
-          <div class="stat"><div class="label">波段</div><div id="wave_${k.code}" class="value" style="font-size:16px">—</div></div>
-          <div class="stat"><div class="label">加碼</div><div id="add_${k.code}" class="value" style="font-size:16px">—</div></div>
+          <div class="stat"><div class="label">加碼訊號</div><div id="add_${k.code}" class="value" style="font-size:16px">—</div></div>
         </div>
 
         <div id="action_${k.code}" class="summary" style="background:rgba(2,6,23,.55);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:12px">等待判讀</div>
@@ -386,13 +461,13 @@ function updateVisuals(){
     updateBalanceRatio(totalAssets, reservoir);
 
     let monthStatusText = '綠燈';
-    let monthStatusHint = '本月節奏正常，可依規則出手';
+    let monthStatusHint = '節奏正常';
     if(usedAmmo > ammoLimit || triggerRemain <= 0 || ammoRemain <= 0){
       monthStatusText = '紅燈';
-      monthStatusHint = '本月額度或次數用盡，停止加碼';
+      monthStatusHint = '本月額度或次數用盡';
     } else if(ammoRemain <= Math.max(6000, ammoLimit * 0.3)){
       monthStatusText = '黃燈';
-      monthStatusHint = '本月彈藥偏緊，請保守使用';
+      monthStatusHint = '彈藥偏緊，請保守';
     }
     safeSetText('monthStatusText', monthStatusText);
     safeSetText('monthStatusHint', monthStatusHint);
@@ -405,13 +480,11 @@ function updateVisuals(){
     const discipline = Math.max(0,100 - warnings.length * 8 - (monthlyInput !== 9000 ? 8 : 0));
     safeSetText('disciplineText', String(discipline));
 
-    const deviationLines = [];
-    const actionable = [];
+    const summaryLines = [];
+    const recommendLines = [];
     const triggeredCandidates = [];
-    const kingStats = [];
-    let triggeredCount = 0;
 
-    kingDefs.forEach((k, i) => {
+    kingDefs.forEach(k => {
       const prices = parsePrices(safeEl(k.code+'_prices')?.value || '');
       const calc = calcDeviation(prices);
       const firstWaveDone = String(safeEl(k.code+'_firstwave')?.value || 'false') === 'true';
@@ -423,31 +496,33 @@ function updateVisuals(){
       const coolEl = safeEl(`cooldown_${k.code}`);
       if(cooldownRemain === null){
         safeSetText(`cooldown_${k.code}`, '未設定收割日');
-        if(coolEl){ coolEl.className = 'cool warn'; }
+        if(coolEl) coolEl.className = 'cool warn';
       } else if(cooldownRemain > 0){
         safeSetText(`cooldown_${k.code}`, `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`);
-        if(coolEl){ coolEl.className = 'cool danger'; }
+        if(coolEl) coolEl.className = 'cool danger';
       } else {
         safeSetText(`cooldown_${k.code}`, '✅ 冷卻完成，可操作');
-        if(coolEl){ coolEl.className = 'cool ok'; }
+        if(coolEl) coolEl.className = 'cool ok';
       }
 
       if(!calc){
         safeSetText('signal_'+k.code, '資料不足');
+        safeSetText('nav_'+k.code, prices.length ? prices[prices.length-1] : '—');
         safeSetText('ma_'+k.code, `${prices.length}/20`);
         safeSetText('dev_'+k.code, '—');
         safeSetText('chg10_'+k.code, prices.length >= 11 ? '待算' : '需11筆');
         safeSetText('trigger_'+k.code, '待判定');
-        safeSetText('wave_'+k.code, '待判定');
         safeSetText('add_'+k.code, '待判定');
         safeSetText('action_'+k.code, '請先輸入最近20筆淨值');
+        safeSetText('decision_'+k.code, '請補滿 20 筆淨值');
+        const dec = safeEl('decision_'+k.code);
+        if(dec) dec.className = 'decision idle';
         return;
       }
 
-      const { ma20, deviation, recent20 } = calc;
+      const { current, ma20, deviation, recent20 } = calc;
       const minVal = Math.min(...recent20);
       const minIndex = recent20.lastIndexOf(minVal);
-      const current = recent20[recent20.length - 1];
       const reboundPct = ((current - minVal) / minVal) * 100;
       const highAfterLow = minIndex < recent20.length - 1 ? Math.max(...recent20.slice(minIndex)) : current;
       const turnedWeak = highAfterLow > current * 1.01;
@@ -457,18 +532,15 @@ function updateVisuals(){
       else if(reboundPct >= 5 && turnedWeak && !firstWaveDone) wave='反彈後轉弱';
       else if(reboundPct >= 5) wave='反彈觀察期';
 
-      let triggerText='待判定', add='❌ 不加碼', signal='待命', action='不動作';
-      let distanceValue = Number.POSITIVE_INFINITY;
-      let distanceText = '等待資料';
+      let triggerText='待判定';
+      let add='❌ 不加碼';
+      let signal='待命';
+      let action='不動作';
 
       if(triggerCheck){
         safeSetText('chg10_'+k.code, `${triggerCheck.change>=0?'+':''}${triggerCheck.change.toFixed(2)}%`);
-        distanceValue = Math.max(0, triggerCheck.change - kingTrigger);
-        distanceText = distanceValue <= 0 ? '已觸發' : `還差 ${distanceValue.toFixed(2)}%`;
-
         if(triggerCheck.triggered){
           triggerText='✅ 已觸發';
-          triggeredCount++;
           if(ammoRemain<=0 || triggerRemain<=0) add='🚫 禁止';
           else if(wave==='第二波候選') add='🟡 第二波可加';
           else add='✅ 可加碼';
@@ -478,65 +550,67 @@ function updateVisuals(){
           if(wave==='第二波候選') score += 2;
           if(firstWaveDone) score += 1;
 
-          triggeredCandidates.push({ name:k.name, triggerChange:triggerCheck.change, wave, score, kingTrigger });
+          triggeredCandidates.push({
+            name:k.name,
+            triggerChange:triggerCheck.change,
+            wave,
+            score,
+            kingTrigger
+          });
         } else {
           triggerText='❌ 未觸發';
         }
       } else {
-        safeSetText('chg10_'+k.code,'需11筆');
+        safeSetText('chg10_'+k.code, '需11筆');
       }
 
-      if(reservoir < 150000){
-        if(deviation >= 10){ action='收至剩 50% 底倉，獲利 100% 回水庫'; signal='保命'; actionable.push(`${k.name}：${action}`); }
-        else if(deviation >= 5){ action='收割 10%，獲利 100% 回水庫'; signal='保命'; actionable.push(`${k.name}：${action}`); }
-      } else if(reservoir < 180000){
-        if(deviation >= 10){ action='收至剩 50% 底倉，獲利 100% 回水庫'; signal='鎖定'; actionable.push(`${k.name}：${action}`); }
-        else if(deviation >= 5){ action='收割 10%，獲利 100% 回水庫'; signal='鎖定'; actionable.push(`${k.name}：${action}`); }
-      } else if(reservoir > 1000000){
-        if(deviation >= 25){ action='收割 20%，底倉至少 85%'; signal='厚尾'; actionable.push(`${k.name}：${action}`); }
-        else if(deviation >= 15){ action='收割 10%，底倉至少 85%'; signal='厚尾'; actionable.push(`${k.name}：${action}`); }
-      } else {
-        if(deviation >= 20){ action='再收割 20%，50% 水庫 / 50% 回原王'; signal='再收'; actionable.push(`${k.name}：${action}`); }
-        else if(deviation >= 15){ action='收割 20%，50% 水庫 / 50% 回原王'; signal='收20'; actionable.push(`${k.name}：${action}`); }
-        else if(deviation >= 10){ action='收割 10%，50% 水庫 / 50% 回原王'; signal='收10'; actionable.push(`${k.name}：${action}`); }
-        else if(deviation >= 5){ action='先觀察，接近收割門檻'; signal='準備'; }
+      const decision = getDeviationDecision(deviation, cooldownRemain);
+      const decisionEl = safeEl('decision_'+k.code);
+      if(decisionEl){
+        decisionEl.className = `decision ${decision.cls}`;
+        decisionEl.textContent = decision.text;
       }
 
       if(cooldownRemain !== null && cooldownRemain > 0){
-        const wouldHarvest = action !== '不動作' && action !== '先觀察，接近收割門檻';
-        if(wouldHarvest){
-          action = `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`;
-          signal = '冷卻';
+        signal = '冷卻';
+        action = `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`;
+      } else {
+        if(deviation >= 20){
+          signal='再收';
+          action='再收割 20%，50% 水庫 / 50% 回原王';
+        } else if(deviation >= 15){
+          signal='收20';
+          action='收割 20%，50% 水庫 / 50% 回原王';
+        } else if(deviation >= 10){
+          signal='收10';
+          action='收割 10%，50% 水庫 / 50% 回原王';
+        } else if(deviation >= 5){
+          signal='準備';
+          action='先觀察，接近收割門檻';
         }
       }
 
       safeSetText('signal_'+k.code, signal);
+      safeSetText('nav_'+k.code, current.toFixed(2));
       safeSetText('ma_'+k.code, ma20.toFixed(2));
       safeSetText('dev_'+k.code, `${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
+      const devEl = safeEl('dev_'+k.code);
+      if(devEl) devEl.className = getDevClass(deviation);
       safeSetText('trigger_'+k.code, triggerText);
-      safeSetText('wave_'+k.code, wave);
       safeSetText('add_'+k.code, add);
       safeSetText('action_'+k.code, action);
 
-      kingStats.push({ name:k.name, deviation, triggerChange: triggerCheck ? triggerCheck.change : null, distanceValue, distanceText });
-      if(i < 3) deviationLines.push(`${k.name}：${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
+      summaryLines.push(`${k.name}：淨值 ${current.toFixed(2)}｜20MA ${ma20.toFixed(2)}｜乖離 ${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
+      if(decision.cls === 'harvest' || decision.cls === 'watch'){
+        recommendLines.push(`• ${k.name}：${decision.text}`);
+      }
     });
 
-    safeSetHTML('deviationSummary', deviationLines.length ? deviationLines.join('<br>') : '等待王卡資料…');
-
-    if(kingStats.length){
-      const closest = [...kingStats].sort((a,b)=>a.distanceValue - b.distanceValue)[0];
-      const strongest = [...kingStats].sort((a,b)=>b.deviation - a.deviation)[0];
-      const weakest = [...kingStats].filter(x => x.triggerChange !== null).sort((a,b)=>a.triggerChange - b.triggerChange)[0] || [...kingStats].sort((a,b)=>a.deviation - b.deviation)[0];
-      safeSetText('closestTriggerKing', closest?.name || '—');
-      safeSetText('closestTriggerHint', closest ? closest.distanceText : '等待資料');
-      safeSetHTML('strongWeakBoard', strongest && weakest
-        ? `最強王：${strongest.name}（乖離 ${strongest.deviation>=0?'+':''}${strongest.deviation.toFixed(2)}%）<br>最弱王：${weakest.name}（${weakest.triggerChange !== null ? `10日跌幅 ${weakest.triggerChange.toFixed(2)}%` : `乖離 ${weakest.deviation.toFixed(2)}%`})`
-        : '等待資料');
-    }
-
-    const globalTrigger = triggeredCount > 0 ? `已觸發 ${triggeredCount} 王` : '未達任何王門檻';
-    const globalAdd = (ammoRemain <= 0 || triggerRemain <= 0) ? '🚫 禁止加碼' : triggeredCount > 0 ? '✅ 可依觸發王分配' : '❌ 本次不加碼';
+    safeSetHTML('summaryBoard',
+      summaryLines.length
+        ? `總資產 ${formatMoney(totalAssets)}｜水庫 ${formatMoney(reservoir)}<br><br>${summaryLines.join('<br>')}`
+        : '等待資料載入…'
+    );
 
     let recommend = 0;
     if(ammoRemain <= 0 || triggerRemain <= 0) recommend = 0;
@@ -550,32 +624,16 @@ function updateVisuals(){
     lastRecommendValue = recommend;
     lastTriggeredCandidateNames = triggeredCandidates.map(x => x.name);
 
-    let recommendText='';
-    if(recommend <= 0 || triggeredCandidates.length === 0){
-      recommendText = '本次建議出手 0。原因：目前沒有任何王達到自己的觸發門檻，或本月額度 / 次數已滿。';
-    } else {
-      const totalScore = triggeredCandidates.reduce((a,b)=>a+b.score,0);
-      let remaining = recommend;
-      const allocs = triggeredCandidates.map((c, idx) => {
-        let raw = Math.floor((recommend * c.score / totalScore) / 1000) * 1000;
-        if(raw < 3000) raw = 3000;
-        if(idx === triggeredCandidates.length - 1) raw = Math.max(3000, remaining);
-        raw = Math.min(raw, remaining);
-        remaining -= raw;
-        return { ...c, amount: raw };
-      }).filter(a => a.amount > 0);
-      if(remaining > 0 && allocs.length) allocs[0].amount += remaining;
-      recommendText = `本次建議出手 ${formatMoney(recommend)} 元。<br>` + allocs.map(a => `• ${a.name}：${formatMoney(a.amount)} 元（10日跌幅 ${a.triggerChange.toFixed(2)}%｜門檻 ${a.kingTrigger}%｜${a.wave}）`).join('<br>');
-    }
+    const triggerText = triggeredCandidates.length
+      ? `<br><br>加碼候選：${triggeredCandidates.map(x => `${x.name}（${x.triggerChange.toFixed(2)}%）`).join('、')}`
+      : '';
 
-    safeSetHTML('recommendBoard', recommendText);
-
-    const summary = [];
-    summary.push(`總資產：${formatMoney(totalAssets)}｜水庫：${formatMoney(reservoir)}`);
-    summary.push(`本月總彈藥：${formatMoney(ammoLimit)}｜已用：${formatMoney(usedAmmo)}｜剩餘：${formatMoney(ammoRemain)}`);
-    summary.push(`本月觸發：${monthlyTriggerCount}/${maxTriggerPerMonth}｜總體觸發：${globalTrigger}｜加碼許可：${globalAdd}`);
-    summary.push(actionable.length ? `今日收割可執行：<br>${actionable.map(x=>`• ${x}`).join('<br>')}` : '今日沒有達到收割門檻的王。');
-    safeSetHTML('summaryBoard', summary.join('<br><br>'));
+    safeSetHTML(
+      'recommendBoard',
+      (recommendLines.length ? recommendLines.join('<br>') : '目前沒有達到明確收割區，照紀律持有。')
+      + `<br><br>本次建議出手：${formatMoney(recommend)} 元`
+      + triggerText
+    );
   } catch(err){
     console.error('updateVisuals error', err);
   }
@@ -583,8 +641,11 @@ function updateVisuals(){
 
 async function parseJsonResponse(res){
   const text = await res.text();
-  try{ return JSON.parse(text); }
-  catch(e){ throw new Error('後端回傳不是 JSON：' + text); }
+  try{
+    return JSON.parse(text);
+  }catch(e){
+    throw new Error('後端回傳不是 JSON：' + text);
+  }
 }
 
 async function loadData(){
@@ -606,6 +667,7 @@ async function loadData(){
     safeSetValue('notes', data.notes || '');
 
     ensureKingCards();
+
     kingDefs.forEach(k => {
       safeSetValue(k.code+'_prices', data[k.code+'_prices'] || '');
       safeSetValue(k.code+'_firstwave', String(data[k.code+'_firstwave']) === 'true' || data[k.code+'_firstwave'] === true ? 'true' : 'false');
@@ -614,11 +676,10 @@ async function loadData(){
     });
 
     resetMonthlyIfNeeded();
-    const syncTime = data.lastSyncTime || '—';
-    safeSetText('lastSyncTime', syncTime);
+    safeSetText('lastSyncTime', data.lastSyncTime || '—');
     updateVisuals();
     setSync('已同步', true);
-  } catch(err){
+  }catch(err){
     console.error(err);
     setSync('讀取失敗', false);
     alert('讀取失敗：' + err.message);
@@ -629,6 +690,7 @@ async function saveData(){
   try{
     resetMonthlyIfNeeded();
     setSync('儲存中...', true);
+
     const payload = {
       monthKey: safeEl('monthKey')?.value || getCurrentMonthKey(),
       totalAssets: safeEl('totalAssets')?.value || 0,
@@ -659,13 +721,12 @@ async function saveData(){
 
     const data = await parseJsonResponse(res);
     if(data && (data.status === 'ok' || data.status === 'success' || data.ok === true)){
-      const syncTime = data.lastSyncTime || payload.lastSyncTime || '—';
-      safeSetText('lastSyncTime', syncTime);
+      safeSetText('lastSyncTime', data.lastSyncTime || payload.lastSyncTime || '—');
       setSync('已儲存', true);
     } else {
       throw new Error(data.error || '儲存失敗');
     }
-  } catch(err){
+  }catch(err){
     console.error(err);
     setSync('儲存失敗', false);
     alert('儲存失敗：' + err.message);
@@ -675,6 +736,7 @@ async function saveData(){
 function bindGlobalEvents(){
   safeEl('reloadBtn')?.addEventListener('click', loadData);
   safeEl('saveBtn')?.addEventListener('click', saveData);
+
   safeEl('applyRecommendBtn')?.addEventListener('click', ()=>{
     if(lastRecommendValue <= 0){
       alert('目前沒有可套用的建議金額。');
@@ -692,12 +754,18 @@ function bindGlobalEvents(){
     updateVisuals();
     setSync('已套用待儲存', true);
   });
+
   safeEl('resetAmmoBtn')?.addEventListener('click', ()=>{
     safeSetValue('usedAmmo', 0);
     updateVisuals();
   });
-  document.addEventListener('input', (e)=>{ if(e.target && e.target.id !== 'notes') updateVisuals(); });
-  document.addEventListener('change', (e)=>{ if(e.target && e.target.id !== 'notes') updateVisuals(); });
+
+  document.addEventListener('input', (e)=>{
+    if(e.target && e.target.id !== 'notes') updateVisuals();
+  });
+  document.addEventListener('change', (e)=>{
+    if(e.target && e.target.id !== 'notes') updateVisuals();
+  });
 }
 
 bindGlobalEvents();
