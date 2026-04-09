@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>飛輪操盤系統 V21.6 整合版</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg1:#06101d;
+      --bg2:#0b1527;
+      --card:rgba(15,23,42,.78);
+      --line:rgba(255,255,255,.08);
+    }
+    body{
+      background:
+        radial-gradient(circle at 20% 0%, rgba(34,211,238,.15), transparent 25%),
+        radial-gradient(circle at 100% 20%, rgba(167,139,250,.14), transparent 22%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#f8fafc;
+    }
+    .glass{
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:0 14px 40px rgba(0,0,0,.28);
+      backdrop-filter:blur(14px);
+    }
+    .input-dark{
+      background:rgba(2,6,23,.72);
+      border:1px solid rgba(148,163,184,.18);
+      color:white;
+    }
+    .input-dark:focus{
+      outline:none;
+      border-color:rgba(34,211,238,.8);
+      box-shadow:0 0 0 3px rgba(34,211,238,.12);
+    }
+    .signal-chip{
+      font-weight:900;
+      font-size:12px;
+      border-radius:999px;
+      padding:6px 10px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .mono{ font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="min-h-screen p-5 xl:p-8">
+  <div class="mx-auto max-w-[1780px] space-y-6">
+    <section class="glass overflow-hidden rounded-[28px]">
+      <div class="flex flex-col gap-6 p-6 xl:flex-row xl:items-end xl:justify-between xl:p-8">
+        <div>
+          <div class="inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1 text-xs font-black tracking-[0.28em] text-cyan-300">FLYWHEEL OS 21.6 · INTEGRATED EDITION</div>
+          <h1 class="mt-4 text-4xl font-black tracking-tight text-white xl:text-6xl">飛輪操盤系統 V21.6 整合版</h1>
+          <p class="mt-4 max-w-5xl text-sm leading-7 text-slate-300 xl:text-base">
+            保留你目前穩定可用的 V21.5，同步加入：冷卻倒數、70/30 資產天平、鉅亨基金淨值快捷連結。
+          </p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 xl:grid-cols-6">
+          <div class="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3"><div class="text-xs text-cyan-200">同步狀態</div><div id="syncBadge" class="mt-1 text-sm font-black text-cyan-300">未同步</div></div>
+          <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3"><div class="text-xs text-emerald-200">資產階段</div><div id="phaseText" class="mt-1 text-sm font-black text-white">基礎累積期</div></div>
+          <div class="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3"><div class="text-xs text-amber-200">模式</div><div id="modeText" class="mt-1 text-sm font-black text-white">點火擴張</div></div>
+          <div class="rounded-2xl border border-violet-400/20 bg-violet-500/10 px-4 py-3"><div class="text-xs text-violet-200">稱號</div><div id="rankText" class="mt-1 text-sm font-black text-white">新手指揮官</div></div>
+          <div class="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3"><div class="text-xs text-rose-200">風險</div><div id="riskTextTop" class="mt-1 text-sm font-black text-emerald-300">綠燈</div></div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><div class="text-xs text-slate-300">觸發體系</div><div class="mt-1 text-sm font-black text-white">每王獨立</div></div>
+        </div>
+      </div>
+
+      <div class="grid gap-px bg-white/5 xl:grid-cols-8">
+        <div class="bg-slate-900/70 p-4"><div class="text-xs text-slate-400">總資產</div><div id="heroAssets" class="mt-1 text-2xl font-black text-cyan-300 mono">1,000,000</div></div>
+        <div class="bg-slate-900/70 p-4"><div class="text-xs text-slate-400">水庫</div><div id="heroReservoir" class="mt-1 text-2xl font-black text-white mono">300,000</div></div>
+        <div class="bg-slate-900/70 p-4"><div class="text-xs text-slate-400">本月總彈藥</div><div id="ammoLimitHero" class="mt-1 text-2xl font-black text-amber-300 mono">45,000</div></div>
+        <div class="bg-slate-900/70 p-4"><div class="text-xs text-slate-400">本月已用</div><div id="ammoUsedHero" class="mt-1 text-2xl font-black text-rose-300 mono">0</div></div>
+        <div class="bg-slate-900/70 p-4"><div class="text-xs text-slate-400">剩餘可用</div><div id="ammoRemainHero" class="mt-1 text-2xl font-black text-cyan-300 mono">45,000</div></div>
+        <div class="bg-slate-900/70 p-4"><div class="text-xs text-slate-400">本次建議</div><div id="ammoRecommendHero" class="mt-1 text-2xl font-black text-emerald-300 mono">0</div></div>
+        <div class="bg-slate-900/70 p-4"><div class="text-xs text-slate-400">本月觸發</div><div id="triggerCountHero" class="mt-1 text-2xl font-black text-white mono">0</div></div>
+        <div class="bg-slate-900/70 p-4"><div class="text-xs text-slate-400">剩餘次數</div><div id="triggerRemainHero" class="mt-1 text-2xl font-black text-violet-300 mono">0</div></div>
+      </div>
+    </section>
+
+    <div class="grid gap-6 2xl:grid-cols-[430px_1fr_450px] xl:grid-cols-[420px_1fr]">
+      <div class="space-y-6">
+        <section class="glass rounded-[28px] p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-black">主控輸入</h2>
+            <div class="text-xs font-bold text-slate-400">Google Sheets 同步</div>
+          </div>
+          <div class="mt-5 space-y-4">
+            <input id="monthKey" type="hidden" />
+
+            <label class="block"><div class="mb-1 text-sm font-bold">總資產</div><input id="totalAssets" type="number" class="input-dark w-full rounded-2xl px-4 py-3" /></label>
+            <label class="block"><div class="mb-1 text-sm font-bold">水庫</div><input id="reservoir" type="number" class="input-dark w-full rounded-2xl px-4 py-3" /></label>
+
+            <div class="grid grid-cols-2 gap-4">
+              <label class="block"><div class="mb-1 text-sm font-bold">每月定投</div><input id="monthlyInput" type="number" class="input-dark w-full rounded-2xl px-4 py-3" /></label>
+              <label class="block"><div class="mb-1 text-sm font-bold">每月回灌</div><input id="monthlyRecycle" type="number" class="input-dark w-full rounded-2xl px-4 py-3" /></label>
+              <label class="block"><div class="mb-1 text-sm font-bold">王數</div><select id="kingCount" class="input-dark w-full rounded-2xl px-4 py-3"><option value="3">3 王</option><option value="4">4 王</option><option value="5">5 王</option><option value="6">6 王</option></select></label>
+              <label class="block"><div class="mb-1 text-sm font-bold">最大回撤%</div><input id="currentDrawdown" type="number" class="input-dark w-full rounded-2xl px-4 py-3" /></label>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <label class="block"><div class="mb-1 text-sm font-bold">本月已加碼（水庫流出）</div><input id="usedAmmo" type="number" class="input-dark w-full rounded-2xl px-4 py-3" /></label>
+              <label class="block"><div class="mb-1 text-sm font-bold">本月最大觸發次數</div><input id="maxTriggerPerMonth" type="number" class="input-dark w-full rounded-2xl px-4 py-3" /></label>
+            </div>
+
+            <label class="block"><div class="mb-1 text-sm font-bold">本月已觸發次數</div><input id="monthlyTriggerCount" type="number" class="input-dark w-full rounded-2xl px-4 py-3" /></label>
+            <label class="block"><div class="mb-1 text-sm font-bold">備註</div><textarea id="notes" class="input-dark min-h-[90px] w-full rounded-2xl px-4 py-3"></textarea></label>
+          </div>
+        </section>
+
+        <section class="glass rounded-[28px] p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-black">加碼監控面板</h2>
+            <div id="ammoState" class="text-sm font-black text-emerald-300">安全</div>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-3">
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本月總彈藥</div><div id="ammoLimit" class="mt-2 text-xl font-black mono">0</div></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本月已用金額</div><div id="ammoUsed" class="mt-2 text-xl font-black text-rose-300 mono">0</div></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本月剩餘金額</div><div id="ammoRemain" class="mt-2 text-xl font-black text-cyan-300 mono">0</div></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本月已觸發</div><div id="triggerCount" class="mt-2 text-xl font-black text-white mono">0</div></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">剩餘可觸發</div><div id="triggerRemain" class="mt-2 text-xl font-black text-violet-300 mono">0</div></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本次建議加碼</div><div id="ammoRecommend" class="mt-2 text-xl font-black text-emerald-300 mono">0</div></div>
+          </div>
+
+          <div class="mt-4 grid grid-cols-5 gap-3">
+            <button class="ammo-btn rounded-2xl bg-slate-800 px-4 py-3 font-black" data-ammo="3000">+3000</button>
+            <button class="ammo-btn rounded-2xl bg-emerald-500 px-4 py-3 font-black text-slate-950" data-ammo="6000">+6000</button>
+            <button class="ammo-btn rounded-2xl bg-amber-500 px-4 py-3 font-black text-slate-950" data-ammo="12000">+12000</button>
+            <button id="applyRecommendBtn" class="rounded-2xl bg-cyan-500 px-4 py-3 font-black text-slate-950">套用建議</button>
+            <button id="resetAmmoBtn" class="rounded-2xl border border-slate-600 bg-slate-900 px-4 py-3 font-black">歸零</button>
+          </div>
+
+          <div class="mt-4 rounded-2xl border border-white/10 bg-slate-950/60 p-4 text-sm leading-7 text-slate-300">
+            <div>超底王是自動扣款，所以最重要的是盯：</div>
+            <div>1. 本月已加碼幾次</div>
+            <div>2. 剩餘可觸發幾次</div>
+            <div>3. 剩餘可用金額</div>
+            <div>4. 本次若再次觸發，建議視為多少金額</div>
+          </div>
+        </section>
+
+        <section class="glass rounded-[28px] p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-black">水庫血量</h2>
+            <div id="reservoirValueText" class="text-sm font-black text-cyan-300 mono">300,000 元</div>
+          </div>
+          <div class="mt-4 flex justify-between text-xs text-slate-400"><span>15萬保命線</span><span>60萬安全線</span></div>
+          <div class="mt-2 h-6 overflow-hidden rounded-full bg-slate-800"><div id="reservoirBar" class="h-full w-0 bg-emerald-500 transition-all"></div></div>
+          <div id="reservoirHint" class="mt-4 text-sm leading-7 text-slate-300">等待判讀</div>
+        </section>
+      </div>
+
+      <div class="space-y-6">
+        <section class="glass rounded-[28px] p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-black">戰情總覽</h2>
+            <div class="text-sm font-black text-cyan-300">超底王觸發 + 20MA 收割分離</div>
+          </div>
+
+          <div class="mt-5 grid gap-4 xl:grid-cols-3">
+            <div class="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-5">
+              <div class="text-xs font-bold tracking-[0.18em] text-cyan-200">今日總指令</div>
+              <div id="summaryBoard" class="mt-3 text-sm leading-7 text-cyan-50">等待資料載入…</div>
+            </div>
+            <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5">
+              <div class="text-xs font-bold tracking-[0.18em] text-emerald-200">本次建議出手</div>
+              <div id="recommendBoard" class="mt-3 text-sm leading-7 text-emerald-50">等待計算…</div>
+            </div>
+            <div class="rounded-3xl border border-violet-400/20 bg-violet-500/10 p-5">
+              <div class="text-xs font-bold tracking-[0.18em] text-violet-200">三王收割乖離</div>
+              <div id="deviationSummary" class="mt-3 text-sm leading-7 text-violet-50">等待王卡資料…</div>
+            </div>
+          </div>
+
+          <div class="mt-6 grid gap-4 xl:grid-cols-2">
+            <div class="rounded-3xl border border-white/10 bg-slate-950/60 p-5">
+              <div class="flex items-center justify-between"><h3 class="text-lg font-black">主線任務進度</h3><div class="text-xs text-slate-400">300萬 / 1000萬</div></div>
+              <div class="mt-4">
+                <div class="mb-2 flex justify-between text-sm text-slate-300"><span>前往 300 萬</span><span id="progress300Text">0%</span></div>
+                <div class="h-5 overflow-hidden rounded-full bg-slate-800"><div id="progress300Bar" class="h-full w-0 bg-amber-500 transition-all"></div></div>
+              </div>
+              <div class="mt-5">
+                <div class="mb-2 flex justify-between text-sm text-slate-300"><span>前往 1000 萬</span><span id="progress1000Text">0%</span></div>
+                <div class="h-5 overflow-hidden rounded-full bg-slate-800"><div id="progress1000Bar" class="h-full w-0 bg-cyan-400 transition-all"></div></div>
+              </div>
+            </div>
+
+            <div class="rounded-3xl border border-white/10 bg-slate-950/60 p-5">
+              <div class="flex items-center justify-between"><h3 class="text-lg font-black">同步控制台</h3><div class="text-xs text-slate-400">雲端資料庫</div></div>
+              <div class="mt-4 grid grid-cols-2 gap-4">
+                <button id="reloadBtn" class="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 font-black text-cyan-200">重新載入</button>
+                <button id="saveBtn" class="rounded-2xl bg-cyan-500 px-4 py-3 font-black text-slate-950">儲存同步</button>
+              </div>
+              <div class="mt-4 rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm leading-7 text-slate-300">
+                <div>同步狀態：<span id="syncInline" class="font-black text-cyan-300">未同步</span></div>
+                <div>最後同步時間：<span id="lastSyncTime" class="font-black text-emerald-300">—</span></div>
+                <div>目前月份鍵：<span id="monthKeyText" class="font-black text-violet-300">—</span></div>
+                <div>這版支援同步：各王 trigger、本月觸發次數、本月最大觸發次數、已用金額、淨值序列、最後收割日。</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 grid gap-4 xl:grid-cols-2 2xl:grid-cols-5">
+            <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5">
+              <div class="text-xs font-bold tracking-[0.18em] text-emerald-200">本月狀態</div>
+              <div id="monthStatusText" class="mt-3 text-2xl font-black text-emerald-100">等待判讀</div>
+              <div id="monthStatusHint" class="mt-2 text-sm leading-6 text-emerald-50">等待資料</div>
+            </div>
+            <div class="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-5">
+              <div class="text-xs font-bold tracking-[0.18em] text-cyan-200">紀律分數</div>
+              <div id="disciplineText" class="mt-3 text-2xl font-black text-cyan-50">—</div>
+              <div class="mt-2 text-sm leading-6 text-cyan-50">依月節奏與風險自動計算</div>
+            </div>
+            <div class="rounded-3xl border border-violet-400/20 bg-violet-500/10 p-5">
+              <div class="text-xs font-bold tracking-[0.18em] text-violet-200">最接近觸發王</div>
+              <div id="closestTriggerKing" class="mt-3 text-lg font-black text-violet-50">—</div>
+              <div id="closestTriggerHint" class="mt-2 text-sm leading-6 text-violet-50">等待資料</div>
+            </div>
+            <div class="rounded-3xl border border-amber-400/20 bg-amber-500/10 p-5">
+              <div class="text-xs font-bold tracking-[0.18em] text-amber-200">最強 / 最弱</div>
+              <div id="strongWeakBoard" class="mt-3 text-sm leading-7 text-amber-50">等待資料</div>
+            </div>
+            <div class="rounded-3xl border border-sky-400/20 bg-sky-500/10 p-5">
+              <div class="text-xs font-bold tracking-[0.18em] text-sky-200">攻守比例</div>
+              <div id="balanceRatioText" class="mt-3 text-lg font-black text-sky-50">前鋒 70% ｜ 水庫 30%</div>
+              <div class="mt-3 h-4 overflow-hidden rounded-full bg-slate-800">
+                <div class="flex h-full w-full">
+                  <div id="balanceAttackBar" class="h-full bg-cyan-400" style="width:70%"></div>
+                  <div id="balanceReservoirBar" class="h-full bg-amber-400" style="width:30%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-3xl border border-white/10 bg-slate-950/60 p-5">
+            <div class="flex items-center justify-between"><h3 class="text-lg font-black">資產 / 水庫 / 本月彈藥 / 建議出手</h3><div class="text-xs text-slate-400">即時視覺分析</div></div>
+            <div class="mt-4"><canvas id="heroChart" height="120"></canvas></div>
+          </div>
+        </section>
+
+        <section class="glass rounded-[28px] p-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-black">王卡戰情室</h2>
+            <div class="text-sm text-slate-400">最近 20 筆淨值，由舊到新，今天放最後</div>
+          </div>
+          <div id="kingCards" class="mt-5 grid gap-4 2xl:grid-cols-2"></div>
+        </section>
+      </div>
+
+      <div class="space-y-6 2xl:block hidden">
+        <section class="glass rounded-[28px] p-6">
+          <h2 class="text-xl font-black">AI 分配結果</h2>
+          <div class="mt-4 grid grid-cols-1 gap-3" id="allocationCards"></div>
+        </section>
+
+        <section class="glass rounded-[28px] p-6">
+          <h2 class="text-xl font-black">犯錯提醒引擎</h2>
+          <div class="mt-4 grid grid-cols-4 gap-3 text-center">
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">狀態</div><div id="riskStateBox" class="mt-2 text-lg font-black">綠燈</div></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">違規次數</div><div id="violationCount" class="mt-2 text-lg font-black mono">0</div></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">糾偏任務</div><div id="correctionTask" class="mt-2 text-sm font-black leading-6">目前無需糾偏</div></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">最後同步</div><div id="lastSyncBox" class="mt-2 text-sm font-black leading-6 text-emerald-300">—</div></div>
+          </div>
+          <div id="warningsContainer" class="mt-4 space-y-3"></div>
+        </section>
+
+        <section class="glass rounded-[28px] p-6">
+          <h2 class="text-xl font-black">規則摘要</h2>
+          <div class="mt-4 space-y-3 text-sm">
+            <div class="rounded-2xl bg-slate-950/60 p-4"><span class="text-slate-400">加碼規則：</span><span id="ruleAdd" class="font-black text-white">每王獨立 10日跌幅門檻</span></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><span class="text-slate-400">收割規則：</span><span id="ruleHarvest" class="font-black text-white">20MA 乖離驅動</span></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><span class="text-slate-400">總體觸發：</span><span id="globalTriggerText" class="font-black text-white">待判定</span></div>
+            <div class="rounded-2xl bg-slate-950/60 p-4"><span class="text-slate-400">加碼許可：</span><span id="globalAddText" class="font-black text-white">待判定</span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "https://script.google.com/macros/s/AKfycbw_z3a9kbwrn7FcXxj8fL8tN-tmX7PNTrCVSmwS5g2knCgCWoaqeNwIHFPp9nZt8yQR/exec";
+
+    const kingDefs = [
+      { code: 'A32001', name: '野村優質', defaultTrigger: -10, anueLink: 'https://www.anuefund.com/fund/detail/A32001' },
+      { code: 'A20106', name: 'NASDAQ-100', defaultTrigger: -8, anueLink: 'https://www.anuefund.com/fund/detail/A20106' },
+      { code: 'B29037', name: '摩根品牌', defaultTrigger: -12, anueLink: 'https://www.anuefund.com/fund/detail/B29037' },
+      { code: 'KING4', name: '第4王', defaultTrigger: -10, anueLink: '' },
+      { code: 'KING5', name: '第5王', defaultTrigger: -10, anueLink: '' },
+      { code: 'KING6', name: '第6王', defaultTrigger: -10, anueLink: '' }
+    ];
+
+    let heroChart = null;
+    let isBuildingCards = false;
+    let lastRecommendValue = 0;
+    let lastTriggeredCandidateCount = 0;
+    let lastTriggeredCandidateNames = [];
+    let lastSuccessfulSync = '';
+
+    function $(id){
+      return document.getElementById(id);
+    }
+
+    function safeEl(id){
+      return document.getElementById(id);
+    }
+
+    function safeSetText(id, value){
+      const el = safeEl(id);
+      if (el) el.textContent = value;
+    }
+
+    function safeSetHTML(id, value){
+      const el = safeEl(id);
+      if (el) el.innerHTML = value;
+    }
+
+    function safeSetValue(id, value){
+      const el = safeEl(id);
+      if (el) el.value = value;
+    }
+
+    function safeSetClass(id, className){
+      const el = safeEl(id);
+      if (el) el.className = className;
+    }
+
+    function safeSetWidth(id, width){
+      const el = safeEl(id);
+      if (el) el.style.width = width;
+    }
+
+    function formatMoney(v){
+      return Number(v || 0).toLocaleString();
+    }
+
+    function getCurrentMonthKey(){
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      return `${year}-${month}`;
+    }
+
+    function getNowText(){
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mi = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+    }
+
+    function resetMonthlyIfNeeded(auto = false){
+      const currentMonthKey = getCurrentMonthKey();
+      const savedMonthKey = String(safeEl('monthKey')?.value || '');
+
+      if(savedMonthKey !== currentMonthKey){
+        safeSetValue('monthKey', currentMonthKey);
+        safeSetValue('usedAmmo', 0);
+        safeSetValue('monthlyTriggerCount', 0);
+        if(auto){
+          console.log(`已跨月重置：${savedMonthKey || '空值'} -> ${currentMonthKey}`);
+        }
+      }
+
+      safeSetText('monthKeyText', currentMonthKey);
+    }
+
+    function parsePrices(text){
+      return String(text || '')
+        .replace(/[；;｜|]/g, ' ')
+        .replace(/\u3000/g, ' ')
+        .trim()
+        .split(/[\s,，\n\t]+/)
+        .map(v => Number(String(v).trim()))
+        .filter(n => !Number.isNaN(n) && n > 0);
+    }
+
+    function calcDeviation(prices){
+      if (prices.length < 20) return null;
+      const recent20 = prices.slice(-20);
+      const current = recent20[recent20.length - 1];
+      const ma20 = recent20.reduce((a,b)=>a+b,0) / 20;
+      const deviation = ((current - ma20) / ma20) * 100;
+      return { current, ma20, deviation, recent20 };
+    }
+
+    function calcTenDayTrigger(prices, triggerPercent){
+      if (prices.length < 11) return null;
+      const today = prices[prices.length - 1];
+      const prev10 = prices[prices.length - 11];
+      const change = ((today - prev10) / prev10) * 100;
+      return { today, prev10, change, triggered: change <= triggerPercent };
+    }
+
+    function getBusinessDaysPassed(dateStr){
+      if(!dateStr) return null;
+
+      const start = new Date(dateStr + 'T00:00:00');
+      const today = new Date();
+      today.setHours(0,0,0,0);
+
+      if(start > today) return 0;
+
+      let days = 0;
+      const cursor = new Date(start);
+
+      while(cursor < today){
+        cursor.setDate(cursor.getDate() + 1);
+        const day = cursor.getDay();
+        if(day !== 0 && day !== 6){
+          days++;
+        }
+      }
+      return days;
+    }
+
+    function getCooldownRemaining(dateStr){
+      if(!dateStr) return null;
+      const passed = getBusinessDaysPassed(dateStr);
+      if(passed === null) return null;
+      return Math.max(0, 5 - passed);
+    }
+
+    function updateBalanceRatio(totalAssets, reservoir){
+      const safeTotal = Math.max(0, Number(totalAssets || 0));
+      const safeReservoir = Math.max(0, Number(reservoir || 0));
+      const attack = Math.max(0, safeTotal - safeReservoir);
+      const attackPct = safeTotal > 0 ? Math.round((attack / safeTotal) * 100) : 0;
+      const reservoirPct = safeTotal > 0 ? Math.round((safeReservoir / safeTotal) * 100) : 0;
+
+      safeSetText('balanceRatioText', `前鋒 ${attackPct}% ｜ 水庫 ${reservoirPct}%`);
+      safeSetWidth('balanceAttackBar', `${attackPct}%`);
+      safeSetWidth('balanceReservoirBar', `${reservoirPct}%`);
+    }
+
+    function setSync(text, color='text-cyan-300'){
+      safeSetText('syncBadge', text);
+      safeSetText('syncInline', text);
+      safeSetClass('syncBadge', `mt-1 text-sm font-black ${color}`);
+      safeSetClass('syncInline', `font-black ${color}`);
+    }
+
+    function getRankTitle(totalAssets){
+      if (totalAssets < 1500000) return '新手指揮官';
+      if (totalAssets < 3000000) return '飛輪操盤官';
+      if (totalAssets < 5000000) return '資產領主';
+      if (totalAssets < 8000000) return '多引擎統帥';
+      if (totalAssets < 10000000) return '巡航元帥';
+      return '千萬飛輪君主';
+    }
+
+    function getPhaseText(totalAssets){
+      if (totalAssets < 3000000) return '基礎累積期';
+      if (totalAssets < 8000000) return '穩定成長期';
+      return '厚尾複利期';
+    }
+
+    function getKingCount(){
+      return Number(safeEl('kingCount')?.value || 3);
+    }
+
+    function appendTodayValue(code){
+      const today = prompt('輸入今天淨值');
+      if(!today) return;
+
+      const num = Number(today);
+      if(Number.isNaN(num) || num <= 0){
+        alert('請輸入正確數字');
+        return;
+      }
+
+      const el = safeEl(code + '_prices');
+      if (!el) return;
+
+      let arr = parsePrices(el.value);
+      arr.push(num);
+      if(arr.length > 20) arr = arr.slice(arr.length - 20);
+
+      el.value = arr.join(' ');
+      updateVisuals();
+    }
+
+    function bindKingCardEvents(){
+      document.querySelectorAll('.append-btn').forEach(btn=>{
+        btn.onclick = () => appendTodayValue(btn.dataset.code);
+      });
+
+      document.querySelectorAll('.clear-btn').forEach(btn=>{
+        btn.onclick = () => {
+          const el = safeEl(btn.dataset.code + '_prices');
+          if (el) el.value = '';
+          updateVisuals();
+        };
+      });
+
+      document.querySelectorAll('.paste-btn').forEach(btn=>{
+        btn.onclick = async () => {
+          try{
+            const txt = await navigator.clipboard.readText();
+            const el = safeEl(btn.dataset.code + '_prices');
+            if (el) el.value = txt;
+            updateVisuals();
+          }catch{
+            alert('無法直接讀取剪貼簿，請手動貼上。');
+          }
+        };
+      });
+
+      document.querySelectorAll('textarea[id$="_prices"]').forEach(el=>{
+        ['input','change','keyup','blur'].forEach(evt=>el.addEventListener(evt, updateVisuals));
+        el.addEventListener('paste', ()=>setTimeout(updateVisuals, 0));
+      });
+
+      document.querySelectorAll('input[id$="_firstwave"], input[id$="_trigger"], input[id$="_lastHarvestDate"]').forEach(el=>{
+        el.addEventListener('input', updateVisuals);
+        el.addEventListener('change', updateVisuals);
+      });
+    }
+
+    function ensureKingCards(){
+      if (isBuildingCards) return;
+      isBuildingCards = true;
+
+      try{
+        const count = getKingCount();
+        const wrap = safeEl('kingCards');
+        if (!wrap) return;
+
+        const html = [];
+
+        for(let i=0;i<count;i++){
+          const k = kingDefs[i];
+          html.push(`
+            <div class="rounded-3xl border border-white/10 bg-slate-950/55 p-5">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-lg font-black text-white">${k.name}</div>
+                  <div class="text-xs text-slate-400">${k.code}</div>
+                </div>
+                <div id="signal_${k.code}" class="signal-chip bg-slate-800 text-white">待判讀</div>
+              </div>
+
+              <div class="mt-4 grid grid-cols-4 gap-3">
+                <button class="paste-btn rounded-2xl bg-slate-800 px-4 py-3 text-sm font-black" data-code="${k.code}">貼上20筆</button>
+                <button class="append-btn rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-black text-slate-950" data-code="${k.code}">記錄今天</button>
+                <button class="clear-btn rounded-2xl border border-slate-600 bg-slate-900 px-4 py-3 text-sm font-black" data-code="${k.code}">清空</button>
+                <input id="${k.code}_trigger" type="number" step="1" value="${k.defaultTrigger}" class="input-dark rounded-2xl px-3 py-3 text-sm font-black mono" />
+              </div>
+
+              <div class="mt-2 text-xs text-slate-400">${k.name} 觸發門檻（%）請填負數，例如 -8 / -10 / -12</div>
+
+              <textarea id="${k.code}_prices" class="input-dark mt-4 min-h-[110px] w-full rounded-2xl px-4 py-3 text-sm" placeholder="例如：10.1 10.2 10.3 ... 今天放最後"></textarea>
+
+              <label class="mt-4 flex items-center gap-2 rounded-2xl bg-slate-900/70 p-4 text-sm font-bold">
+                <input id="${k.code}_firstwave" type="checkbox" class="h-4 w-4" />
+                本王已執行過首波加碼
+              </label>
+
+              <div class="mt-4 rounded-2xl bg-slate-900/70 p-4">
+                <div class="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_auto] xl:items-end">
+                  <label class="block">
+                    <div class="mb-1 text-xs font-bold text-slate-400">最後收割日期</div>
+                    <input id="${k.code}_lastHarvestDate" type="date" class="input-dark w-full rounded-2xl px-3 py-3 text-sm font-black" />
+                  </label>
+                  ${k.anueLink ? `<a href="${k.anueLink}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-3 text-sm font-black text-cyan-200">🔗 鉅亨淨值頁</a>` : `<div class="text-xs text-slate-500">第4~6王請自行放連結</div>`}
+                </div>
+                <div id="cooldown_${k.code}" class="mt-3 text-sm font-black text-amber-300">未設定收割日</div>
+              </div>
+
+              <div class="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-4">
+                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">20MA</div><div id="ma_${k.code}" class="mt-2 text-base font-black text-white mono">—</div></div>
+                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">乖離</div><div id="dev_${k.code}" class="mt-2 text-base font-black text-cyan-300 mono">—</div></div>
+                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">10日跌幅</div><div id="chg10_${k.code}" class="mt-2 text-base font-black text-white mono">—</div></div>
+                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">觸發狀態</div><div id="trigger_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
+              </div>
+
+              <div class="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-3">
+                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">波段</div><div id="wave_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
+                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">加碼</div><div id="add_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
+                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">門檻</div><div id="threshold_${k.code}" class="mt-2 text-base font-black text-amber-300 mono">—</div></div>
+              </div>
+
+              <div id="action_${k.code}" class="mt-4 rounded-2xl bg-slate-900/60 p-4 text-sm font-black text-emerald-300">等待判讀</div>
+            </div>
+          `);
+        }
+
+        wrap.innerHTML = html.join('');
+        bindKingCardEvents();
+      } finally {
+        isBuildingCards = false;
+      }
+    }
+
+    function updateChart(totalAssets,reservoir,recommend){
+      const ctx = safeEl('heroChart');
+      if (!ctx) return;
+
+      if(heroChart){
+        heroChart.destroy();
+        heroChart = null;
+      }
+
+      heroChart = new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:['總資產','水庫','本月總彈藥','本次建議出手'],
+          datasets:[{
+            data:[totalAssets,reservoir,Math.floor(reservoir*0.15),recommend],
+            backgroundColor:['rgba(34,211,238,.75)','rgba(251,191,36,.75)','rgba(167,139,250,.75)','rgba(52,211,153,.75)'],
+            borderRadius:12
+          }]
+        },
+        options:{
+          responsive:true,
+          plugins:{ legend:{ display:false } },
+          scales:{
+            x:{ ticks:{ color:'#cbd5e1' }, grid:{ color:'rgba(255,255,255,.06)' } },
+            y:{ ticks:{ color:'#cbd5e1' }, grid:{ color:'rgba(255,255,255,.06)' } }
+          }
+        }
+      });
+    }
+
+    function applyRecommendAmount(){
+      if(lastRecommendValue <= 0){
+        alert('目前沒有可套用的建議金額。');
+        return;
+      }
+
+      const usedAmmo = Number(safeEl('usedAmmo')?.value || 0);
+      const monthlyTriggerCount = Number(safeEl('monthlyTriggerCount')?.value || 0);
+      const maxTriggerPerMonth = Number(safeEl('maxTriggerPerMonth')?.value || 0);
+
+      if(maxTriggerPerMonth > 0 && monthlyTriggerCount >= maxTriggerPerMonth){
+        alert('本月觸發次數已滿，不能再套用建議。');
+        return;
+      }
+
+      safeSetValue('usedAmmo', usedAmmo + lastRecommendValue);
+      safeSetValue('monthlyTriggerCount', monthlyTriggerCount + 1);
+
+      const noteEl = safeEl('notes');
+      if(noteEl){
+        const stamp = getNowText();
+        const line = `[${stamp}] 套用建議 ${formatMoney(lastRecommendValue)} 元｜候選：${lastTriggeredCandidateNames.join('、') || '無'}`;
+        noteEl.value = noteEl.value ? `${noteEl.value}\n${line}` : line;
+      }
+
+      updateVisuals();
+      setSync('已套用待儲存', 'text-amber-300');
+    }
+
+    function updateVisuals(){
+      try{
+        resetMonthlyIfNeeded(true);
+
+        const totalAssets = Number(safeEl('totalAssets')?.value || 0);
+        const reservoir = Number(safeEl('reservoir')?.value || 0);
+        const monthlyInput = Number(safeEl('monthlyInput')?.value || 0);
+        const monthlyRecycle = Number(safeEl('monthlyRecycle')?.value || 0);
+        const kingCount = getKingCount();
+        const currentDrawdown = Number(safeEl('currentDrawdown')?.value || 0);
+        const usedAmmo = Number(safeEl('usedAmmo')?.value || 0);
+        const monthlyTriggerCount = Number(safeEl('monthlyTriggerCount')?.value || 0);
+        const maxTriggerPerMonth = Number(safeEl('maxTriggerPerMonth')?.value || 0);
+
+        const ammoLimit = Math.floor(reservoir * 0.15);
+        const ammoRemain = Math.max(0, ammoLimit - usedAmmo);
+        const triggerRemain = Math.max(0, maxTriggerPerMonth - monthlyTriggerCount);
+
+        safeSetText('heroAssets', formatMoney(totalAssets));
+        safeSetText('heroReservoir', formatMoney(reservoir));
+        safeSetText('ammoLimitHero', formatMoney(ammoLimit));
+        safeSetText('ammoUsedHero', formatMoney(usedAmmo));
+        safeSetText('ammoRemainHero', formatMoney(ammoRemain));
+        safeSetText('triggerCountHero', String(monthlyTriggerCount));
+        safeSetText('triggerRemainHero', String(triggerRemain));
+        safeSetText('rankText', getRankTitle(totalAssets));
+
+        safeSetText('ammoLimit', formatMoney(ammoLimit));
+        safeSetText('ammoUsed', formatMoney(usedAmmo));
+        safeSetText('ammoRemain', formatMoney(ammoRemain));
+        safeSetText('triggerCount', String(monthlyTriggerCount));
+        safeSetText('triggerRemain', String(triggerRemain));
+        safeSetText('reservoirValueText', `${formatMoney(reservoir)} 元`);
+        safeSetText('monthKeyText', safeEl('monthKey')?.value || getCurrentMonthKey());
+
+        updateBalanceRatio(totalAssets, reservoir);
+
+        safeSetText('ammoState', usedAmmo > ammoLimit ? '超限' : ammoRemain <= 6000 ? '緊繃' : '安全');
+        safeSetClass('ammoState', usedAmmo > ammoLimit ? 'text-sm font-black text-rose-300' : ammoRemain <= 6000 ? 'text-sm font-black text-amber-300' : 'text-sm font-black text-emerald-300');
+
+        safeSetText('phaseText', getPhaseText(totalAssets));
+
+        let mode='點火擴張', hint='目前位於安全區', barClass='bg-emerald-500', risk='綠燈';
+        if(reservoir < 150000){ mode='極速保命'; hint='危險區：先補血，所有獲利優先回水庫'; barClass='bg-rose-500'; risk='紅燈'; }
+        else if(reservoir < 180000){ mode='過渡鎖定'; hint='過渡鎖定區：先站回18萬以上'; barClass='bg-orange-500'; risk='黃燈'; }
+        else if(reservoir < 600000){ mode='點火擴張'; hint='擴張區：一邊補水庫，一邊壯大三王'; barClass='bg-sky-500'; }
+        else { mode='厚尾複利'; hint='水庫充足：讓大部位吃主升段'; barClass='bg-emerald-500'; }
+
+        safeSetText('modeText', mode);
+        safeSetText('riskTextTop', risk);
+        safeSetClass('riskTextTop', risk==='紅燈' ? 'mt-1 text-sm font-black text-rose-300' : risk==='黃燈' ? 'mt-1 text-sm font-black text-amber-300' : 'mt-1 text-sm font-black text-emerald-300');
+        safeSetText('riskStateBox', risk);
+        safeSetClass('riskStateBox', risk==='紅燈' ? 'mt-2 text-lg font-black text-rose-300' : risk==='黃燈' ? 'mt-2 text-lg font-black text-amber-300' : 'mt-2 text-lg font-black text-emerald-300');
+
+        safeSetText('reservoirHint', hint);
+        safeSetWidth('reservoirBar', `${Math.min(100, reservoir / 600000 * 100)}%`);
+        safeSetClass('reservoirBar', `h-full transition-all ${barClass}`);
+
+        safeSetWidth('progress300Bar', `${Math.min(100,totalAssets/3000000*100)}%`);
+        safeSetText('progress300Text', `${Math.min(100,totalAssets/3000000*100).toFixed(1)}%`);
+        safeSetWidth('progress1000Bar', `${Math.min(100,totalAssets/10000000*100)}%`);
+        safeSetText('progress1000Text', `${Math.min(100,totalAssets/10000000*100).toFixed(1)}%`);
+
+        const warnings = [];
+        if(monthlyInput !== 9000) warnings.push('固定定投不是 9000');
+        if(usedAmmo > ammoLimit) warnings.push('本月子彈超打');
+        if(monthlyTriggerCount > maxTriggerPerMonth && maxTriggerPerMonth > 0) warnings.push('本月觸發次數超限');
+        if(ammoRemain <= 6000 && usedAmmo <= ammoLimit) warnings.push('本月子彈接近打完');
+        if(totalAssets < 3000000 && kingCount > 3) warnings.push('300萬以下不建議超過 3 王');
+        if(currentDrawdown <= -20) warnings.push(`總資產回撤 ${currentDrawdown}%`);
+
+        const discipline = Math.max(0,100 - warnings.length * 8 - (monthlyInput !== 9000 ? 8 : 0));
+        safeSetText('disciplineText', String(discipline));
+        safeSetText('violationCount', String(warnings.length));
+        safeSetText('correctionTask', warnings.length ? (reservoir < 150000 ? '先補水庫，停止擴張' : '先修正輸入與節奏') : '目前無需糾偏');
+        safeSetHTML('warningsContainer',
+          warnings.length
+            ? warnings.map(w=>`<div class="rounded-2xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-100">${w}</div>`).join('')
+            : '<div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4 text-sm text-emerald-100">目前輸入符合飛輪法典。</div>'
+        );
+
+        let monthStatusText = '綠燈';
+        let monthStatusHint = '本月節奏正常，可依規則出手';
+        if(usedAmmo > ammoLimit || triggerRemain <= 0 || ammoRemain <= 0){
+          monthStatusText = '紅燈';
+          monthStatusHint = '本月額度或次數用盡，停止加碼';
+        } else if(ammoRemain <= Math.max(6000, ammoLimit * 0.3)){
+          monthStatusText = '黃燈';
+          monthStatusHint = '本月彈藥偏緊，請保守使用';
+        }
+        safeSetText('monthStatusText', monthStatusText);
+        safeSetText('monthStatusHint', monthStatusHint);
+
+        const deviationLines = [];
+        const actionable = [];
+        const triggeredCandidates = [];
+        const kingStats = [];
+        let triggeredCount = 0;
+
+        for(let i=0;i<kingCount;i++){
+          const k = kingDefs[i];
+          const priceText = safeEl(k.code+'_prices')?.value || '';
+          const prices = parsePrices(priceText);
+          const calc = calcDeviation(prices);
+          const firstWaveDone = !!safeEl(k.code+'_firstwave')?.checked;
+          const kingTrigger = Number(safeEl(k.code+'_trigger')?.value || k.defaultTrigger);
+          const triggerCheck = calcTenDayTrigger(prices, kingTrigger);
+          const harvestDate = safeEl(k.code+'_lastHarvestDate')?.value || '';
+          const cooldownRemain = getCooldownRemaining(harvestDate);
+
+          if(cooldownRemain === null){
+            safeSetText(`cooldown_${k.code}`, '未設定收割日');
+            safeSetClass(`cooldown_${k.code}`, 'mt-3 text-sm font-black text-slate-300');
+          } else if(cooldownRemain > 0){
+            safeSetText(`cooldown_${k.code}`, `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`);
+            safeSetClass(`cooldown_${k.code}`, 'mt-3 text-sm font-black text-amber-300');
+          } else {
+            safeSetText(`cooldown_${k.code}`, '✅ 冷卻完成，可再次收割');
+            safeSetClass(`cooldown_${k.code}`, 'mt-3 text-sm font-black text-emerald-300');
+          }
+
+          if(!calc){
+            safeSetText('signal_'+k.code,'資料不足');
+            safeSetClass('signal_'+k.code,'signal-chip bg-slate-800 text-white');
+            safeSetText('ma_'+k.code, `${prices.length}/20`);
+            safeSetText('dev_'+k.code,'—');
+            safeSetText('chg10_'+k.code, prices.length >= 11 ? '待算' : '需11筆');
+            safeSetText('trigger_'+k.code,'待判定');
+            safeSetText('wave_'+k.code,'待判定');
+            safeSetText('add_'+k.code,'待判定');
+            safeSetText('threshold_'+k.code, `${kingTrigger}%`);
+            safeSetText('action_'+k.code,'請先輸入最近20筆淨值');
+            continue;
+          }
+
+          const { ma20, deviation, recent20 } = calc;
+          const minVal = Math.min(...recent20);
+          const minIndex = recent20.lastIndexOf(minVal);
+          const current = recent20[recent20.length - 1];
+          const reboundPct = ((current - minVal) / minVal) * 100;
+          const highAfterLow = minIndex < recent20.length - 1 ? Math.max(...recent20.slice(minIndex)) : current;
+          const turnedWeak = highAfterLow > current * 1.01;
+
+          let wave='跌勢中';
+          if(reboundPct >= 5 && turnedWeak && firstWaveDone) wave='第二波候選';
+          else if(reboundPct >= 5 && turnedWeak && !firstWaveDone) wave='反彈後轉弱';
+          else if(reboundPct >= 5) wave='反彈觀察期';
+
+          let triggerText='待判定', add='❌ 不加碼', signal='待命', signalClass='signal-chip bg-slate-700 text-white', action='不動作';
+          let distanceValue = Number.POSITIVE_INFINITY;
+          let distanceText = '等待資料';
+
+          if(triggerCheck){
+            safeSetText('chg10_'+k.code, `${triggerCheck.change>=0?'+':''}${triggerCheck.change.toFixed(2)}%`);
+            distanceValue = Math.max(0, triggerCheck.change - kingTrigger);
+            distanceText = distanceValue <= 0 ? '已觸發' : `還差 ${distanceValue.toFixed(2)}%`;
+
+            if(triggerCheck.triggered){
+              triggerText='✅ 已觸發';
+              triggeredCount++;
+              if(ammoRemain<=0 || triggerRemain<=0) add='🚫 禁止';
+              else if(wave==='第二波候選') add='🟡 第二波可加';
+              else add='✅ 可加碼';
+
+              let score = Math.abs(triggerCheck.change);
+              if(wave==='跌勢中') score += 4;
+              if(wave==='第二波候選') score += 2;
+              if(firstWaveDone) score += 1;
+
+              triggeredCandidates.push({
+                name:k.name,
+                code:k.code,
+                triggerChange:triggerCheck.change,
+                wave,
+                score,
+                kingTrigger
+              });
+            } else {
+              triggerText='❌ 未觸發';
+              add='❌ 不加碼';
+            }
+          } else {
+            safeSetText('chg10_'+k.code,'需11筆');
+            triggerText='待判定';
+            add='待判定';
+          }
+
+          if(reservoir < 150000){
+            if(deviation >= 10){ action='收至剩 50% 底倉，獲利 100% 回水庫'; signal='保命'; signalClass='signal-chip bg-rose-600 text-white'; actionable.push(`${k.name}：${action}`); }
+            else if(deviation >= 5){ action='收割 10%，獲利 100% 回水庫'; signal='保命'; signalClass='signal-chip bg-orange-500 text-white'; actionable.push(`${k.name}：${action}`); }
+          } else if(reservoir < 180000){
+            if(deviation >= 10){ action='收至剩 50% 底倉，獲利 100% 回水庫'; signal='鎖定'; signalClass='signal-chip bg-rose-600 text-white'; actionable.push(`${k.name}：${action}`); }
+            else if(deviation >= 5){ action='收割 10%，獲利 100% 回水庫'; signal='鎖定'; signalClass='signal-chip bg-orange-500 text-white'; actionable.push(`${k.name}：${action}`); }
+          } else if(reservoir > 1000000){
+            if(deviation >= 25){ action='收割 20%，底倉至少 85%'; signal='厚尾'; signalClass='signal-chip bg-rose-600 text-white'; actionable.push(`${k.name}：${action}`); }
+            else if(deviation >= 15){ action='收割 10%，底倉至少 85%'; signal='厚尾'; signalClass='signal-chip bg-amber-500 text-white'; actionable.push(`${k.name}：${action}`); }
+          } else {
+            if(deviation >= 20){ action='再收割 20%，50% 水庫 / 50% 回原王'; signal='再收'; signalClass='signal-chip bg-rose-600 text-white'; actionable.push(`${k.name}：${action}`); }
+            else if(deviation >= 15){ action='收割 20%，50% 水庫 / 50% 回原王'; signal='收20'; signalClass='signal-chip bg-orange-500 text-white'; actionable.push(`${k.name}：${action}`); }
+            else if(deviation >= 10){ action='收割 10%，50% 水庫 / 50% 回原王'; signal='收10'; signalClass='signal-chip bg-amber-500 text-white'; actionable.push(`${k.name}：${action}`); }
+            else if(deviation >= 5){ action='先觀察，接近收割門檻'; signal='準備'; signalClass='signal-chip bg-emerald-600 text-white'; }
+          }
+
+          if(cooldownRemain !== null && cooldownRemain > 0){
+            const wouldHarvest = action !== '不動作' && action !== '先觀察，接近收割門檻';
+            if(wouldHarvest){
+              action = `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`;
+              signal = '冷卻';
+              signalClass = 'signal-chip bg-amber-500 text-slate-950';
+            }
+          }
+
+          safeSetText('signal_'+k.code, signal);
+          safeSetClass('signal_'+k.code, signalClass);
+          safeSetText('ma_'+k.code, ma20.toFixed(2));
+          safeSetText('dev_'+k.code, `${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
+          safeSetText('trigger_'+k.code, triggerText);
+          safeSetText('wave_'+k.code, wave);
+          safeSetText('add_'+k.code, add);
+          safeSetText('threshold_'+k.code, `${kingTrigger}%`);
+          safeSetText('action_'+k.code, action);
+
+          kingStats.push({
+            name: k.name,
+            code: k.code,
+            deviation,
+            triggerChange: triggerCheck ? triggerCheck.change : null,
+            distanceValue,
+            distanceText
+          });
+
+          if(i < 3) deviationLines.push(`${k.name}：${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
+        }
+
+        safeSetHTML('deviationSummary', deviationLines.length ? deviationLines.join('<br>') : '等待王卡資料…');
+
+        if(kingStats.length){
+          const closest = [...kingStats].sort((a,b)=>a.distanceValue - b.distanceValue)[0];
+          const strongest = [...kingStats].sort((a,b)=>b.deviation - a.deviation)[0];
+          const weakest = [...kingStats]
+            .filter(x => x.triggerChange !== null)
+            .sort((a,b)=>a.triggerChange - b.triggerChange)[0] || [...kingStats].sort((a,b)=>a.deviation - b.deviation)[0];
+
+          safeSetText('closestTriggerKing', closest?.name || '—');
+          safeSetText('closestTriggerHint', closest ? closest.distanceText : '等待資料');
+          safeSetHTML('strongWeakBoard',
+            strongest && weakest
+              ? `最強王：${strongest.name}（乖離 ${strongest.deviation>=0?'+':''}${strongest.deviation.toFixed(2)}%）<br>最弱王：${weakest.name}（${weakest.triggerChange !== null ? `10日跌幅 ${weakest.triggerChange.toFixed(2)}%` : `乖離 ${weakest.deviation.toFixed(2)}%`})`
+              : '等待資料'
+          );
+        } else {
+          safeSetText('closestTriggerKing', '—');
+          safeSetText('closestTriggerHint', '等待資料');
+          safeSetHTML('strongWeakBoard', '等待資料');
+        }
+
+        const globalTrigger = triggeredCount > 0 ? `已觸發 ${triggeredCount} 王` : '未達任何王門檻';
+        const globalAdd = (ammoRemain <= 0 || triggerRemain <= 0) ? '🚫 禁止加碼' : triggeredCount > 0 ? '✅ 可依觸發王分配' : '❌ 本次不加碼';
+
+        safeSetText('globalTriggerText', globalTrigger);
+        safeSetText('globalAddText', globalAdd);
+
+        let recommend = 0;
+        if(ammoRemain <= 0 || triggerRemain <= 0) recommend = 0;
+        else if(triggeredCandidates.length === 0) recommend = 0;
+        else if(reservoir < 150000) recommend = Math.min(ammoRemain, 3000);
+        else if(triggeredCandidates.length === 1) recommend = Math.min(ammoRemain, 6000);
+        else if(triggeredCandidates.length === 2) recommend = Math.min(ammoRemain, 12000);
+        else recommend = Math.min(ammoRemain, 22000);
+
+        safeSetText('ammoRecommend', formatMoney(recommend));
+        safeSetText('ammoRecommendHero', formatMoney(recommend));
+        lastRecommendValue = recommend;
+        lastTriggeredCandidateCount = triggeredCandidates.length;
+        lastTriggeredCandidateNames = triggeredCandidates.map(x => x.name);
+
+        let allocationHtml='', recommendText='';
+        if(recommend <= 0 || triggeredCandidates.length === 0){
+          allocationHtml = '<div class="rounded-2xl border border-white/10 bg-slate-950/60 p-4 text-sm text-slate-300">本次建議出手 0。原因：沒有任何王達到自己的超底王觸發門檻，或本月已無剩餘金額 / 剩餘次數。</div>';
+          recommendText = '本次建議出手 0。<br>原因：目前沒有任何王的「今日 vs 10天前」跌幅達到自己的門檻，或本月額度 / 次數已滿。';
+        } else {
+          const totalScore = triggeredCandidates.reduce((a,b)=>a+b.score,0);
+          let remaining = recommend;
+
+          const allocs = triggeredCandidates.map((c, idx) => {
+            let raw = Math.floor((recommend * c.score / totalScore) / 1000) * 1000;
+            if(raw < 3000) raw = 3000;
+            if(idx === triggeredCandidates.length - 1) raw = Math.max(3000, remaining);
+            raw = Math.min(raw, remaining);
+            remaining -= raw;
+            return { ...c, amount: raw };
+          }).filter(a => a.amount > 0);
+
+          if(remaining > 0 && allocs.length) allocs[0].amount += remaining;
+
+          allocationHtml = allocs.map(a => `
+            <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4">
+              <div class="flex items-center justify-between">
+                <div class="font-black text-white">${a.name}</div>
+                <div class="text-lg font-black text-emerald-300 mono">${formatMoney(a.amount)}</div>
+              </div>
+              <div class="mt-2 text-sm text-emerald-100">10日跌幅 ${a.triggerChange.toFixed(2)}%｜門檻 ${a.kingTrigger}%｜${a.wave}</div>
+            </div>
+          `).join('');
+
+          recommendText = `本次建議出手 ${formatMoney(recommend)} 元。<br>` + allocs.map(a => `• ${a.name}：${formatMoney(a.amount)} 元（10日跌幅 ${a.triggerChange.toFixed(2)}%｜門檻 ${a.kingTrigger}%｜${a.wave}）`).join('<br>');
+        }
+
+        safeSetHTML('allocationCards', allocationHtml);
+        safeSetHTML('recommendBoard', recommendText);
+
+        const summary = [];
+        summary.push(`總資產：${formatMoney(totalAssets)}｜水庫：${formatMoney(reservoir)}｜月定投：${formatMoney(monthlyInput)}｜月回灌：${formatMoney(monthlyRecycle)}`);
+        summary.push(`本月總彈藥：${formatMoney(ammoLimit)}｜已用：${formatMoney(usedAmmo)}｜剩餘：${formatMoney(ammoRemain)}｜本月觸發：${monthlyTriggerCount}/${maxTriggerPerMonth}`);
+        summary.push(`本次建議：${formatMoney(recommend)}｜總體觸發：${globalTrigger}｜加碼許可：${globalAdd}`);
+        summary.push(actionable.length ? `今日收割可執行：<br>${actionable.map(x=>`• ${x}`).join('<br>')}` : '今日沒有達到收割門檻的王。請維持定投，收盤後再檢核。');
+
+        safeSetHTML('summaryBoard', summary.join('<br><br>'));
+        updateChart(totalAssets, reservoir, recommend);
+      } catch (err) {
+        console.error('updateVisuals error:', err);
+      }
+    }
+
+    async function parseJsonResponse(res){
+      const text = await res.text();
+      try{
+        return JSON.parse(text);
+      } catch(e){
+        throw new Error('後端回傳不是 JSON：' + text);
+      }
+    }
+
+    async function loadData(){
+      try{
+        setSync('讀取中...', 'text-amber-300');
+        const res = await fetch(API);
+        const data = await parseJsonResponse(res);
+
+        safeSetValue('monthKey', data.monthKey || '');
+        safeSetValue('totalAssets', data.totalAssets || 0);
+        safeSetValue('reservoir', data.reservoir || 0);
+        safeSetValue('monthlyInput', data.monthlyInput || 9000);
+        safeSetValue('monthlyRecycle', data.monthlyRecycle || 0);
+        safeSetValue('kingCount', data.kingCount || 3);
+        safeSetValue('currentDrawdown', data.currentDrawdown || 0);
+        safeSetValue('usedAmmo', data.usedAmmo || 0);
+        safeSetValue('monthlyTriggerCount', data.monthlyTriggerCount || 0);
+        safeSetValue('maxTriggerPerMonth', data.maxTriggerPerMonth || 6);
+        safeSetValue('notes', data.notes || '');
+
+        ensureKingCards();
+
+        for(const k of kingDefs){
+          safeSetValue(k.code+'_prices', data[k.code+'_prices'] || '');
+          const fw = safeEl(k.code+'_firstwave');
+          if (fw) fw.checked = String(data[k.code+'_firstwave']) === 'true' || data[k.code+'_firstwave'] === true;
+          safeSetValue(k.code+'_trigger', data[k.code+'_trigger'] ?? k.defaultTrigger);
+          safeSetValue(k.code+'_lastHarvestDate', data[k.code+'_lastHarvestDate'] || '');
+        }
+
+        resetMonthlyIfNeeded(true);
+
+        const syncTime = data.lastSyncTime || '—';
+        lastSuccessfulSync = syncTime;
+        safeSetText('lastSyncTime', syncTime);
+        safeSetText('lastSyncBox', syncTime);
+
+        updateVisuals();
+        setSync('已同步', 'text-emerald-300');
+      } catch(err){
+        console.error(err);
+        setSync('讀取失敗', 'text-rose-300');
+        alert('讀取失敗：' + err.message);
+      }
+    }
+
+    async function saveData(){
+      try{
+        resetMonthlyIfNeeded(true);
+        setSync('儲存中...', 'text-amber-300');
+
+        const payload = {
+          monthKey: safeEl('monthKey')?.value || getCurrentMonthKey(),
+          totalAssets: safeEl('totalAssets')?.value || 0,
+          reservoir: safeEl('reservoir')?.value || 0,
+          monthlyInput: safeEl('monthlyInput')?.value || 0,
+          monthlyRecycle: safeEl('monthlyRecycle')?.value || 0,
+          kingCount: safeEl('kingCount')?.value || 3,
+          currentDrawdown: safeEl('currentDrawdown')?.value || 0,
+          usedAmmo: safeEl('usedAmmo')?.value || 0,
+          monthlyTriggerCount: safeEl('monthlyTriggerCount')?.value || 0,
+          maxTriggerPerMonth: safeEl('maxTriggerPerMonth')?.value || 6,
+          notes: safeEl('notes')?.value || '',
+          lastSyncTime: getNowText()
+        };
+
+        const count = getKingCount();
+        for(let i=0;i<count;i++){
+          const k = kingDefs[i];
+          payload[k.code+'_prices'] = safeEl(k.code+'_prices')?.value || '';
+          payload[k.code+'_firstwave'] = !!safeEl(k.code+'_firstwave')?.checked;
+          payload[k.code+'_trigger'] = safeEl(k.code+'_trigger')?.value || k.defaultTrigger;
+          payload[k.code+'_lastHarvestDate'] = safeEl(k.code+'_lastHarvestDate')?.value || '';
+        }
+
+        const res = await fetch(API,{
+          method:'POST',
+          headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await parseJsonResponse(res);
+
+        if(data && (data.status === 'ok' || data.status === 'success' || data.ok === true)){
+          const syncTime = data.lastSyncTime || payload.lastSyncTime || '—';
+          lastSuccessfulSync = syncTime;
+          safeSetText('lastSyncTime', syncTime);
+          safeSetText('lastSyncBox', syncTime);
+          setSync('已儲存', 'text-emerald-300');
+        } else {
+          throw new Error(data.error || '儲存失敗');
+        }
+      } catch(err){
+        console.error(err);
+        setSync('儲存失敗', 'text-rose-300');
+        alert('儲存失敗：' + err.message);
+      }
+    }
+
+    function bindGlobalEvents(){
+      safeEl('reloadBtn')?.addEventListener('click', loadData);
+      safeEl('saveBtn')?.addEventListener('click', saveData);
+      safeEl('applyRecommendBtn')?.addEventListener('click', applyRecommendAmount);
+
+      safeEl('resetAmmoBtn')?.addEventListener('click', ()=>{
+        safeSetValue('usedAmmo', 0);
+        updateVisuals();
+      });
+
+      document.querySelectorAll('.ammo-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const current = Number(safeEl('usedAmmo')?.value || 0);
+          safeSetValue('usedAmmo', current + Number(btn.dataset.ammo || 0));
+          updateVisuals();
+        });
+      });
+
+      document.addEventListener('input', (e)=>{
+        if(!e.target || !e.target.id) return;
+        if(e.target.id === 'kingCount'){
+          ensureKingCards();
+        }
+        updateVisuals();
+      });
+
+      document.addEventListener('change', (e)=>{
+        if(!e.target || !e.target.id) return;
+        if(e.target.id === 'kingCount'){
+          ensureKingCards();
+        }
+        updateVisuals();
+      });
+    }
+
+    bindGlobalEvents();
+    ensureKingCards();
+    safeSetValue('monthKey', getCurrentMonthKey());
+    safeSetText('lastSyncTime', lastSuccessfulSync || '—');
+    safeSetText('lastSyncBox', lastSuccessfulSync || '—');
+    updateVisuals();
+    loadData();
+  </script>
+</body>
+</html>
