@@ -3,21 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>飛輪操盤系統 V21.6 整合版</title>
+  <title>飛輪操盤系統 V22 三王決策版</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root{
-      --bg1:#06101d;
-      --bg2:#0b1527;
-      --card:rgba(15,23,42,.78);
+      --bg1:#04101d;
+      --bg2:#0a1426;
+      --bg3:#0f1b33;
+      --card:rgba(15,23,42,.82);
       --line:rgba(255,255,255,.08);
+      --cyan:#22d3ee;
+      --emerald:#34d399;
+      --amber:#fbbf24;
+      --rose:#fb7185;
+      --violet:#a78bfa;
+      --sky:#38bdf8;
+      --slate:#94a3b8;
     }
     body{
       background:
-        radial-gradient(circle at 20% 0%, rgba(34,211,238,.15), transparent 25%),
-        radial-gradient(circle at 100% 20%, rgba(167,139,250,.14), transparent 22%),
-        linear-gradient(180deg,var(--bg1),var(--bg2));
+        radial-gradient(circle at 15% 0%, rgba(34,211,238,.16), transparent 24%),
+        radial-gradient(circle at 100% 10%, rgba(167,139,250,.12), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(56,189,248,.08), transparent 20%),
+        linear-gradient(180deg,var(--bg1),var(--bg2),var(--bg3));
       color:#f8fafc;
     }
     .glass{
@@ -36,6 +45,8 @@
       border-color:rgba(34,211,238,.8);
       box-shadow:0 0 0 3px rgba(34,211,238,.12);
     }
+    .mono{ font-variant-numeric: tabular-nums; }
+
     .signal-chip{
       font-weight:900;
       font-size:12px;
@@ -45,27 +56,161 @@
       align-items:center;
       gap:6px;
     }
-    .mono{ font-variant-numeric: tabular-nums; }
+
+    .hero-glow{
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.05),
+        0 20px 60px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .decision-panel{
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.08);
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34,211,238,.14), transparent 25%),
+        linear-gradient(180deg, rgba(3,10,24,.92), rgba(8,14,30,.92));
+    }
+
+    .decision-big{
+      border-radius:22px;
+      padding:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(2,6,23,.52);
+      min-height:170px;
+    }
+
+    .decision-card{
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(2,6,23,.48);
+      padding:16px;
+      transition:.18s ease;
+    }
+    .decision-card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 30px rgba(0,0,0,.25);
+    }
+
+    .decision-state{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.03em;
+    }
+
+    .state-war{
+      background:rgba(251,113,133,.14);
+      border:1px solid rgba(251,113,133,.24);
+      color:#fecdd3;
+    }
+    .state-lock{
+      background:rgba(251,191,36,.14);
+      border:1px solid rgba(251,191,36,.24);
+      color:#fde68a;
+    }
+    .state-ignite{
+      background:rgba(56,189,248,.14);
+      border:1px solid rgba(56,189,248,.24);
+      color:#bae6fd;
+    }
+    .state-tail{
+      background:rgba(167,139,250,.14);
+      border:1px solid rgba(167,139,250,.24);
+      color:#ddd6fe;
+    }
+
+    .cmd-harvest{
+      border:1px solid rgba(251,113,133,.22);
+      background:linear-gradient(180deg, rgba(127,29,29,.42), rgba(76,29,49,.32));
+      color:#ffe4e8;
+    }
+    .cmd-watch{
+      border:1px solid rgba(251,191,36,.22);
+      background:linear-gradient(180deg, rgba(120,53,15,.34), rgba(87,51,15,.22));
+      color:#fde7a5;
+    }
+    .cmd-wait{
+      border:1px solid rgba(148,163,184,.18);
+      background:linear-gradient(180deg, rgba(30,41,59,.5), rgba(15,23,42,.36));
+      color:#e2e8f0;
+    }
+    .cmd-cooldown{
+      border:1px solid rgba(167,139,250,.22);
+      background:linear-gradient(180deg, rgba(76,29,149,.28), rgba(55,28,99,.22));
+      color:#ddd6fe;
+    }
+
+    .king-command{
+      border-radius:18px;
+      padding:14px 16px;
+      font-size:14px;
+      font-weight:900;
+      line-height:1.7;
+      letter-spacing:.01em;
+    }
+
+    .metric-box{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(2,6,23,.5);
+      padding:14px;
+    }
+
+    .glow-cyan{ box-shadow:0 0 0 1px rgba(34,211,238,.12),0 12px 30px rgba(34,211,238,.08); }
+    .glow-emerald{ box-shadow:0 0 0 1px rgba(52,211,153,.12),0 12px 30px rgba(52,211,153,.08); }
+    .glow-amber{ box-shadow:0 0 0 1px rgba(251,191,36,.12),0 12px 30px rgba(251,191,36,.08); }
+    .glow-rose{ box-shadow:0 0 0 1px rgba(251,113,133,.12),0 12px 30px rgba(251,113,133,.08); }
+    .glow-violet{ box-shadow:0 0 0 1px rgba(167,139,250,.12),0 12px 30px rgba(167,139,250,.08); }
+
+    .soft-scroll::-webkit-scrollbar{ height:8px; width:8px; }
+    .soft-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,.12); border-radius:999px; }
   </style>
 </head>
 <body class="min-h-screen p-5 xl:p-8">
-  <div class="mx-auto max-w-[1780px] space-y-6">
-    <section class="glass overflow-hidden rounded-[28px]">
+  <div class="mx-auto max-w-[1820px] space-y-6">
+    <!-- HERO -->
+    <section class="decision-panel hero-glow rounded-[30px] overflow-hidden">
       <div class="flex flex-col gap-6 p-6 xl:flex-row xl:items-end xl:justify-between xl:p-8">
         <div>
-          <div class="inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1 text-xs font-black tracking-[0.28em] text-cyan-300">FLYWHEEL OS 21.6 · INTEGRATED EDITION</div>
-          <h1 class="mt-4 text-4xl font-black tracking-tight text-white xl:text-6xl">飛輪操盤系統 V21.6 整合版</h1>
+          <div class="inline-flex rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1 text-xs font-black tracking-[0.28em] text-cyan-300">FLYWHEEL OS V22 · DECISION COMMAND</div>
+          <h1 class="mt-4 text-4xl font-black tracking-tight text-white xl:text-6xl">飛輪操盤系統 V22 三王決策版</h1>
           <p class="mt-4 max-w-5xl text-sm leading-7 text-slate-300 xl:text-base">
-            保留你目前穩定可用的 V21.5，同步加入：冷卻倒數、70/30 資產天平、鉅亨基金淨值快捷連結。
+            這版不再只給你資料，而是直接把法典翻譯成「今日該做什麼」。
+            三王獨立判斷、全域水庫決策、冷卻壓制、加碼分配都保留，目標是讓 10 年後的你打開也能無腦照做。
           </p>
         </div>
+
         <div class="grid grid-cols-2 gap-3 xl:grid-cols-6">
-          <div class="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3"><div class="text-xs text-cyan-200">同步狀態</div><div id="syncBadge" class="mt-1 text-sm font-black text-cyan-300">未同步</div></div>
-          <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3"><div class="text-xs text-emerald-200">資產階段</div><div id="phaseText" class="mt-1 text-sm font-black text-white">基礎累積期</div></div>
-          <div class="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3"><div class="text-xs text-amber-200">模式</div><div id="modeText" class="mt-1 text-sm font-black text-white">點火擴張</div></div>
-          <div class="rounded-2xl border border-violet-400/20 bg-violet-500/10 px-4 py-3"><div class="text-xs text-violet-200">稱號</div><div id="rankText" class="mt-1 text-sm font-black text-white">新手指揮官</div></div>
-          <div class="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3"><div class="text-xs text-rose-200">風險</div><div id="riskTextTop" class="mt-1 text-sm font-black text-emerald-300">綠燈</div></div>
-          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"><div class="text-xs text-slate-300">觸發體系</div><div class="mt-1 text-sm font-black text-white">每王獨立</div></div>
+          <div class="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 glow-cyan">
+            <div class="text-xs text-cyan-200">同步狀態</div>
+            <div id="syncBadge" class="mt-1 text-sm font-black text-cyan-300">未同步</div>
+          </div>
+          <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 glow-emerald">
+            <div class="text-xs text-emerald-200">資產階段</div>
+            <div id="phaseText" class="mt-1 text-sm font-black text-white">基礎累積期</div>
+          </div>
+          <div class="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 glow-amber">
+            <div class="text-xs text-amber-200">飛輪戰區</div>
+            <div id="modeText" class="mt-1 text-sm font-black text-white">點火擴張</div>
+          </div>
+          <div class="rounded-2xl border border-violet-400/20 bg-violet-500/10 px-4 py-3 glow-violet">
+            <div class="text-xs text-violet-200">稱號</div>
+            <div id="rankText" class="mt-1 text-sm font-black text-white">新手指揮官</div>
+          </div>
+          <div class="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 glow-rose">
+            <div class="text-xs text-rose-200">風險燈號</div>
+            <div id="riskTextTop" class="mt-1 text-sm font-black text-emerald-300">綠燈</div>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+            <div class="text-xs text-slate-300">判斷模式</div>
+            <div class="mt-1 text-sm font-black text-white">三王獨立 / 水庫總控</div>
+          </div>
         </div>
       </div>
 
@@ -81,13 +226,50 @@
       </div>
     </section>
 
+    <!-- TOP DECISION CENTER -->
+    <section class="glass rounded-[30px] p-6 xl:p-7 hero-glow">
+      <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+        <div>
+          <div class="text-xs font-black tracking-[0.25em] text-cyan-300">TODAY'S COMMAND</div>
+          <h2 class="mt-2 text-3xl font-black text-white">今日唯一指令</h2>
+          <p class="mt-2 max-w-4xl text-sm leading-7 text-slate-300">
+            上面這塊只回答一件事：今天到底該不該動、要動幾筆、每一筆是收割還是等待。
+          </p>
+        </div>
+        <div class="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm font-black text-cyan-200">讓未來的你不用靠記憶</div>
+      </div>
+
+      <div class="mt-5 grid gap-4 xl:grid-cols-[1.3fr_.7fr]">
+        <div id="globalCommandCard" class="decision-big cmd-wait">
+          <div class="text-xs font-black tracking-[0.2em] text-slate-300">GLOBAL COMMAND</div>
+          <div id="globalCommandTitle" class="mt-3 text-3xl font-black text-white">等待資料</div>
+          <div id="globalCommandReason" class="mt-3 text-base leading-8 text-slate-200">系統正在整理你的三王與水庫狀態。</div>
+          <div id="globalCommandHint" class="mt-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-7 text-slate-300">等待讀取後，這裡會直接告訴你今天是否要收割、是否要加碼、或是全部不動。</div>
+        </div>
+
+        <div class="grid gap-4">
+          <div class="decision-card">
+            <div class="text-xs font-black tracking-[0.18em] text-emerald-200">飛輪戰區</div>
+            <div id="battleZoneBadge" class="mt-3 decision-state state-ignite">⚡ 點火擴張區</div>
+            <div id="battleZoneRule" class="mt-3 text-sm leading-7 text-slate-300">等待資料</div>
+          </div>
+          <div class="decision-card">
+            <div class="text-xs font-black tracking-[0.18em] text-violet-200">三王決策總表</div>
+            <div id="threeKingDecisionBoard" class="mt-3 text-sm leading-7 text-slate-100">等待資料</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <div class="grid gap-6 2xl:grid-cols-[430px_1fr_450px] xl:grid-cols-[420px_1fr]">
+      <!-- LEFT -->
       <div class="space-y-6">
         <section class="glass rounded-[28px] p-6">
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-black">主控輸入</h2>
             <div class="text-xs font-bold text-slate-400">Google Sheets 同步</div>
           </div>
+
           <div class="mt-5 space-y-4">
             <input id="monthKey" type="hidden" />
 
@@ -116,13 +298,14 @@
             <h2 class="text-xl font-black">加碼監控面板</h2>
             <div id="ammoState" class="text-sm font-black text-emerald-300">安全</div>
           </div>
+
           <div class="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-3">
-            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本月總彈藥</div><div id="ammoLimit" class="mt-2 text-xl font-black mono">0</div></div>
-            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本月已用金額</div><div id="ammoUsed" class="mt-2 text-xl font-black text-rose-300 mono">0</div></div>
-            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本月剩餘金額</div><div id="ammoRemain" class="mt-2 text-xl font-black text-cyan-300 mono">0</div></div>
-            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本月已觸發</div><div id="triggerCount" class="mt-2 text-xl font-black text-white mono">0</div></div>
-            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">剩餘可觸發</div><div id="triggerRemain" class="mt-2 text-xl font-black text-violet-300 mono">0</div></div>
-            <div class="rounded-2xl bg-slate-950/60 p-4"><div class="text-xs text-slate-400">本次建議加碼</div><div id="ammoRecommend" class="mt-2 text-xl font-black text-emerald-300 mono">0</div></div>
+            <div class="metric-box"><div class="text-xs text-slate-400">本月總彈藥</div><div id="ammoLimit" class="mt-2 text-xl font-black mono">0</div></div>
+            <div class="metric-box"><div class="text-xs text-slate-400">本月已用金額</div><div id="ammoUsed" class="mt-2 text-xl font-black text-rose-300 mono">0</div></div>
+            <div class="metric-box"><div class="text-xs text-slate-400">本月剩餘金額</div><div id="ammoRemain" class="mt-2 text-xl font-black text-cyan-300 mono">0</div></div>
+            <div class="metric-box"><div class="text-xs text-slate-400">本月已觸發</div><div id="triggerCount" class="mt-2 text-xl font-black text-white mono">0</div></div>
+            <div class="metric-box"><div class="text-xs text-slate-400">剩餘可觸發</div><div id="triggerRemain" class="mt-2 text-xl font-black text-violet-300 mono">0</div></div>
+            <div class="metric-box"><div class="text-xs text-slate-400">本次建議加碼</div><div id="ammoRecommend" class="mt-2 text-xl font-black text-emerald-300 mono">0</div></div>
           </div>
 
           <div class="mt-4 grid grid-cols-5 gap-3">
@@ -134,11 +317,11 @@
           </div>
 
           <div class="mt-4 rounded-2xl border border-white/10 bg-slate-950/60 p-4 text-sm leading-7 text-slate-300">
-            <div>超底王是自動扣款，所以最重要的是盯：</div>
+            <div>超底王重點不是猜市場，而是紀律管火力：</div>
             <div>1. 本月已加碼幾次</div>
             <div>2. 剩餘可觸發幾次</div>
             <div>3. 剩餘可用金額</div>
-            <div>4. 本次若再次觸發，建議視為多少金額</div>
+            <div>4. 若再次觸發，系統建議多少額度</div>
           </div>
         </section>
 
@@ -153,23 +336,24 @@
         </section>
       </div>
 
+      <!-- CENTER -->
       <div class="space-y-6">
         <section class="glass rounded-[28px] p-6">
           <div class="flex items-center justify-between">
             <h2 class="text-2xl font-black">戰情總覽</h2>
-            <div class="text-sm font-black text-cyan-300">超底王觸發 + 20MA 收割分離</div>
+            <div class="text-sm font-black text-cyan-300">三王決策 + 20MA 收割 + 水庫總控</div>
           </div>
 
           <div class="mt-5 grid gap-4 xl:grid-cols-3">
-            <div class="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-5">
+            <div class="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-5 glow-cyan">
               <div class="text-xs font-bold tracking-[0.18em] text-cyan-200">今日總指令</div>
               <div id="summaryBoard" class="mt-3 text-sm leading-7 text-cyan-50">等待資料載入…</div>
             </div>
-            <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5">
+            <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5 glow-emerald">
               <div class="text-xs font-bold tracking-[0.18em] text-emerald-200">本次建議出手</div>
               <div id="recommendBoard" class="mt-3 text-sm leading-7 text-emerald-50">等待計算…</div>
             </div>
-            <div class="rounded-3xl border border-violet-400/20 bg-violet-500/10 p-5">
+            <div class="rounded-3xl border border-violet-400/20 bg-violet-500/10 p-5 glow-violet">
               <div class="text-xs font-bold tracking-[0.18em] text-violet-200">三王收割乖離</div>
               <div id="deviationSummary" class="mt-3 text-sm leading-7 text-violet-50">等待王卡資料…</div>
             </div>
@@ -204,26 +388,26 @@
           </div>
 
           <div class="mt-6 grid gap-4 xl:grid-cols-2 2xl:grid-cols-5">
-            <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5">
+            <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5 glow-emerald">
               <div class="text-xs font-bold tracking-[0.18em] text-emerald-200">本月狀態</div>
               <div id="monthStatusText" class="mt-3 text-2xl font-black text-emerald-100">等待判讀</div>
               <div id="monthStatusHint" class="mt-2 text-sm leading-6 text-emerald-50">等待資料</div>
             </div>
-            <div class="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-5">
+            <div class="rounded-3xl border border-cyan-400/20 bg-cyan-500/10 p-5 glow-cyan">
               <div class="text-xs font-bold tracking-[0.18em] text-cyan-200">紀律分數</div>
               <div id="disciplineText" class="mt-3 text-2xl font-black text-cyan-50">—</div>
               <div class="mt-2 text-sm leading-6 text-cyan-50">依月節奏與風險自動計算</div>
             </div>
-            <div class="rounded-3xl border border-violet-400/20 bg-violet-500/10 p-5">
+            <div class="rounded-3xl border border-violet-400/20 bg-violet-500/10 p-5 glow-violet">
               <div class="text-xs font-bold tracking-[0.18em] text-violet-200">最接近觸發王</div>
               <div id="closestTriggerKing" class="mt-3 text-lg font-black text-violet-50">—</div>
               <div id="closestTriggerHint" class="mt-2 text-sm leading-6 text-violet-50">等待資料</div>
             </div>
-            <div class="rounded-3xl border border-amber-400/20 bg-amber-500/10 p-5">
+            <div class="rounded-3xl border border-amber-400/20 bg-amber-500/10 p-5 glow-amber">
               <div class="text-xs font-bold tracking-[0.18em] text-amber-200">最強 / 最弱</div>
               <div id="strongWeakBoard" class="mt-3 text-sm leading-7 text-amber-50">等待資料</div>
             </div>
-            <div class="rounded-3xl border border-sky-400/20 bg-sky-500/10 p-5">
+            <div class="rounded-3xl border border-sky-400/20 bg-sky-500/10 p-5 glow-cyan">
               <div class="text-xs font-bold tracking-[0.18em] text-sky-200">攻守比例</div>
               <div id="balanceRatioText" class="mt-3 text-lg font-black text-sky-50">前鋒 70% ｜ 水庫 30%</div>
               <div class="mt-3 h-4 overflow-hidden rounded-full bg-slate-800">
@@ -250,6 +434,7 @@
         </section>
       </div>
 
+      <!-- RIGHT -->
       <div class="space-y-6 2xl:block hidden">
         <section class="glass rounded-[28px] p-6">
           <h2 class="text-xl font-black">AI 分配結果</h2>
@@ -295,46 +480,17 @@
     let heroChart = null;
     let isBuildingCards = false;
     let lastRecommendValue = 0;
-    let lastTriggeredCandidateCount = 0;
     let lastTriggeredCandidateNames = [];
     let lastSuccessfulSync = '';
 
-    function $(id){
-      return document.getElementById(id);
-    }
+    function safeEl(id){ return document.getElementById(id); }
+    function safeSetText(id, value){ const el = safeEl(id); if (el) el.textContent = value; }
+    function safeSetHTML(id, value){ const el = safeEl(id); if (el) el.innerHTML = value; }
+    function safeSetValue(id, value){ const el = safeEl(id); if (el) el.value = value; }
+    function safeSetClass(id, value){ const el = safeEl(id); if (el) el.className = value; }
+    function safeSetWidth(id, value){ const el = safeEl(id); if (el) el.style.width = value; }
 
-    function safeEl(id){
-      return document.getElementById(id);
-    }
-
-    function safeSetText(id, value){
-      const el = safeEl(id);
-      if (el) el.textContent = value;
-    }
-
-    function safeSetHTML(id, value){
-      const el = safeEl(id);
-      if (el) el.innerHTML = value;
-    }
-
-    function safeSetValue(id, value){
-      const el = safeEl(id);
-      if (el) el.value = value;
-    }
-
-    function safeSetClass(id, className){
-      const el = safeEl(id);
-      if (el) el.className = className;
-    }
-
-    function safeSetWidth(id, width){
-      const el = safeEl(id);
-      if (el) el.style.width = width;
-    }
-
-    function formatMoney(v){
-      return Number(v || 0).toLocaleString();
-    }
+    function formatMoney(v){ return Number(v || 0).toLocaleString(); }
 
     function getCurrentMonthKey(){
       const now = new Date();
@@ -399,22 +555,16 @@
 
     function getBusinessDaysPassed(dateStr){
       if(!dateStr) return null;
-
       const start = new Date(dateStr + 'T00:00:00');
       const today = new Date();
       today.setHours(0,0,0,0);
-
       if(start > today) return 0;
-
       let days = 0;
       const cursor = new Date(start);
-
       while(cursor < today){
         cursor.setDate(cursor.getDate() + 1);
         const day = cursor.getDay();
-        if(day !== 0 && day !== 6){
-          days++;
-        }
+        if(day !== 0 && day !== 6){ days++; }
       }
       return days;
     }
@@ -464,23 +614,163 @@
       return Number(safeEl('kingCount')?.value || 3);
     }
 
+    function getBattleState(reservoir){
+      if (reservoir < 150000) {
+        return {
+          key: 'war',
+          label: '🔴 戰時狀態',
+          cls: 'state-war',
+          mode: '極速保命',
+          hint: '危險區：先補水庫，所有獲利優先回水庫',
+          risk: '紅燈',
+          rule: '+5% → 收割10%；+10% → 收割至剩50%底倉；獲利100%回水庫'
+        };
+      }
+      if (reservoir < 180000) {
+        return {
+          key: 'lock',
+          label: '🟡 過渡鎖定區',
+          cls: 'state-lock',
+          mode: '過渡鎖定',
+          hint: '先站回18萬以上，維持戰時收割規則',
+          risk: '黃燈',
+          rule: '+5% → 收割10%；+10% → 收割至剩50%底倉；獲利100%回水庫'
+        };
+      }
+      if (reservoir > 1000000) {
+        return {
+          key: 'tail',
+          label: '🚀 厚尾複利區',
+          cls: 'state-tail',
+          mode: '厚尾複利',
+          hint: '水庫充足，讓大部位吃主升段',
+          risk: '綠燈',
+          rule: '+15% → 收割10%；+25% → 收割20%；底倉至少保留85%'
+        };
+      }
+      return {
+        key: 'ignite',
+        label: '⚡ 點火擴張區',
+        cls: 'state-ignite',
+        mode: '點火擴張',
+        hint: '擴張區：一邊補水庫，一邊壯大三王',
+        risk: '綠燈',
+        rule: '+10% → 收10%；+15% → 收20%；+20% → 再收20%；獲利50/50分流'
+      };
+    }
+
+    function getKingDecision({ deviation, cooldownRemain, battle, name }){
+      let signal = '待命';
+      let signalClass = 'signal-chip bg-slate-700 text-white';
+      let action = '不動作';
+      let cmdClass = 'cmd-wait';
+      let title = '等待';
+      let reason = '目前未達你的法典執行門檻，維持定投即可。';
+
+      if (cooldownRemain !== null && cooldownRemain > 0) {
+        signal = '冷卻';
+        signalClass = 'signal-chip bg-violet-500 text-white';
+        action = `❄️ 冷卻中：還剩 ${cooldownRemain} 個交易日，禁止收割`;
+        cmdClass = 'cmd-cooldown';
+        title = '冷卻中';
+        reason = `${name} 已進入 5 個交易日冷卻，不論乖離多高，今天都禁止收割。`;
+        return { signal, signalClass, action, cmdClass, title, reason };
+      }
+
+      if (battle.key === 'war' || battle.key === 'lock') {
+        if (deviation >= 10) {
+          signal = '收割';
+          signalClass = 'signal-chip bg-rose-600 text-white';
+          action = '🔴 收至 50% 底倉｜獲利 100% 回水庫';
+          cmdClass = 'cmd-harvest';
+          title = '立即收割';
+          reason = `目前位於${battle.label}，且乖離 ${deviation.toFixed(2)}% ≥ +10%，依戰時法典收至剩 50% 底倉。`;
+        } else if (deviation >= 5) {
+          signal = '收割';
+          signalClass = 'signal-chip bg-orange-500 text-white';
+          action = '🟠 收割 10%｜獲利 100% 回水庫';
+          cmdClass = 'cmd-harvest';
+          title = '立即收割';
+          reason = `目前位於${battle.label}，且乖離 ${deviation.toFixed(2)}% ≥ +5%，依戰時法典收割 10%。`;
+        } else if (deviation > 0) {
+          signal = '觀察';
+          signalClass = 'signal-chip bg-amber-500 text-slate-950';
+          action = '🟡 正乖離但未達戰時門檻｜先觀察';
+          cmdClass = 'cmd-watch';
+          title = '先觀察';
+          reason = `目前雖已轉正，但在${battle.label}下還沒達到戰時收割門檻。`;
+        }
+      } else if (battle.key === 'tail') {
+        if (deviation >= 25) {
+          signal = '收割';
+          signalClass = 'signal-chip bg-rose-600 text-white';
+          action = '🔴 收割 20%｜底倉至少保留 85%';
+          cmdClass = 'cmd-harvest';
+          title = '立即收割';
+          reason = `目前位於厚尾複利區，乖離 ${deviation.toFixed(2)}% ≥ +25%，依厚尾規則收割 20%。`;
+        } else if (deviation >= 15) {
+          signal = '收割';
+          signalClass = 'signal-chip bg-amber-500 text-slate-950';
+          action = '🟠 收割 10%｜底倉至少保留 85%';
+          cmdClass = 'cmd-watch';
+          title = '執行收割';
+          reason = `目前位於厚尾複利區，乖離 ${deviation.toFixed(2)}% ≥ +15%，依厚尾規則收割 10%。`;
+        } else if (deviation >= 5) {
+          signal = '觀察';
+          signalClass = 'signal-chip bg-emerald-600 text-white';
+          action = '🟡 接近厚尾收割區｜先觀察';
+          cmdClass = 'cmd-watch';
+          title = '先觀察';
+          reason = `目前位於厚尾複利區，已接近收割區但未達執行門檻。`;
+        }
+      } else {
+        if (deviation >= 20) {
+          signal = '收割';
+          signalClass = 'signal-chip bg-rose-600 text-white';
+          action = '🔴 再收割 20%｜50% 水庫 / 50% 回原王';
+          cmdClass = 'cmd-harvest';
+          title = '立即收割';
+          reason = `目前位於點火擴張區，乖離 ${deviation.toFixed(2)}% ≥ +20%，依規則再收割 20%。`;
+        } else if (deviation >= 15) {
+          signal = '收割';
+          signalClass = 'signal-chip bg-orange-500 text-white';
+          action = '🟠 收割 20%｜50% 水庫 / 50% 回原王';
+          cmdClass = 'cmd-harvest';
+          title = '立即收割';
+          reason = `目前位於點火擴張區，乖離 ${deviation.toFixed(2)}% ≥ +15%，依規則收割 20%。`;
+        } else if (deviation >= 10) {
+          signal = '收割';
+          signalClass = 'signal-chip bg-amber-500 text-slate-950';
+          action = '🟡 收割 10%｜50% 水庫 / 50% 回原王';
+          cmdClass = 'cmd-watch';
+          title = '執行收割';
+          reason = `目前位於點火擴張區，乖離 ${deviation.toFixed(2)}% ≥ +10%，依規則收割 10%。`;
+        } else if (deviation >= 5) {
+          signal = '準備';
+          signalClass = 'signal-chip bg-emerald-600 text-white';
+          action = '🟢 接近收割區｜先觀察';
+          cmdClass = 'cmd-watch';
+          title = '先觀察';
+          reason = `乖離已轉強，但仍未達點火區正式收割門檻。`;
+        }
+      }
+
+      return { signal, signalClass, action, cmdClass, title, reason };
+    }
+
     function appendTodayValue(code){
       const today = prompt('輸入今天淨值');
       if(!today) return;
-
       const num = Number(today);
       if(Number.isNaN(num) || num <= 0){
         alert('請輸入正確數字');
         return;
       }
-
       const el = safeEl(code + '_prices');
       if (!el) return;
-
       let arr = parsePrices(el.value);
       arr.push(num);
       if(arr.length > 20) arr = arr.slice(arr.length - 20);
-
       el.value = arr.join(' ');
       updateVisuals();
     }
@@ -536,13 +826,18 @@
         for(let i=0;i<count;i++){
           const k = kingDefs[i];
           html.push(`
-            <div class="rounded-3xl border border-white/10 bg-slate-950/55 p-5">
-              <div class="flex items-center justify-between gap-3">
+            <div class="rounded-3xl border border-white/10 bg-slate-950/55 p-5 hero-glow">
+              <div class="flex items-start justify-between gap-3">
                 <div>
                   <div class="text-lg font-black text-white">${k.name}</div>
                   <div class="text-xs text-slate-400">${k.code}</div>
                 </div>
                 <div id="signal_${k.code}" class="signal-chip bg-slate-800 text-white">待判讀</div>
+              </div>
+
+              <div id="cmdBox_${k.code}" class="king-command cmd-wait mt-4">
+                <div class="text-base font-black" id="cmdTitle_${k.code}">等待資料</div>
+                <div class="mt-1 text-sm font-medium text-slate-200" id="cmdReason_${k.code}">系統尚未取得足夠資料判斷。</div>
               </div>
 
               <div class="mt-4 grid grid-cols-4 gap-3">
@@ -573,16 +868,16 @@
               </div>
 
               <div class="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-4">
-                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">20MA</div><div id="ma_${k.code}" class="mt-2 text-base font-black text-white mono">—</div></div>
-                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">乖離</div><div id="dev_${k.code}" class="mt-2 text-base font-black text-cyan-300 mono">—</div></div>
-                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">10日跌幅</div><div id="chg10_${k.code}" class="mt-2 text-base font-black text-white mono">—</div></div>
-                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">觸發狀態</div><div id="trigger_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
+                <div class="metric-box"><div class="text-xs text-slate-400">20MA</div><div id="ma_${k.code}" class="mt-2 text-base font-black text-white mono">—</div></div>
+                <div class="metric-box"><div class="text-xs text-slate-400">乖離</div><div id="dev_${k.code}" class="mt-2 text-base font-black text-cyan-300 mono">—</div></div>
+                <div class="metric-box"><div class="text-xs text-slate-400">10日跌幅</div><div id="chg10_${k.code}" class="mt-2 text-base font-black text-white mono">—</div></div>
+                <div class="metric-box"><div class="text-xs text-slate-400">觸發狀態</div><div id="trigger_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
               </div>
 
               <div class="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-3">
-                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">波段</div><div id="wave_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
-                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">加碼</div><div id="add_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
-                <div class="rounded-2xl bg-slate-900/70 p-4"><div class="text-xs text-slate-400">門檻</div><div id="threshold_${k.code}" class="mt-2 text-base font-black text-amber-300 mono">—</div></div>
+                <div class="metric-box"><div class="text-xs text-slate-400">波段</div><div id="wave_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
+                <div class="metric-box"><div class="text-xs text-slate-400">加碼</div><div id="add_${k.code}" class="mt-2 text-base font-black text-white">—</div></div>
+                <div class="metric-box"><div class="text-xs text-slate-400">門檻</div><div id="threshold_${k.code}" class="mt-2 text-base font-black text-amber-300 mono">—</div></div>
               </div>
 
               <div id="action_${k.code}" class="mt-4 rounded-2xl bg-slate-900/60 p-4 text-sm font-black text-emerald-300">等待判讀</div>
@@ -673,6 +968,7 @@
         const ammoLimit = Math.floor(reservoir * 0.15);
         const ammoRemain = Math.max(0, ammoLimit - usedAmmo);
         const triggerRemain = Math.max(0, maxTriggerPerMonth - monthlyTriggerCount);
+        const battle = getBattleState(reservoir);
 
         safeSetText('heroAssets', formatMoney(totalAssets));
         safeSetText('heroReservoir', formatMoney(reservoir));
@@ -698,21 +994,19 @@
 
         safeSetText('phaseText', getPhaseText(totalAssets));
 
-        let mode='點火擴張', hint='目前位於安全區', barClass='bg-emerald-500', risk='綠燈';
-        if(reservoir < 150000){ mode='極速保命'; hint='危險區：先補血，所有獲利優先回水庫'; barClass='bg-rose-500'; risk='紅燈'; }
-        else if(reservoir < 180000){ mode='過渡鎖定'; hint='過渡鎖定區：先站回18萬以上'; barClass='bg-orange-500'; risk='黃燈'; }
-        else if(reservoir < 600000){ mode='點火擴張'; hint='擴張區：一邊補水庫，一邊壯大三王'; barClass='bg-sky-500'; }
-        else { mode='厚尾複利'; hint='水庫充足：讓大部位吃主升段'; barClass='bg-emerald-500'; }
+        safeSetText('modeText', battle.mode);
+        safeSetText('riskTextTop', battle.risk);
+        safeSetClass('riskTextTop', battle.risk==='紅燈' ? 'mt-1 text-sm font-black text-rose-300' : battle.risk==='黃燈' ? 'mt-1 text-sm font-black text-amber-300' : 'mt-1 text-sm font-black text-emerald-300');
+        safeSetText('riskStateBox', battle.risk);
+        safeSetClass('riskStateBox', battle.risk==='紅燈' ? 'mt-2 text-lg font-black text-rose-300' : battle.risk==='黃燈' ? 'mt-2 text-lg font-black text-amber-300' : 'mt-2 text-lg font-black text-emerald-300');
 
-        safeSetText('modeText', mode);
-        safeSetText('riskTextTop', risk);
-        safeSetClass('riskTextTop', risk==='紅燈' ? 'mt-1 text-sm font-black text-rose-300' : risk==='黃燈' ? 'mt-1 text-sm font-black text-amber-300' : 'mt-1 text-sm font-black text-emerald-300');
-        safeSetText('riskStateBox', risk);
-        safeSetClass('riskStateBox', risk==='紅燈' ? 'mt-2 text-lg font-black text-rose-300' : risk==='黃燈' ? 'mt-2 text-lg font-black text-amber-300' : 'mt-2 text-lg font-black text-emerald-300');
-
-        safeSetText('reservoirHint', hint);
+        safeSetText('reservoirHint', battle.hint);
         safeSetWidth('reservoirBar', `${Math.min(100, reservoir / 600000 * 100)}%`);
-        safeSetClass('reservoirBar', `h-full transition-all ${barClass}`);
+        safeSetClass('reservoirBar', `h-full transition-all ${battle.key === 'war' ? 'bg-rose-500' : battle.key === 'lock' ? 'bg-orange-500' : battle.key === 'tail' ? 'bg-violet-500' : 'bg-emerald-500'}`);
+
+        safeSetText('battleZoneBadge', battle.label);
+        safeSetClass('battleZoneBadge', `decision-state ${battle.cls}`);
+        safeSetText('battleZoneRule', battle.rule);
 
         safeSetWidth('progress300Bar', `${Math.min(100,totalAssets/3000000*100)}%`);
         safeSetText('progress300Text', `${Math.min(100,totalAssets/3000000*100).toFixed(1)}%`);
@@ -753,7 +1047,10 @@
         const actionable = [];
         const triggeredCandidates = [];
         const kingStats = [];
+        const decisionLines = [];
         let triggeredCount = 0;
+        let harvestCount = 0;
+        let cooldownCount = 0;
 
         for(let i=0;i<kingCount;i++){
           const k = kingDefs[i];
@@ -788,6 +1085,10 @@
             safeSetText('add_'+k.code,'待判定');
             safeSetText('threshold_'+k.code, `${kingTrigger}%`);
             safeSetText('action_'+k.code,'請先輸入最近20筆淨值');
+
+            safeSetClass(`cmdBox_${k.code}`, 'king-command cmd-wait mt-4');
+            safeSetText(`cmdTitle_${k.code}`, '等待資料');
+            safeSetText(`cmdReason_${k.code}`, '這一王尚未補滿 20 筆淨值，系統不做決策。');
             continue;
           }
 
@@ -804,7 +1105,7 @@
           else if(reboundPct >= 5 && turnedWeak && !firstWaveDone) wave='反彈後轉弱';
           else if(reboundPct >= 5) wave='反彈觀察期';
 
-          let triggerText='待判定', add='❌ 不加碼', signal='待命', signalClass='signal-chip bg-slate-700 text-white', action='不動作';
+          let triggerText='待判定', add='❌ 不加碼';
           let distanceValue = Number.POSITIVE_INFINITY;
           let distanceText = '等待資料';
 
@@ -843,40 +1144,26 @@
             add='待判定';
           }
 
-          if(reservoir < 150000){
-            if(deviation >= 10){ action='收至剩 50% 底倉，獲利 100% 回水庫'; signal='保命'; signalClass='signal-chip bg-rose-600 text-white'; actionable.push(`${k.name}：${action}`); }
-            else if(deviation >= 5){ action='收割 10%，獲利 100% 回水庫'; signal='保命'; signalClass='signal-chip bg-orange-500 text-white'; actionable.push(`${k.name}：${action}`); }
-          } else if(reservoir < 180000){
-            if(deviation >= 10){ action='收至剩 50% 底倉，獲利 100% 回水庫'; signal='鎖定'; signalClass='signal-chip bg-rose-600 text-white'; actionable.push(`${k.name}：${action}`); }
-            else if(deviation >= 5){ action='收割 10%，獲利 100% 回水庫'; signal='鎖定'; signalClass='signal-chip bg-orange-500 text-white'; actionable.push(`${k.name}：${action}`); }
-          } else if(reservoir > 1000000){
-            if(deviation >= 25){ action='收割 20%，底倉至少 85%'; signal='厚尾'; signalClass='signal-chip bg-rose-600 text-white'; actionable.push(`${k.name}：${action}`); }
-            else if(deviation >= 15){ action='收割 10%，底倉至少 85%'; signal='厚尾'; signalClass='signal-chip bg-amber-500 text-white'; actionable.push(`${k.name}：${action}`); }
-          } else {
-            if(deviation >= 20){ action='再收割 20%，50% 水庫 / 50% 回原王'; signal='再收'; signalClass='signal-chip bg-rose-600 text-white'; actionable.push(`${k.name}：${action}`); }
-            else if(deviation >= 15){ action='收割 20%，50% 水庫 / 50% 回原王'; signal='收20'; signalClass='signal-chip bg-orange-500 text-white'; actionable.push(`${k.name}：${action}`); }
-            else if(deviation >= 10){ action='收割 10%，50% 水庫 / 50% 回原王'; signal='收10'; signalClass='signal-chip bg-amber-500 text-white'; actionable.push(`${k.name}：${action}`); }
-            else if(deviation >= 5){ action='先觀察，接近收割門檻'; signal='準備'; signalClass='signal-chip bg-emerald-600 text-white'; }
-          }
+          const decision = getKingDecision({ deviation, cooldownRemain, battle, name: k.name });
 
-          if(cooldownRemain !== null && cooldownRemain > 0){
-            const wouldHarvest = action !== '不動作' && action !== '先觀察，接近收割門檻';
-            if(wouldHarvest){
-              action = `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`;
-              signal = '冷卻';
-              signalClass = 'signal-chip bg-amber-500 text-slate-950';
-            }
-          }
+          if (decision.signal === '收割') harvestCount++;
+          if (decision.signal === '冷卻') cooldownCount++;
 
-          safeSetText('signal_'+k.code, signal);
-          safeSetClass('signal_'+k.code, signalClass);
+          safeSetText('signal_'+k.code, decision.signal);
+          safeSetClass('signal_'+k.code, decision.signalClass);
           safeSetText('ma_'+k.code, ma20.toFixed(2));
           safeSetText('dev_'+k.code, `${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
           safeSetText('trigger_'+k.code, triggerText);
           safeSetText('wave_'+k.code, wave);
           safeSetText('add_'+k.code, add);
           safeSetText('threshold_'+k.code, `${kingTrigger}%`);
-          safeSetText('action_'+k.code, action);
+          safeSetText('action_'+k.code, decision.action);
+
+          safeSetClass(`cmdBox_${k.code}`, `king-command ${decision.cmdClass} mt-4`);
+          safeSetText(`cmdTitle_${k.code}`, `👉 ${decision.title}`);
+          safeSetText(`cmdReason_${k.code}`, decision.reason);
+
+          decisionLines.push(`• ${k.name}：${decision.action}`);
 
           kingStats.push({
             name: k.name,
@@ -888,6 +1175,10 @@
           });
 
           if(i < 3) deviationLines.push(`${k.name}：${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
+
+          if (decision.signal === '收割') {
+            actionable.push(`${k.name}：${decision.action}`);
+          }
         }
 
         safeSetHTML('deviationSummary', deviationLines.length ? deviationLines.join('<br>') : '等待王卡資料…');
@@ -914,7 +1205,6 @@
 
         const globalTrigger = triggeredCount > 0 ? `已觸發 ${triggeredCount} 王` : '未達任何王門檻';
         const globalAdd = (ammoRemain <= 0 || triggerRemain <= 0) ? '🚫 禁止加碼' : triggeredCount > 0 ? '✅ 可依觸發王分配' : '❌ 本次不加碼';
-
         safeSetText('globalTriggerText', globalTrigger);
         safeSetText('globalAddText', globalAdd);
 
@@ -929,7 +1219,6 @@
         safeSetText('ammoRecommend', formatMoney(recommend));
         safeSetText('ammoRecommendHero', formatMoney(recommend));
         lastRecommendValue = recommend;
-        lastTriggeredCandidateCount = triggeredCandidates.length;
         lastTriggeredCandidateNames = triggeredCandidates.map(x => x.name);
 
         let allocationHtml='', recommendText='';
@@ -967,11 +1256,41 @@
         safeSetHTML('allocationCards', allocationHtml);
         safeSetHTML('recommendBoard', recommendText);
 
+        // GLOBAL COMMAND
+        let globalTitle = '👉 今日維持紀律，不動作';
+        let globalReason = '目前沒有任何收割指令優先於冷卻與法典條件，也沒有必須立刻執行的動作。';
+        let globalHint = '今天重點：照常定投，收盤後再檢核。';
+        let globalClass = 'decision-big cmd-wait';
+
+        if (harvestCount > 0) {
+          globalTitle = `👉 今日執行 ${harvestCount} 筆收割`;
+          globalReason = `已有 ${harvestCount} 王達到當前水庫戰區的收割門檻，請依各王卡上的指令執行。`;
+          globalHint = actionable.length ? actionable.join(' ｜ ') : '請查看王卡指令。';
+          globalClass = 'decision-big cmd-harvest';
+        } else if (cooldownCount > 0) {
+          globalTitle = '👉 今日以冷卻優先，不追操作';
+          globalReason = `目前有 ${cooldownCount} 王處於冷卻中，冷卻期間禁止收割，避免你自己手滑。`;
+          globalHint = '今天優先遵守冷卻鐵律。';
+          globalClass = 'decision-big cmd-cooldown';
+        } else if (triggeredCandidates.length > 0 && recommend > 0) {
+          globalTitle = `👉 今日可加碼，建議 ${formatMoney(recommend)} 元`;
+          globalReason = `有 ${triggeredCandidates.length} 王達到超底王門檻，且本月仍有剩餘彈藥與次數。`;
+          globalHint = `候選：${lastTriggeredCandidateNames.join('、')}`;
+          globalClass = 'decision-big cmd-watch';
+        }
+
+        safeSetClass('globalCommandCard', globalClass);
+        safeSetText('globalCommandTitle', globalTitle);
+        safeSetText('globalCommandReason', globalReason);
+        safeSetText('globalCommandHint', globalHint);
+
+        safeSetHTML('threeKingDecisionBoard', decisionLines.length ? decisionLines.join('<br>') : '等待資料');
+
         const summary = [];
         summary.push(`總資產：${formatMoney(totalAssets)}｜水庫：${formatMoney(reservoir)}｜月定投：${formatMoney(monthlyInput)}｜月回灌：${formatMoney(monthlyRecycle)}`);
         summary.push(`本月總彈藥：${formatMoney(ammoLimit)}｜已用：${formatMoney(usedAmmo)}｜剩餘：${formatMoney(ammoRemain)}｜本月觸發：${monthlyTriggerCount}/${maxTriggerPerMonth}`);
-        summary.push(`本次建議：${formatMoney(recommend)}｜總體觸發：${globalTrigger}｜加碼許可：${globalAdd}`);
-        summary.push(actionable.length ? `今日收割可執行：<br>${actionable.map(x=>`• ${x}`).join('<br>')}` : '今日沒有達到收割門檻的王。請維持定投，收盤後再檢核。');
+        summary.push(`飛輪戰區：${battle.label}｜規則：${battle.rule}`);
+        summary.push(actionable.length ? `今日可執行收割：<br>${actionable.map(x=>`• ${x}`).join('<br>')}` : '今日沒有達到收割門檻的王。請維持定投，收盤後再檢核。');
 
         safeSetHTML('summaryBoard', summary.join('<br><br>'));
         updateChart(totalAssets, reservoir, recommend);
