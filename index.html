@@ -3,151 +3,476 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>飛輪操盤系統 Mobile V2</title>
+  <title>飛輪操盤系統 Mobile Neo</title>
   <style>
     :root{
-      --bg:#07111f;
-      --bg2:#0a1729;
-      --card:rgba(15,23,42,.88);
+      --bg:#030712;
+      --bg2:#07111f;
+      --bg3:#0b1730;
+      --card:rgba(10,20,40,.82);
+      --card-2:rgba(7,15,30,.88);
       --line:rgba(255,255,255,.08);
       --text:#f8fafc;
       --muted:#94a3b8;
       --cyan:#22d3ee;
+      --cyan2:#67e8f9;
       --emerald:#34d399;
+      --emerald2:#86efac;
       --amber:#fbbf24;
+      --amber2:#fde68a;
       --rose:#fb7185;
+      --rose2:#fecdd3;
       --violet:#a78bfa;
+      --violet2:#ddd6fe;
       --sky:#38bdf8;
+      --slate:#cbd5e1;
+      --glow-cyan:0 0 0 1px rgba(34,211,238,.16), 0 10px 30px rgba(34,211,238,.14);
+      --glow-rose:0 0 0 1px rgba(251,113,133,.16), 0 10px 30px rgba(251,113,133,.14);
+      --glow-amber:0 0 0 1px rgba(251,191,36,.16), 0 10px 30px rgba(251,191,36,.14);
+      --glow-emerald:0 0 0 1px rgba(52,211,153,.16), 0 10px 30px rgba(52,211,153,.14);
     }
+
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{
       margin:0;padding:0;
       background:
-        radial-gradient(circle at 20% 0%, rgba(34,211,238,.15), transparent 24%),
-        radial-gradient(circle at 100% 20%, rgba(167,139,250,.12), transparent 20%),
-        linear-gradient(180deg,var(--bg),var(--bg2));
+        radial-gradient(circle at 12% 0%, rgba(34,211,238,.15), transparent 24%),
+        radial-gradient(circle at 100% 10%, rgba(167,139,250,.12), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(56,189,248,.08), transparent 25%),
+        linear-gradient(180deg,var(--bg),var(--bg2) 36%,var(--bg3));
       color:var(--text);
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;
     }
-    body{min-height:100vh;padding:14px 14px 28px;}
-    .shell{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+    body{
+      min-height:100vh;
+      padding:14px 14px 34px;
+    }
+
+    .shell{
+      max-width:820px;
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
     .glass{
-      background:var(--card);
+      position:relative;
+      background:linear-gradient(180deg,rgba(12,24,46,.92),rgba(7,16,31,.94));
       border:1px solid var(--line);
-      border-radius:22px;
-      box-shadow:0 14px 40px rgba(0,0,0,.28);
-      backdrop-filter:blur(14px)
+      border-radius:24px;
+      box-shadow:0 18px 50px rgba(0,0,0,.34);
+      overflow:hidden;
     }
-    .hero{padding:18px}
+
+    .glass::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 28%);
+      pointer-events:none;
+    }
+
+    .hero{
+      padding:20px 18px 18px;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-30px;
+      top:-30px;
+      width:130px;
+      height:130px;
+      background:radial-gradient(circle, rgba(34,211,238,.18), transparent 65%);
+      pointer-events:none;
+    }
+
     .pill{
-      display:inline-flex;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:900;
-      letter-spacing:.16em;border:1px solid rgba(34,211,238,.25);
-      background:rgba(34,211,238,.1);color:#9beaf5
+      display:inline-flex;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.18em;
+      border:1px solid rgba(34,211,238,.22);
+      background:rgba(34,211,238,.1);
+      color:#a5f3fc;
+      box-shadow:var(--glow-cyan);
     }
-    h1{margin:10px 0 0;font-size:28px;line-height:1.1}
-    p{margin:8px 0 0;color:var(--muted);line-height:1.6}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .stats .box,.mini,.king .stat,.signal-box{
-      background:rgba(2,6,23,.55);
+
+    h1{
+      margin:12px 0 0;
+      font-size:30px;
+      line-height:1.05;
+      letter-spacing:.01em;
+    }
+
+    p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .section{
+      padding:16px;
+    }
+
+    .section h2{
+      margin:0 0 12px;
+      font-size:18px;
+      letter-spacing:.02em;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .box,.mini,.stat{
+      background:linear-gradient(180deg,rgba(5,10,24,.9),rgba(8,16,31,.9));
       border:1px solid rgba(255,255,255,.06);
-      border-radius:18px;padding:12px
+      border-radius:18px;
+      padding:12px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
     }
-    .label{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .value{font-weight:900;font-size:20px;line-height:1.15}
-    .mono{font-variant-numeric:tabular-nums}
-    .section{padding:16px}
-    .section h2{margin:0 0 12px;font-size:18px}
-    .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+    .label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .value{
+      font-weight:900;
+      font-size:20px;
+      line-height:1.15;
+    }
+
+    .mono{
+      font-variant-numeric:tabular-nums;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .toolbar-3{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:8px;
+    }
+
     button,.btn-link{
-      appearance:none;border:none;border-radius:16px;padding:14px 14px;font-weight:900;
-      font-size:15px;cursor:pointer;color:#04111f;
-      background:linear-gradient(180deg,#63f3ff,#2ed8ea);
-      box-shadow:0 6px 18px rgba(34,211,238,.24);
+      appearance:none;
+      border:none;
+      border-radius:18px;
+      padding:14px 14px;
+      font-weight:900;
+      font-size:15px;
+      cursor:pointer;
+      color:#02111e;
+      background:linear-gradient(180deg,#67f3ff,#2bd4e6);
+      box-shadow:0 12px 28px rgba(34,211,238,.22);
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
+
     button.secondary{
-      background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.28);box-shadow:none
+      background:rgba(34,211,238,.08);
+      color:#c8f8ff;
+      border:1px solid rgba(34,211,238,.26);
+      box-shadow:none;
     }
-    button.dark{
-      background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(255,255,255,.08);box-shadow:none
+
+    button.dark,.btn-link.dark{
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:none;
     }
+
     input,textarea,select{
-      width:100%;background:rgba(2,6,23,.72);border:1px solid rgba(148,163,184,.18);
-      color:white;border-radius:16px;padding:13px 14px;font-size:16px;outline:none;
+      width:100%;
+      background:rgba(2,6,23,.76);
+      border:1px solid rgba(148,163,184,.18);
+      color:white;
+      border-radius:16px;
+      padding:13px 14px;
+      font-size:16px;
+      outline:none;
     }
+
     input:focus,textarea:focus,select:focus{
-      border-color:rgba(34,211,238,.8);box-shadow:0 0 0 3px rgba(34,211,238,.12)
+      border-color:rgba(34,211,238,.8);
+      box-shadow:0 0 0 3px rgba(34,211,238,.12);
     }
-    textarea{min-height:88px;resize:vertical}
-    .stack{display:flex;flex-direction:column;gap:10px}
+
+    textarea{
+      min-height:92px;
+      resize:vertical;
+    }
+
+    .stack{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
     .chip{
-      display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:7px 11px;
-      font-size:12px;font-weight:900
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.02em;
     }
-    .chip.ok{background:rgba(52,211,153,.16);color:#b6f6df;border:1px solid rgba(52,211,153,.25)}
-    .chip.warn{background:rgba(251,191,36,.16);color:#fde7a5;border:1px solid rgba(251,191,36,.22)}
-    .chip.danger{background:rgba(251,113,133,.14);color:#fecdd6;border:1px solid rgba(251,113,133,.22)}
-    .balance{display:flex;border-radius:999px;overflow:hidden;height:14px;background:rgba(255,255,255,.06)}
-    .balance .attack{background:linear-gradient(90deg,#38bdf8,#22d3ee)}
-    .balance .defense{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
-    .king{padding:16px;display:flex;flex-direction:column;gap:12px}
-    .king-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-    .king-title{font-size:19px;font-weight:900}
-    .king-sub{font-size:12px;color:var(--muted);margin-top:4px}
-    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .king .value{font-size:18px}
-    .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-    .actions button,.actions .btn-link{padding:12px 10px;font-size:13px;text-align:center;text-decoration:none}
-    .actions .btn-link{
-      display:flex;align-items:center;justify-content:center;
-      background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.28);box-shadow:none
+
+    .chip.ok{
+      background:rgba(52,211,153,.16);
+      color:#b6f6df;
+      border:1px solid rgba(52,211,153,.24);
+      box-shadow:var(--glow-emerald);
     }
-    .cool{font-size:13px;font-weight:900}
-    .cool.ok{color:#86efac}.cool.warn{color:#fde68a}.cool.danger{color:#fda4af}
-    .note{font-size:12px;line-height:1.55;color:var(--muted)}
-    .summary{font-size:14px;line-height:1.7;color:#def7ff}
-    .decision{
-      border-radius:18px;padding:12px 14px;font-size:14px;font-weight:900;line-height:1.6
+
+    .chip.warn{
+      background:rgba(251,191,36,.16);
+      color:#fde7a5;
+      border:1px solid rgba(251,191,36,.22);
+      box-shadow:var(--glow-amber);
     }
-    .decision.harvest{
+
+    .chip.danger{
       background:rgba(251,113,133,.14);
+      color:#fecdd6;
+      border:1px solid rgba(251,113,133,.22);
+      box-shadow:var(--glow-rose);
+    }
+
+    .chip.idle{
+      background:rgba(255,255,255,.06);
+      color:#e2e8f0;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .cool{
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+
+    .cool.ok{color:#86efac}
+    .cool.warn{color:#fde68a}
+    .cool.danger{color:#fda4af}
+
+    .summary{
+      font-size:14px;
+      line-height:1.74;
+      color:#def7ff;
+    }
+
+    .note{
+      font-size:12px;
+      line-height:1.58;
+      color:var(--muted);
+    }
+
+    .balance{
+      display:flex;
+      border-radius:999px;
+      overflow:hidden;
+      height:16px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .balance .attack{
+      background:linear-gradient(90deg,#38bdf8,#22d3ee);
+      box-shadow:0 0 24px rgba(34,211,238,.24) inset;
+    }
+
+    .balance .defense{
+      background:linear-gradient(90deg,#fbbf24,#f59e0b);
+      box-shadow:0 0 24px rgba(251,191,36,.18) inset;
+    }
+
+    .king{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .king-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .king-title{
+      font-size:19px;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+
+    .king-sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:8px;
+    }
+
+    .actions button,.actions .btn-link{
+      padding:12px 10px;
+      font-size:13px;
+    }
+
+    .actions .btn-link{
+      background:rgba(34,211,238,.08);
+      color:#c8f8ff;
+      border:1px solid rgba(34,211,238,.28);
+      box-shadow:none;
+    }
+
+    .stat-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .decision{
+      border-radius:18px;
+      padding:13px 14px;
+      font-size:14px;
+      font-weight:900;
+      line-height:1.6;
+      letter-spacing:.01em;
+    }
+
+    .decision.harvest{
+      background:linear-gradient(180deg,rgba(127,29,29,.48),rgba(88,28,40,.38));
       border:1px solid rgba(251,113,133,.25);
       color:#ffd1d8;
+      box-shadow:var(--glow-rose);
     }
+
     .decision.watch{
-      background:rgba(251,191,36,.12);
+      background:linear-gradient(180deg,rgba(120,53,15,.34),rgba(87,51,15,.22));
       border:1px solid rgba(251,191,36,.22);
       color:#fde7a5;
+      box-shadow:var(--glow-amber);
     }
-    .decision.add{
-      background:rgba(52,211,153,.14);
-      border:1px solid rgba(52,211,153,.22);
-      color:#b6f6df;
-    }
+
     .decision.idle{
       background:rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.08);
       color:#e2e8f0;
     }
-    .dev-positive{color:#fecdd3 !important}
-    .dev-mid{color:#fde68a !important}
-    .dev-low{color:#86efac !important}
+
+    .decision.lock{
+      background:linear-gradient(180deg,rgba(76,29,149,.28),rgba(55,28,99,.22));
+      border:1px solid rgba(167,139,250,.22);
+      color:#ddd6fe;
+      box-shadow:0 0 0 1px rgba(167,139,250,.12), 0 10px 30px rgba(167,139,250,.08);
+    }
+
+    .dev-hot{color:#fecdd3 !important}
+    .dev-warm{color:#fde68a !important}
+    .dev-cool{color:#86efac !important}
+    .dev-cold{color:#67e8f9 !important}
+
+    .zone-card{
+      border-radius:20px;
+      padding:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,rgba(8,15,29,.88),rgba(6,11,22,.92));
+    }
+
+    .zone-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .warn-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .warn-item{
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(251,113,133,.1);
+      border:1px solid rgba(251,113,133,.18);
+      color:#ffd1d8;
+      font-size:13px;
+      line-height:1.6;
+      font-weight:800;
+    }
+
+    .ok-item{
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(52,211,153,.1);
+      border:1px solid rgba(52,211,153,.16);
+      color:#b6f6df;
+      font-size:13px;
+      line-height:1.6;
+      font-weight:800;
+    }
+
+    .footer-space{height:20px}
   </style>
 </head>
 <body>
   <div class="shell">
     <section class="glass hero">
-      <div class="pill">FLYWHEEL MOBILE · DEVIATION COMMAND</div>
+      <div class="pill">FLYWHEEL MOBILE · NEO COMMAND</div>
       <h1>飛輪操盤系統</h1>
-      <p>手機強化版。這版主打：自動算 20MA、即時乖離、收割訊號、10 日觸發加碼、冷卻倒數、攻守比例。</p>
+      <p>酷炫手機版，但核心不變。所有收割、加碼、戰區切換，都依飛輪 20.0 法典自動判定，不讓情緒接管你的手。</p>
     </section>
 
-    <section class="glass section stats">
+    <section class="glass section">
       <div class="grid2">
-        <div class="box"><div class="label">同步狀態</div><div id="syncBadge" class="value" style="font-size:18px;color:#67e8f9">未同步</div></div>
-        <div class="box"><div class="label">最後同步</div><div id="lastSyncTime" class="value mono" style="font-size:16px">—</div></div>
-        <div class="box"><div class="label">本月狀態</div><div id="monthStatusText" class="value" style="font-size:18px;color:#86efac">綠燈</div><div id="monthStatusHint" class="note">節奏正常</div></div>
-        <div class="box"><div class="label">資產階段</div><div id="phaseText" class="value" style="font-size:18px">基礎累積期</div><div class="note">月份鍵：<span id="monthKeyText">—</span></div></div>
+        <div class="box">
+          <div class="label">同步狀態</div>
+          <div id="syncBadge" class="value" style="font-size:18px;color:#67e8f9">未同步</div>
+        </div>
+        <div class="box">
+          <div class="label">最後同步</div>
+          <div id="lastSyncTime" class="value mono" style="font-size:16px">—</div>
+        </div>
+        <div class="box">
+          <div class="label">本月狀態</div>
+          <div id="monthStatusText" class="value" style="font-size:18px;color:#86efac">綠燈</div>
+          <div id="monthStatusHint" class="note">節奏正常</div>
+        </div>
+        <div class="box">
+          <div class="label">資產階段</div>
+          <div id="phaseText" class="value" style="font-size:18px">基礎累積期</div>
+          <div class="note">月份鍵：<span id="monthKeyText">—</span></div>
+        </div>
       </div>
+
       <div class="toolbar" style="margin-top:10px">
         <button id="reloadBtn" class="secondary">重新載入</button>
         <button id="saveBtn">儲存同步</button>
@@ -164,19 +489,33 @@
         <label class="stack"><span class="label">本月已加碼</span><input id="usedAmmo" type="number"></label>
         <label class="stack"><span class="label">本月已觸發次數</span><input id="monthlyTriggerCount" type="number"></label>
       </div>
+
       <input id="monthKey" type="hidden">
       <input id="kingCount" type="hidden" value="3">
       <input id="currentDrawdown" type="hidden" value="0">
       <input id="maxTriggerPerMonth" type="hidden" value="6">
+
       <div class="grid2" style="margin-top:10px">
         <div class="mini"><div class="label">本月總彈藥</div><div id="ammoLimit" class="value mono">0</div></div>
         <div class="mini"><div class="label">剩餘可用</div><div id="ammoRemain" class="value mono" style="color:#67e8f9">0</div></div>
         <div class="mini"><div class="label">本次建議</div><div id="ammoRecommend" class="value mono" style="color:#86efac">0</div></div>
         <div class="mini"><div class="label">紀律分數</div><div id="disciplineText" class="value mono">100</div></div>
       </div>
+
       <div class="toolbar" style="margin-top:10px">
         <button id="applyRecommendBtn">套用建議</button>
         <button id="resetAmmoBtn" class="dark">本月歸零</button>
+      </div>
+    </section>
+
+    <section class="glass section">
+      <h2>飛輪戰區</h2>
+      <div class="zone-card">
+        <div class="zone-top">
+          <div id="battleZoneChip" class="chip idle">等待判讀</div>
+          <div class="chip idle">核心法典驅動</div>
+        </div>
+        <div id="battleZoneRule" class="summary">等待資料</div>
       </div>
     </section>
 
@@ -187,21 +526,24 @@
         <div id="balanceAttackBar" class="attack" style="width:70%"></div>
         <div id="balanceReservoirBar" class="defense" style="width:30%"></div>
       </div>
-      <div class="note" style="margin-top:10px">看這格就知道現在陣型偏進攻還是偏防守。</div>
+      <div class="note" style="margin-top:10px">防手癢優先級鎖：水庫未達當前 Phase 目標前，禁止優先新增王。</div>
     </section>
 
     <section class="glass section">
-      <h2>今日摘要</h2>
+      <h2>今日總覽</h2>
       <div id="summaryBoard" class="summary">等待資料載入…</div>
-      <div id="recommendBoard" class="summary" style="margin-top:10px;color:#bbf7d0">等待計算…</div>
+      <div id="recommendBoard" class="summary" style="margin-top:12px;color:#bbf7d0">等待計算…</div>
+      <div id="warningBoard" class="warn-list"></div>
     </section>
 
     <section id="kingCards" class="stack"></section>
 
     <section class="glass section">
       <h2>備註</h2>
-      <textarea id="notes" placeholder="可記錄今日動作與想法"></textarea>
+      <textarea id="notes" placeholder="記錄今日動作、收割、加碼、心法提醒"></textarea>
     </section>
+
+    <div class="footer-space"></div>
   </div>
 
 <script>
@@ -209,8 +551,8 @@ const API = "https://script.google.com/macros/s/AKfycbw_z3a9kbwrn7FcXxj8fL8tN-tm
 
 const kingDefs = [
   { code: 'A32001', name: '野村優質', defaultTrigger: -10, anueLink: 'https://www.anuefund.com/fund/detail/A32001' },
-  { code: 'A20106', name: 'NASDAQ-100', defaultTrigger: -8, anueLink: 'https://www.anuefund.com/fund/detail/A20106' },
-  { code: 'B29037', name: '摩根品牌', defaultTrigger: -12, anueLink: 'https://www.anuefund.com/fund/detail/B29037' }
+  { code: 'A20106', name: '富邦 NASDAQ-100', defaultTrigger: -10, anueLink: 'https://www.anuefund.com/fund/detail/A20106' },
+  { code: 'B29037', name: '摩根品牌', defaultTrigger: -10, anueLink: 'https://www.anuefund.com/fund/detail/B29037' }
 ];
 
 let isBuildingCards = false;
@@ -290,9 +632,95 @@ function getCooldownRemaining(dateStr){
 }
 
 function getPhaseText(totalAssets){
-  if(totalAssets < 3000000) return '基礎累積期';
-  if(totalAssets < 8000000) return '穩定成長期';
-  return '厚尾複利期';
+  if(totalAssets < 3000000) return 'Phase 1｜基礎累積期';
+  if(totalAssets < 8000000) return 'Phase 2｜擴張邊界期';
+  return 'Phase 3｜防禦巡航期';
+}
+
+function getPhaseReservoirTarget(totalAssets){
+  if(totalAssets < 3000000) return 600000;
+  if(totalAssets < 8000000) return 1000000;
+  return 2400000;
+}
+
+function getBattleZone(reservoir){
+  if(reservoir < 150000){
+    return {
+      key:'war',
+      chipText:'🔴 戰時狀態',
+      chipClass:'chip danger',
+      rule:'水庫 < 15萬：+5% 收割10%；+10% 收割至剩 50% 底倉；獲利 100% 回水庫。'
+    };
+  }
+  if(reservoir >= 150000 && reservoir < 180000){
+    return {
+      key:'transition',
+      chipText:'🟡 過渡鎖定區',
+      chipClass:'chip warn',
+      rule:'15萬 ~ 18萬：維持戰時規則；+5% 收割10%；+10% 收割至剩 50% 底倉；獲利 100% 回水庫。'
+    };
+  }
+  if(reservoir >= 180000 && reservoir < 600000){
+    return {
+      key:'ignite',
+      chipText:'⚡ 點火擴張區',
+      chipClass:'chip ok',
+      rule:'18萬 ~ 60萬：+10% 收割10%；+15% 收割20%；+20% 再收20%；獲利 50% 水庫 / 50% 回原王。'
+    };
+  }
+  if(reservoir > 1000000){
+    return {
+      key:'thicktail',
+      chipText:'🚀 厚尾複利區',
+      chipClass:'chip ok',
+      rule:'水庫 > 100萬：+15% 收割10%；+25% 收割20%；底倉至少保留 85%；獲利 50% 水庫 / 50% 回原王。'
+    };
+  }
+  return {
+    key:'buffer',
+    chipText:'🟢 水庫擴充區',
+    chipClass:'chip ok',
+    rule:'60萬 ~ 100萬：優先擴充水庫，可沿用點火擴張收割邏輯，但避免過度進攻。'
+  };
+}
+
+function getHarvestDecision(deviation, reservoir, cooldownRemain){
+  if(cooldownRemain !== null && cooldownRemain > 0){
+    return { cls:'lock', text:'❄️ 冷卻中，暫停收割', action:'冷卻中禁止收割' };
+  }
+
+  const zone = getBattleZone(reservoir);
+
+  if(zone.key === 'war' || zone.key === 'transition'){
+    if(deviation >= 10) return { cls:'harvest', text:'🔴 收至 50% 底倉', action:'收割至剩 50% 底倉｜獲利 100% 回水庫' };
+    if(deviation >= 5) return { cls:'harvest', text:'🟠 收割 10%', action:'收割 10%｜獲利 100% 回水庫' };
+    if(deviation > 0) return { cls:'watch', text:'🟡 轉正觀察', action:'未達戰時收割門檻，先觀察' };
+    return { cls:'idle', text:'⚪ 未達收割區', action:'未達收割區，維持紀律' };
+  }
+
+  if(zone.key === 'ignite' || zone.key === 'buffer'){
+    if(deviation >= 20) return { cls:'harvest', text:'🚨 再收 20%', action:'再收割 20%｜獲利 50% 水庫 / 50% 回原王' };
+    if(deviation >= 15) return { cls:'harvest', text:'🔴 收割 20%', action:'收割 20%｜獲利 50% 水庫 / 50% 回原王' };
+    if(deviation >= 10) return { cls:'watch', text:'🟠 收割 10%', action:'收割 10%｜獲利 50% 水庫 / 50% 回原王' };
+    if(deviation >= 5) return { cls:'watch', text:'🟡 接近收割區', action:'接近收割區，先觀察' };
+    return { cls:'idle', text:'⚪ 未達收割區', action:'未達收割區，維持紀律' };
+  }
+
+  if(zone.key === 'thicktail'){
+    if(deviation >= 25) return { cls:'harvest', text:'🔴 收割 20%', action:'收割 20%｜底倉至少保留 85%｜獲利 50% 水庫 / 50% 回原王' };
+    if(deviation >= 15) return { cls:'watch', text:'🟠 收割 10%', action:'收割 10%｜底倉至少保留 85%｜獲利 50% 水庫 / 50% 回原王' };
+    if(deviation >= 5) return { cls:'watch', text:'🟡 接近厚尾區', action:'接近厚尾收割區，先觀察' };
+    return { cls:'idle', text:'⚪ 未達收割區', action:'未達收割區，維持紀律' };
+  }
+
+  return { cls:'idle', text:'⚪ 未達收割區', action:'未達收割區，維持紀律' };
+}
+
+function getDevClass(dev){
+  if(dev >= 15) return 'value mono dev-hot';
+  if(dev >= 5) return 'value mono dev-warm';
+  if(dev > 0) return 'value mono dev-cool';
+  return 'value mono dev-cold';
 }
 
 function resetMonthlyIfNeeded(){
@@ -342,31 +770,6 @@ function appendTodayValue(code){
   updateVisuals();
 }
 
-function getDeviationDecision(deviation, cooldownRemain){
-  if(cooldownRemain !== null && cooldownRemain > 0){
-    return { cls:'watch', text:`🔒 冷卻中，暫不收割` };
-  }
-  if(deviation >= 20){
-    return { cls:'harvest', text:`🚨 乖離過大，優先收割 20%` };
-  }
-  if(deviation >= 15){
-    return { cls:'harvest', text:`🔴 達收割區，建議收割 20%` };
-  }
-  if(deviation >= 10){
-    return { cls:'watch', text:`🟠 達收割區，建議收割 10%` };
-  }
-  if(deviation >= 5){
-    return { cls:'watch', text:`🟡 接近收割區，先觀察` };
-  }
-  return { cls:'idle', text:`⚪ 未到收割區，維持紀律` };
-}
-
-function getDevClass(dev){
-  if(dev >= 15) return 'value mono dev-positive';
-  if(dev >= 5) return 'value mono dev-mid';
-  return 'value mono dev-low';
-}
-
 function ensureKingCards(){
   if(isBuildingCards) return;
   isBuildingCards = true;
@@ -380,7 +783,7 @@ function ensureKingCards(){
             <div class="king-title">${k.name}</div>
             <div class="king-sub">${k.code}</div>
           </div>
-          <div id="signal_${k.code}" class="chip ok">待判讀</div>
+          <div id="signal_${k.code}" class="chip idle">待判讀</div>
         </div>
 
         <div class="actions">
@@ -454,11 +857,17 @@ function updateVisuals(){
     const ammoLimit = Math.floor(reservoir * 0.15);
     const ammoRemain = Math.max(0, ammoLimit - usedAmmo);
     const triggerRemain = Math.max(0, maxTriggerPerMonth - monthlyTriggerCount);
+    const battleZone = getBattleZone(reservoir);
 
     safeSetText('phaseText', getPhaseText(totalAssets));
     safeSetText('ammoLimit', formatMoney(ammoLimit));
     safeSetText('ammoRemain', formatMoney(ammoRemain));
     updateBalanceRatio(totalAssets, reservoir);
+
+    const battleChip = safeEl('battleZoneChip');
+    safeSetText('battleZoneChip', battleZone.chipText);
+    if(battleChip) battleChip.className = battleZone.chipClass;
+    safeSetText('battleZoneRule', battleZone.rule);
 
     let monthStatusText = '綠燈';
     let monthStatusHint = '節奏正常';
@@ -473,10 +882,14 @@ function updateVisuals(){
     safeSetText('monthStatusHint', monthStatusHint);
 
     const warnings = [];
-    if(monthlyInput !== 9000) warnings.push('固定定投不是 9000');
-    if(usedAmmo > ammoLimit) warnings.push('本月子彈超打');
-    if(monthlyTriggerCount > maxTriggerPerMonth && maxTriggerPerMonth > 0) warnings.push('本月觸發次數超限');
-    if(ammoRemain <= 6000 && usedAmmo <= ammoLimit) warnings.push('本月子彈接近打完');
+    if(monthlyInput !== 9000) warnings.push('固定定投不是 9,000，違反外部鋼鐵活水鐵律。');
+    if(usedAmmo > ammoLimit) warnings.push('本月子彈超打，超出水庫 15% 上限。');
+    if(monthlyTriggerCount > maxTriggerPerMonth && maxTriggerPerMonth > 0) warnings.push('本月觸發次數超限。');
+    if(ammoRemain <= 6000 && usedAmmo <= ammoLimit) warnings.push('本月彈藥接近打完，後續請保守。');
+    if(totalAssets < 3000000 && reservoir < 600000) warnings.push('Phase 1 目標：先把水庫穩到 60 萬。');
+    if(totalAssets >= 3000000 && totalAssets < 8000000 && reservoir < 1000000) warnings.push('Phase 2 目標：水庫優先擴至 100 萬。');
+    if(totalAssets >= 8000000 && reservoir < 2400000) warnings.push('Phase 3 目標：雙水庫要到 240 萬。');
+
     const discipline = Math.max(0,100 - warnings.length * 8 - (monthlyInput !== 9000 ? 8 : 0));
     safeSetText('disciplineText', String(discipline));
 
@@ -507,6 +920,8 @@ function updateVisuals(){
 
       if(!calc){
         safeSetText('signal_'+k.code, '資料不足');
+        const chip = safeEl('signal_'+k.code);
+        if(chip) chip.className = 'chip idle';
         safeSetText('nav_'+k.code, prices.length ? prices[prices.length-1] : '—');
         safeSetText('ma_'+k.code, `${prices.length}/20`);
         safeSetText('dev_'+k.code, '—');
@@ -535,14 +950,17 @@ function updateVisuals(){
       let triggerText='待判定';
       let add='❌ 不加碼';
       let signal='待命';
+      let signalClass='chip idle';
       let action='不動作';
 
       if(triggerCheck){
         safeSetText('chg10_'+k.code, `${triggerCheck.change>=0?'+':''}${triggerCheck.change.toFixed(2)}%`);
         if(triggerCheck.triggered){
           triggerText='✅ 已觸發';
+          signal='觸發';
+          signalClass='chip ok';
           if(ammoRemain<=0 || triggerRemain<=0) add='🚫 禁止';
-          else if(wave==='第二波候選') add='🟡 第二波可加';
+          else if(firstWaveDone) add='🟡 第二波可加';
           else add='✅ 可加碼';
 
           let score = Math.abs(triggerCheck.change);
@@ -559,38 +977,40 @@ function updateVisuals(){
           });
         } else {
           triggerText='❌ 未觸發';
+          signal='待命';
+          signalClass='chip idle';
         }
       } else {
         safeSetText('chg10_'+k.code, '需11筆');
       }
 
-      const decision = getDeviationDecision(deviation, cooldownRemain);
+      const decision = getHarvestDecision(deviation, reservoir, cooldownRemain);
       const decisionEl = safeEl('decision_'+k.code);
       if(decisionEl){
         decisionEl.className = `decision ${decision.cls}`;
         decisionEl.textContent = decision.text;
       }
 
-      if(cooldownRemain !== null && cooldownRemain > 0){
-        signal = '冷卻';
-        action = `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`;
+      if(decision.cls === 'lock'){
+        signal='冷卻';
+        signalClass='chip warn';
+        action = decision.action;
       } else {
-        if(deviation >= 20){
-          signal='再收';
-          action='再收割 20%，50% 水庫 / 50% 回原王';
-        } else if(deviation >= 15){
-          signal='收20';
-          action='收割 20%，50% 水庫 / 50% 回原王';
-        } else if(deviation >= 10){
-          signal='收10';
-          action='收割 10%，50% 水庫 / 50% 回原王';
-        } else if(deviation >= 5){
-          signal='準備';
-          action='先觀察，接近收割門檻';
-        }
+        signalClass =
+          decision.cls === 'harvest' ? 'chip danger' :
+          decision.cls === 'watch' ? 'chip warn' :
+          'chip idle';
+        signal =
+          decision.cls === 'harvest' ? '收割' :
+          decision.cls === 'watch' ? '觀察' :
+          '待命';
+        action = decision.action;
       }
 
       safeSetText('signal_'+k.code, signal);
+      const chip = safeEl('signal_'+k.code);
+      if(chip) chip.className = signalClass;
+
       safeSetText('nav_'+k.code, current.toFixed(2));
       safeSetText('ma_'+k.code, ma20.toFixed(2));
       safeSetText('dev_'+k.code, `${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
@@ -600,25 +1020,29 @@ function updateVisuals(){
       safeSetText('add_'+k.code, add);
       safeSetText('action_'+k.code, action);
 
-      summaryLines.push(`${k.name}：淨值 ${current.toFixed(2)}｜20MA ${ma20.toFixed(2)}｜乖離 ${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
+      summaryLines.push(`${k.name}｜淨值 ${current.toFixed(2)}｜20MA ${ma20.toFixed(2)}｜乖離 ${deviation>=0?'+':''}${deviation.toFixed(2)}%｜${decision.text}`);
       if(decision.cls === 'harvest' || decision.cls === 'watch'){
-        recommendLines.push(`• ${k.name}：${decision.text}`);
+        recommendLines.push(`• ${k.name}：${decision.action}`);
       }
     });
 
-    safeSetHTML('summaryBoard',
-      summaryLines.length
-        ? `總資產 ${formatMoney(totalAssets)}｜水庫 ${formatMoney(reservoir)}<br><br>${summaryLines.join('<br>')}`
-        : '等待資料載入…'
+    const phaseTarget = getPhaseReservoirTarget(totalAssets);
+
+    safeSetHTML(
+      'summaryBoard',
+      `總資產 ${formatMoney(totalAssets)}｜水庫 ${formatMoney(reservoir)}｜Phase 水庫目標 ${formatMoney(phaseTarget)}<br><br>`
+      + (summaryLines.length ? summaryLines.join('<br>') : '等待資料載入…')
     );
 
     let recommend = 0;
     if(ammoRemain <= 0 || triggerRemain <= 0) recommend = 0;
     else if(triggeredCandidates.length === 0) recommend = 0;
-    else if(reservoir < 150000) recommend = Math.min(ammoRemain, 3000);
+    else if(reservoir < 80000) recommend = Math.min(ammoRemain, 3000);
+    else if(reservoir >= 80000 && reservoir < 120000) recommend = Math.min(ammoRemain, 6000);
+    else if(reservoir >= 120000 && reservoir < 150000) recommend = Math.min(ammoRemain, 18000);
     else if(triggeredCandidates.length === 1) recommend = Math.min(ammoRemain, 6000);
     else if(triggeredCandidates.length === 2) recommend = Math.min(ammoRemain, 12000);
-    else recommend = Math.min(ammoRemain, 22000);
+    else recommend = Math.min(ammoRemain, 18000);
 
     safeSetText('ammoRecommend', formatMoney(recommend));
     lastRecommendValue = recommend;
@@ -634,6 +1058,16 @@ function updateVisuals(){
       + `<br><br>本次建議出手：${formatMoney(recommend)} 元`
       + triggerText
     );
+
+    const warningBoard = safeEl('warningBoard');
+    if(warningBoard){
+      if(warnings.length){
+        warningBoard.innerHTML = warnings.map(x => `<div class="warn-item">${x}</div>`).join('');
+      } else {
+        warningBoard.innerHTML = `<div class="ok-item">目前輸入與水庫節奏符合飛輪法典，可持續照系統執行。</div>`;
+      }
+    }
+
   } catch(err){
     console.error('updateVisuals error', err);
   }
