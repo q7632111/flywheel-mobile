@@ -3,224 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>飛輪系統 20.1 Mobile</title>
+<title>飛輪系統 Mobile 完整版</title>
 
 <style>
-body{
-  background:#0b0b0b;
-  color:#fff;
-  font-family:Arial;
-  padding:10px;
-}
-
-.card{
-  background:#151515;
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:10px;
-}
-
-.title{
-  font-size:14px;
-  color:#aaa;
-  margin-bottom:6px;
-}
-
-.big{
-  font-size:18px;
-  font-weight:bold;
-}
-
-input,textarea{
-  width:100%;
-  padding:6px;
-  border-radius:6px;
-  border:none;
-  margin-top:5px;
-  background:#222;
-  color:#fff;
-}
-
-.btn{
-  margin-top:6px;
-  padding:6px;
-  border:none;
-  border-radius:6px;
-  background:#2a2a2a;
-  color:#fff;
-}
+body{background:#0b0b0b;color:#fff;font-family:Arial;padding:10px;}
+.card{background:#151515;border-radius:12px;padding:12px;margin-bottom:10px;}
+.title{font-size:14px;color:#aaa;margin-bottom:6px;}
+input,textarea{width:100%;padding:6px;border-radius:6px;border:none;margin-top:5px;background:#222;color:#fff;}
+.btn{margin-top:6px;padding:6px;border:none;border-radius:6px;background:#2a2a2a;color:#fff;}
+.green{color:#00e676;}
+.yellow{color:#ffd600;}
+.red{color:#ff5252;}
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 戰況雷達 -->
 <div class="card">
-  <div class="title">📡 系統戰況</div>
-  <div id="battleStatus" class="big"></div>
-  <div id="battleAdvice"></div>
+<div class="title">總資產</div>
+<input id="totalAssets" oninput="update()">
 </div>
 
 <div class="card">
-  <div class="title">🏦 水庫狀態</div>
-  <div id="reservoirStatus"></div>
+<div class="title">水庫</div>
+<input id="reservoir" oninput="update()">
 </div>
 
-<!-- 🔧 基本輸入 -->
+<!-- 三王 -->
 <div class="card">
-  <div class="title">總資產</div>
-  <input id="totalAssets" oninput="update()">
-</div>
-
-<div class="card">
-  <div class="title">水庫</div>
-  <input id="reservoir" oninput="update()">
-</div>
-
-<!-- 👑 三王 -->
-<div class="card">
-  <div class="title">王A（價格）</div>
-  <textarea id="A_prices" oninput="update()"></textarea>
-  <div id="A_result"></div>
-  <button class="btn" onclick="logAction('A','收割')">一鍵收割</button>
-  <button class="btn" onclick="logAction('A','加碼')">一鍵加碼</button>
+<div class="title">王A</div>
+<textarea id="A_prices" oninput="update()"></textarea>
+<div id="A_result"></div>
+<button class="btn" onclick="logAction('A','收割')">收割</button>
+<button class="btn" onclick="logAction('A','加碼')">加碼</button>
 </div>
 
 <div class="card">
-  <div class="title">王B（價格）</div>
-  <textarea id="B_prices" oninput="update()"></textarea>
-  <div id="B_result"></div>
-  <button class="btn" onclick="logAction('B','收割')">一鍵收割</button>
-  <button class="btn" onclick="logAction('B','加碼')">一鍵加碼</button>
+<div class="title">王B</div>
+<textarea id="B_prices" oninput="update()"></textarea>
+<div id="B_result"></div>
+<button class="btn" onclick="logAction('B','收割')">收割</button>
+<button class="btn" onclick="logAction('B','加碼')">加碼</button>
 </div>
 
 <div class="card">
-  <div class="title">王C（價格）</div>
-  <textarea id="C_prices" oninput="update()"></textarea>
-  <div id="C_result"></div>
-  <button class="btn" onclick="logAction('C','收割')">一鍵收割</button>
-  <button class="btn" onclick="logAction('C','加碼')">一鍵加碼</button>
+<div class="title">王C</div>
+<textarea id="C_prices" oninput="update()"></textarea>
+<div id="C_result"></div>
+<button class="btn" onclick="logAction('C','收割')">收割</button>
+<button class="btn" onclick="logAction('C','加碼')">加碼</button>
 </div>
 
-<!-- 📜 操作紀錄 -->
+<!-- 操作紀錄 -->
 <div class="card">
-  <div class="title">📜 操作紀錄</div>
-  <div id="logList"></div>
-  <button class="btn" onclick="exportLog()">匯出</button>
-  <button class="btn" onclick="clearLog()">清空</button>
+<div class="title">操作紀錄</div>
+<div id="logList"></div>
+<button class="btn" onclick="clearLog()">清空</button>
 </div>
 
 <script>
 
-// ===== 工具 =====
+// ===== 基本工具 =====
 function parsePrices(str){
-  if(!str) return [];
-  return str.split(',').map(Number).filter(n=>!isNaN(n));
+if(!str) return [];
+return str.split(',').map(Number).filter(n=>!isNaN(n));
 }
 
 function deviation(prices){
-  if(prices.length < 20) return null;
-  let sum = 0;
-  for(let i=prices.length-20;i<prices.length;i++){
-    sum += prices[i];
-  }
-  const ma = sum/20;
-  const now = prices[prices.length-1];
-  return ((now-ma)/ma)*100;
+if(prices.length<20) return null;
+let sum=0;
+for(let i=prices.length-20;i<prices.length;i++){sum+=prices[i];}
+const ma=sum/20;
+const now=prices[prices.length-1];
+return ((now-ma)/ma)*100;
 }
 
-// ===== 區域 =====
-function zone(r){
-  if(r<150000) return "戰時";
-  if(r<180000) return "過渡";
-  if(r<600000) return "點火";
-  if(r<1000000) return "厚尾準備";
-  return "厚尾複利";
+// ===== 收割次數 =====
+function getCount(k){
+return Number(localStorage.getItem("count_"+k)||0);
+}
+function addCount(k){
+localStorage.setItem("count_"+k,getCount(k)+1);
 }
 
-// ===== 戰況 =====
-function radar(total,res){
+// ===== 判斷 =====
+function judge(type,k,total,res){
 
-  let status="",advice="",rText="";
-  const attack = total-res;
-  const ratio = total>0?attack/total:1;
+const attack=total-res;
+let result={text:"合理",cls:"green"};
 
-  if(ratio<0.6){
-    status="🔴 攻擊不足";
-    advice="停止收割";
-  }else{
-    status="🟢 正常";
-  }
-
-  if(res<80000){
-    rText="🔴 危險";
-  }else if(res<150000){
-    rText="🟡 偏低";
-  }else{
-    rText="🟢 正常";
-  }
-
-  document.getElementById("battleStatus").innerText=status;
-  document.getElementById("battleAdvice").innerText=advice;
-  document.getElementById("reservoirStatus").innerText=rText;
+if(type==="收割"){
+if(total>0 && attack/total<0.6){
+return {text:"違規（攻擊不足）",cls:"red"};
+}
+if(getCount(k)>=2){
+return {text:"違規（超過次數）",cls:"red"};
+}
+if(res<150000){
+return {text:"警告（水庫偏低）",cls:"yellow"};
+}
+addCount(k);
 }
 
-// ===== 主更新 =====
+return result;
+}
+
+// ===== 更新 =====
 function update(){
 
-  const total = Number(document.getElementById("totalAssets").value||0);
-  const res = Number(document.getElementById("reservoir").value||0);
+const total=Number(document.getElementById("totalAssets").value||0);
+const res=Number(document.getElementById("reservoir").value||0);
 
-  radar(total,res);
-
-  ["A","B","C"].forEach(k=>{
-    const p=parsePrices(document.getElementById(k+"_prices").value);
-    const d=deviation(p);
-
-    if(d===null){
-      document.getElementById(k+"_result").innerText="資料不足";
-      return;
-    }
-
-    document.getElementById(k+"_result").innerText=
-      `乖離:${d.toFixed(2)}%｜區:${zone(res)}`;
-  });
+["A","B","C"].forEach(k=>{
+const p=parsePrices(document.getElementById(k+"_prices").value);
+const d=deviation(p);
+if(d===null){
+document.getElementById(k+"_result").innerText="資料不足";
+return;
+}
+document.getElementById(k+"_result").innerText=`乖離:${d.toFixed(2)}%`;
+});
 }
 
-// ===== 操作紀錄 =====
-function logAction(code,type){
+// ===== 紀錄 =====
+function logAction(k,type){
 
-  const total = document.getElementById("totalAssets").value;
-  const res = document.getElementById("reservoir").value;
-  const result = document.getElementById(code+"_result").innerText;
+const total=Number(document.getElementById("totalAssets").value||0);
+const res=Number(document.getElementById("reservoir").value||0);
 
-  const now = new Date().toLocaleString();
+const judgeResult=judge(type,k,total,res);
 
-  const text = `${now}｜${code}｜${type}｜${result}｜水庫:${res}`;
+const now=new Date().toLocaleString();
 
-  let logs = JSON.parse(localStorage.getItem("logs")||"[]");
-  logs.unshift(text);
+const text=`${now}｜${k}｜${type}｜<span class="${judgeResult.cls}">${judgeResult.text}</span>｜水庫:${res}`;
 
-  localStorage.setItem("logs",JSON.stringify(logs));
+let logs=JSON.parse(localStorage.getItem("logs")||"[]");
+logs.unshift(text);
 
-  renderLog();
+localStorage.setItem("logs",JSON.stringify(logs));
+
+renderLog();
 }
 
 function renderLog(){
-  const logs = JSON.parse(localStorage.getItem("logs")||"[]");
-  document.getElementById("logList").innerHTML =
-    logs.map(l=>`<div>${l}</div>`).join('');
+const logs=JSON.parse(localStorage.getItem("logs")||"[]");
+document.getElementById("logList").innerHTML=
+logs.map(l=>`<div>${l}</div>`).join('');
 }
 
 function clearLog(){
-  localStorage.removeItem("logs");
-  renderLog();
-}
-
-function exportLog(){
-  const logs = JSON.parse(localStorage.getItem("logs")||"[]").join("\n");
-  navigator.clipboard.writeText(logs);
-  alert("已複製");
+localStorage.removeItem("logs");
+renderLog();
 }
 
 renderLog();
