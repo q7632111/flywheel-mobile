@@ -1,196 +1,257 @@
-<!-- 🔥 只顯示關鍵新增區塊（你貼時直接覆蓋原本script即可） -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>飛輪系統 20.1 Mobile Pro</title>
+
+<style>
+body{
+  background:#0b0b0b;
+  color:#fff;
+  font-family:Arial;
+  padding:10px;
+}
+
+.card{
+  background:#151515;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+}
+
+.title{
+  font-size:14px;
+  color:#aaa;
+  margin-bottom:6px;
+}
+
+.big{
+  font-size:18px;
+  font-weight:bold;
+}
+
+input,textarea{
+  width:100%;
+  padding:6px;
+  border-radius:6px;
+  border:none;
+  margin-top:5px;
+  background:#222;
+  color:#fff;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================= -->
+<!-- 🔥 戰況雷達 -->
+<!-- ============================= -->
+
+<div class="card">
+  <div class="title">📡 系統戰況</div>
+  <div id="battleStatus" class="big"></div>
+  <div id="battleAdvice"></div>
+</div>
+
+<div class="card">
+  <div class="title">🏦 水庫</div>
+  <div id="reservoirStatus"></div>
+</div>
+
+<!-- ============================= -->
+<!-- 🔧 輸入 -->
+<!-- ============================= -->
+
+<div class="card">
+  <div class="title">總資產</div>
+  <input id="totalAssets" oninput="update()">
+</div>
+
+<div class="card">
+  <div class="title">水庫</div>
+  <input id="reservoir" oninput="update()">
+</div>
+
+<!-- ============================= -->
+<!-- 三王 -->
+<!-- ============================= -->
+
+<div class="card">
+  <div class="title">王 A（價格）</div>
+  <textarea id="A_prices" oninput="update()"></textarea>
+  <div id="A_result"></div>
+</div>
+
+<div class="card">
+  <div class="title">王 B（價格）</div>
+  <textarea id="B_prices" oninput="update()"></textarea>
+  <div id="B_result"></div>
+</div>
+
+<div class="card">
+  <div class="title">王 C（價格）</div>
+  <textarea id="C_prices" oninput="update()"></textarea>
+  <div id="C_result"></div>
+</div>
+
 <script>
 
 // =============================
-// 🧠 20.1 核心補強區（新增）
+// 工具
 // =============================
 
-// 🔥 攻擊力保護鎖
-function isAttackTooLow(totalAssets, reservoir){
-  const attack = totalAssets - reservoir;
-  if(totalAssets <= 0) return false;
-  const ratio = attack / totalAssets;
-  return ratio < 0.6;
+function parsePrices(str){
+  return str.split(',').map(Number).filter(n=>!isNaN(n));
 }
 
-// 🔥 每王每月收割次數
-function getHarvestCount(code){
-  return Number(localStorage.getItem(code+'_harvestCount') || 0);
+function deviation(prices){
+  if(prices.length < 20) return null;
+  const now = prices[prices.length-1];
+  const ma = prices.slice(-20).reduce((a,b)=>a+b)/20;
+  return ((now-ma)/ma)*100;
 }
 
-function addHarvestCount(code){
-  const count = getHarvestCount(code) + 1;
-  localStorage.setItem(code+'_harvestCount', count);
-}
-
-function resetHarvestCountIfNewMonth(){
-  const key = "harvest_month";
-  const current = getCurrentMonthKey();
-  const saved = localStorage.getItem(key);
-
-  if(saved !== current){
-    localStorage.setItem(key, current);
-    kingDefs.forEach(k=>{
-      localStorage.setItem(k.code+'_harvestCount', 0);
-    });
-  }
-}
-
-// 🔥 極速保命模式
-function getEmergencyLimit(reservoir){
-  if(reservoir < 80000) return 1;
-  if(reservoir < 120000) return 2;
-  if(reservoir < 150000) return 3;
-  return Infinity;
-}
-
-// 🔥 完整水庫5階段
-function getBattleZone(reservoir){
-  if(reservoir < 150000){
-    return { key:'war', name:'戰時' };
-  }
-  if(reservoir < 180000){
-    return { key:'transition', name:'過渡' };
-  }
-  if(reservoir < 600000){
-    return { key:'ignite', name:'點火' };
-  }
-  if(reservoir < 1000000){
-    return { key:'prepare', name:'厚尾準備' };
-  }
-  return { key:'compound', name:'厚尾複利' };
+function monthKey(){
+  const d=new Date();
+  return d.getFullYear()+"-"+(d.getMonth()+1);
 }
 
 // =============================
-// 🧠 收割決策（覆蓋舊版）
+// 收割計數
 // =============================
 
-function getHarvestDecision20(deviation, reservoir, cooldownRemain, totalAssets, code){
+function getCount(code){
+  return Number(localStorage.getItem(code)||0);
+}
 
-  const zone = getBattleZone(reservoir);
+function addCount(code){
+  localStorage.setItem(code,getCount(code)+1);
+}
 
-  // 🔥 攻擊力鎖
-  if(isAttackTooLow(totalAssets, reservoir)){
-    return {
-      signal:'鎖定',
-      text:'🛑 攻擊力不足，禁止收割'
-    };
+function resetMonth(){
+  const key="month";
+  const now=monthKey();
+  if(localStorage.getItem(key)!==now){
+    localStorage.setItem(key,now);
+    ["A","B","C"].forEach(k=>localStorage.setItem(k,0));
   }
-
-  // 🔥 冷卻
-  if(cooldownRemain > 0){
-    return {
-      signal:'冷卻',
-      text:`冷卻中 ${cooldownRemain} 天`
-    };
-  }
-
-  // 🔥 收割次數限制
-  if(getHarvestCount(code) >= 2){
-    return {
-      signal:'限制',
-      text:'本月已收割2次'
-    };
-  }
-
-  // =====================
-  // 🔥 各區收割規則
-  // =====================
-
-  if(zone.key === 'war' || zone.key === 'transition'){
-    if(deviation >= 10){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收至50%'};
-    }
-    if(deviation >= 5){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收10%'};
-    }
-  }
-
-  if(zone.key === 'ignite'){
-    if(deviation >= 20){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收20%'};
-    }
-    if(deviation >= 15){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收20%'};
-    }
-    if(deviation >= 10){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收10%'};
-    }
-  }
-
-  if(zone.key === 'prepare'){
-    if(deviation >= 20){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收20%'};
-    }
-    if(deviation >= 15){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收20%'};
-    }
-    if(deviation >= 10){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收10%'};
-    }
-  }
-
-  if(zone.key === 'compound'){
-    if(deviation >= 25){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收20%'};
-    }
-    if(deviation >= 15){
-      addHarvestCount(code);
-      return {signal:'收割', text:'收10%'};
-    }
-  }
-
-  return {signal:'等待', text:'不動'};
 }
 
 // =============================
-// 🧠 updateVisuals 強化
+// 區域
 // =============================
 
-function updateVisuals(){
+function zone(r){
+  if(r<150000) return "war";
+  if(r<180000) return "transition";
+  if(r<600000) return "ignite";
+  if(r<1000000) return "prepare";
+  return "compound";
+}
 
-  resetMonthlyIfNeeded();
-  resetHarvestCountIfNewMonth();
+// =============================
+// 核心判斷
+// =============================
 
-  const totalAssets = Number(safeEl('totalAssets')?.value || 0);
-  const reservoir = Number(safeEl('reservoir')?.value || 0);
+function decision(dev,res,total,code){
 
-  kingDefs.forEach(k => {
+  const attack = total-res;
+  if(total>0 && attack/total <0.6){
+    return "🛑 禁止收割（攻擊不足）";
+  }
 
-    const prices = parsePrices(safeEl(k.code+'_prices')?.value || '');
-    const calc = calcDeviation(prices);
-    if(!calc) return;
+  if(getCount(code)>=2){
+    return "⛔ 本月已收2次";
+  }
 
-    const deviation = calc.deviation;
-    const cooldownRemain = getCooldownRemaining(
-      safeEl(k.code+'_lastHarvestDate')?.value
-    );
+  const z = zone(res);
 
-    const decision = getHarvestDecision20(
-      deviation,
-      reservoir,
-      cooldownRemain,
-      totalAssets,
-      k.code
-    );
+  if(z==="war"||z==="transition"){
+    if(dev>=10){addCount(code);return "收至50%";}
+    if(dev>=5){addCount(code);return "收10%";}
+  }
 
-    safeSetText('decision_'+k.code, decision.text);
+  if(z==="ignite"){
+    if(dev>=20){addCount(code);return "收20%";}
+    if(dev>=15){addCount(code);return "收20%";}
+    if(dev>=10){addCount(code);return "收10%";}
+  }
 
-    // 🔥 顯示本月收割次數
-    const count = getHarvestCount(k.code);
-    safeSetText('signal_'+k.code, `${decision.signal} (${count}/2)`);
+  if(z==="compound"){
+    if(dev>=25){addCount(code);return "收20%";}
+    if(dev>=15){addCount(code);return "收10%";}
+  }
 
+  return "觀望";
+}
+
+// =============================
+// 戰況雷達
+// =============================
+
+function radar(total,res){
+
+  const attack = total-res;
+  const ratio = total>0?attack/total:1;
+
+  let status="";
+  let advice="";
+  let rText="";
+
+  if(ratio<0.6){
+    status="🔴 攻擊不足";
+    advice="停止收割";
+  }else{
+    status="🟢 正常";
+  }
+
+  if(res<80000){
+    rText="🔴 危險";
+    advice="進入保命模式";
+  }else if(res<150000){
+    rText="🟡 偏低";
+  }else if(res<600000){
+    rText="🟢 正常";
+  }else{
+    rText="🟡 厚尾";
+  }
+
+  document.getElementById("battleStatus").innerText=status;
+  document.getElementById("battleAdvice").innerText=advice;
+  document.getElementById("reservoirStatus").innerText=rText;
+}
+
+// =============================
+// 主更新
+// =============================
+
+function update(){
+
+  resetMonth();
+
+  const total = Number(document.getElementById("totalAssets").value||0);
+  const res = Number(document.getElementById("reservoir").value||0);
+
+  radar(total,res);
+
+  ["A","B","C"].forEach(k=>{
+    const p=parsePrices(document.getElementById(k+"_prices").value);
+    const d=deviation(p);
+
+    if(d===null){
+      document.getElementById(k+"_result").innerText="資料不足";
+      return;
+    }
+
+    const dec=decision(d,res,total,k);
+    document.getElementById(k+"_result").innerText=
+      `乖離:${d.toFixed(2)}% → ${dec} (${getCount(k)}/2)`;
   });
-
 }
 
 </script>
+
+</body>
+</html>
