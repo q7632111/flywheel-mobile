@@ -505,6 +505,10 @@
     function safeSetWidth(id, value){ const el = safeEl(id); if (el) el.style.width = value; }
     function formatMoney(v){ return Number(v || 0).toLocaleString(); }
 
+    function getHarvestCountField(code){ return `${code}_monthlyHarvestCount`; }
+    function getMonthlyHarvestCount(code){ return Number(safeEl(getHarvestCountField(code))?.value || 0); }
+    function setMonthlyHarvestCount(code, value){ safeSetValue(getHarvestCountField(code), value); }
+
     function getCurrentMonthKey(){
       const now = new Date();
       return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -618,6 +622,10 @@
           if (fw) fw.checked = String(data[k.code+'_firstwave']) === 'true' || data[k.code+'_firstwave'] === true;
           safeSetValue(k.code+'_trigger', data[k.code+'_trigger'] ?? k.defaultTrigger);
           safeSetValue(k.code+'_lastHarvestDate', data[k.code+'_lastHarvestDate'] || '');
+          setMonthlyHarvestCount(k.code, data[getHarvestCountField(k.code)] || 0);
+          safeSetValue(k.code+'_lastHarvestCountedDate', data[k.code+'_lastHarvestCountedDate'] || '');
+          setMonthlyHarvestCount(k.code, data[getHarvestCountField(k.code)] || 0);
+          safeSetValue(k.code+'_lastHarvestCountedDate', data[k.code+'_lastHarvestCountedDate'] || '');
         }
 
         if (data.lastSyncTime) {
@@ -669,6 +677,10 @@
         safeSetValue('monthKey', currentMonthKey);
         safeSetValue('usedAmmo', 0);
         safeSetValue('monthlyTriggerCount', 0);
+        kingDefs.forEach(k => {
+          setMonthlyHarvestCount(k.code, 0);
+          safeSetValue(k.code + '_lastHarvestCountedDate', '');
+        });
         if(auto){
           console.log(`已跨月重置：${savedMonthKey || '空值'} -> ${currentMonthKey}`);
         }
@@ -852,7 +864,7 @@
       };
     }
 
-    function getKingDecision({ deviation, cooldownRemain, battle, name }){
+    function getKingDecision({ deviation, cooldownRemain, battle, name, attackLock = false, harvestLock = false, monthlyHarvestCount = 0, attackRatio = 0 }){
       let signal = '待命';
       let signalClass = 'signal-chip bg-slate-700 text-white';
       let action = '不動作';
@@ -867,6 +879,26 @@
         cmdClass = 'cmd-cooldown';
         title = '冷卻中';
         reason = `${name} 已進入 5 個交易日冷卻，不論20MA乖離多高，今天都禁止收割。`;
+        return { signal, signalClass, action, cmdClass, title, reason };
+      }
+
+      if (attackLock) {
+        signal = '保護鎖';
+        signalClass = 'signal-chip bg-rose-700 text-white';
+        action = `🛡️ 攻擊力保護鎖啟動｜攻擊資產僅 ${(attackRatio * 100).toFixed(1)}%｜暫停收割`;
+        cmdClass = 'cmd-cooldown';
+        title = '停止收割';
+        reason = `${name} 雖可能達收割門檻，但目前整體攻擊比低於 60%，依法典補強層先保住攻擊力。`;
+        return { signal, signalClass, action, cmdClass, title, reason };
+      }
+
+      if (harvestLock) {
+        signal = '月限鎖';
+        signalClass = 'signal-chip bg-amber-600 text-slate-950';
+        action = `🟡 本月已收割 ${monthlyHarvestCount} 次｜當月停止本王收割`;
+        cmdClass = 'cmd-watch';
+        title = '本月停收';
+        reason = `${name} 本月已達每王最多 2 次收割上限，避免強勢行情被連續削弱部位。`;
         return { signal, signalClass, action, cmdClass, title, reason };
       }
 
@@ -977,6 +1009,17 @@
       updateVisuals();
     }
 
+
+    function syncHarvestCountersFromDate(code){
+      const dateStr = safeEl(code + '_lastHarvestDate')?.value || '';
+      const countedDate = safeEl(code + '_lastHarvestCountedDate')?.value || '';
+      const monthKey = safeEl('monthKey')?.value || getCurrentMonthKey();
+      if (!dateStr || !dateStr.startsWith(monthKey)) return;
+      if (dateStr === countedDate) return;
+      setMonthlyHarvestCount(code, getMonthlyHarvestCount(code) + 1);
+      safeSetValue(code + '_lastHarvestCountedDate', dateStr);
+    }
+
     function bindKingCardEvents(){
       document.querySelectorAll('.append-btn').forEach(btn=>{
         btn.onclick = () => appendTodayValue(btn.dataset.code);
@@ -1023,9 +1066,18 @@
         }, 0));
       });
 
-      document.querySelectorAll('input[id$="_firstwave"], input[id$="_trigger"], input[id$="_lastHarvestDate"]').forEach(el=>{
+      document.querySelectorAll('input[id$="_firstwave"], input[id$="_trigger"]').forEach(el=>{
         el.addEventListener('input', updateVisuals);
         el.addEventListener('change', updateVisuals);
+      });
+
+      document.querySelectorAll('input[id$="_lastHarvestDate"]').forEach(el=>{
+        el.addEventListener('change', ()=>{
+          const code = el.id.replace('_lastHarvestDate', '');
+          syncHarvestCountersFromDate(code);
+          saveLocalBackup();
+          updateVisuals();
+        });
       });
     }
 
@@ -1062,6 +1114,8 @@
                 <button class="append-btn rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-black text-slate-950" data-code="${k.code}">記錄今天</button>
                 <button class="clear-btn rounded-2xl border border-slate-600 bg-slate-900 px-4 py-3 text-sm font-black" data-code="${k.code}">清空</button>
                 <input id="${k.code}_trigger" type="number" step="1" value="${k.defaultTrigger}" class="input-dark rounded-2xl px-3 py-3 text-sm font-black mono" />
+                <input id="${k.code}_monthlyHarvestCount" type="hidden" value="0" />
+                <input id="${k.code}_lastHarvestCountedDate" type="hidden" value="" />
               </div>
 
               <div class="mt-2 text-xs text-slate-400">${k.name} 10日跌幅觸發門檻（%）請填負數，例如 -8 / -10 / -12｜淨值固定保留20筆，超過會自動刪最舊</div>
@@ -1283,6 +1337,8 @@
         safeSetText('monthKeyText', safeEl('monthKey')?.value || getCurrentMonthKey());
 
         const ratioData = updateBalanceRatio(totalAssets, reservoir);
+        const attackRatio = totalAssets > 0 ? Math.max(0, (totalAssets - reservoir) / totalAssets) : 0;
+        const attackLock = attackRatio < 0.60;
 
         safeSetText('ammoState', usedAmmo > ammoLimit ? '超限' : ammoRemain <= 6000 ? '緊繃' : '安全');
         safeSetClass('ammoState', usedAmmo > ammoLimit ? 'text-sm font-black text-rose-300' : ammoRemain <= 6000 ? 'text-sm font-black text-amber-300' : 'text-sm font-black text-emerald-300');
@@ -1325,6 +1381,7 @@
         if(battle.key === 'war') warnings.push(`極速保命模式啟動：本月有效觸發上限 ${effectiveTriggerLimit} 次`);
         if(currentDrawdown <= -20) warnings.push(`總資產回撤 ${currentDrawdown}%`);
         if(monthlyInput + monthlyRecycle < kingCount * 5000) warnings.push('現有王每月投入未達每王至少 5000，觸發防碎鑽鐵律');
+        if(attackLock) warnings.push(`攻擊力保護鎖啟動：攻擊資產僅 ${(attackRatio * 100).toFixed(1)}%，暫停所有收割`);
 
         const discipline = Math.max(0,100 - warnings.length * 8 - (monthlyInput !== 9000 ? 8 : 0));
         safeSetText('disciplineText', String(discipline));
@@ -1338,7 +1395,10 @@
 
         let monthStatusText = '綠燈';
         let monthStatusHint = '本月節奏正常，可依規則出手';
-        if(usedAmmo > ammoLimit || triggerRemain <= 0 || ammoRemain <= 0){
+        if (attackLock) {
+          monthStatusText = '紅燈';
+          monthStatusHint = `攻擊資產僅 ${(attackRatio * 100).toFixed(1)}%，先停止收割，讓三王重新長回攻擊力`;
+        } else if(usedAmmo > ammoLimit || triggerRemain <= 0 || ammoRemain <= 0){
           monthStatusText = '紅燈';
           monthStatusHint = `本月額度或有效次數用盡（上限 ${effectiveTriggerLimit} 次），停止加碼`;
         } else if(ammoRemain <= Math.max(6000, ammoLimit * 0.3)){
@@ -1348,6 +1408,8 @@
         safeSetText('monthStatusText', monthStatusText);
         if (battle.key === 'war' && monthStatusText !== '紅燈') monthStatusHint += `｜極速保命有效上限 ${effectiveTriggerLimit} 次`;
         safeSetText('monthStatusHint', monthStatusHint);
+
+        kingDefs.slice(0, kingCount).forEach(k => syncHarvestCountersFromDate(k.code));
 
         const deviationLines = [];
         const actionable = [];
@@ -1367,15 +1429,17 @@
           const triggerCheck = calcTenDayTrigger(prices, kingTrigger);
           const harvestDate = safeEl(k.code+'_lastHarvestDate')?.value || '';
           const cooldownRemain = getCooldownRemaining(harvestDate);
+          const monthlyHarvestCount = getMonthlyHarvestCount(k.code);
+          const harvestLock = monthlyHarvestCount >= 2;
 
           if(cooldownRemain === null){
-            safeSetText(`cooldown_${k.code}`, '未設定收割日');
+            safeSetText(`cooldown_${k.code}`, `未設定收割日｜本月已收 ${monthlyHarvestCount} 次`);
             safeSetClass(`cooldown_${k.code}`, 'mt-3 text-sm font-black text-slate-300');
           } else if(cooldownRemain > 0){
-            safeSetText(`cooldown_${k.code}`, `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`);
+            safeSetText(`cooldown_${k.code}`, `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日｜本月已收 ${monthlyHarvestCount} 次`);
             safeSetClass(`cooldown_${k.code}`, 'mt-3 text-sm font-black text-amber-300');
           } else {
-            safeSetText(`cooldown_${k.code}`, '✅ 冷卻完成，可再次收割');
+            safeSetText(`cooldown_${k.code}`, `✅ 冷卻完成，可再次收割｜本月已收 ${monthlyHarvestCount} 次`);
             safeSetClass(`cooldown_${k.code}`, 'mt-3 text-sm font-black text-emerald-300');
           }
 
@@ -1445,7 +1509,7 @@
             add='待判定';
           }
 
-          const decision = getKingDecision({ deviation, cooldownRemain, battle, name: k.name });
+          const decision = getKingDecision({ deviation, cooldownRemain, battle, name: k.name, attackLock, harvestLock, monthlyHarvestCount, attackRatio });
 
           if (decision.signal === '收割') harvestCount++;
           if (decision.signal === '冷卻') cooldownCount++;
@@ -1583,7 +1647,12 @@
         let globalHint = '今天重點：照常定投，收盤後再檢核。';
         let globalClass = 'decision-big cmd-wait';
 
-        if (harvestCount > 0) {
+        if (attackLock) {
+          globalTitle = '👉 今日停止收割，先恢復攻擊力';
+          globalReason = `目前攻擊資產僅 ${(attackRatio * 100).toFixed(1)}%，已低於 60% 防線。所有收割邏輯暫停，避免部位被自己削弱。`;
+          globalHint = '今天重點：只觀察與加碼，不做任何收割。';
+          globalClass = 'decision-big cmd-cooldown';
+        } else if (harvestCount > 0) {
           globalTitle = `👉 今日執行 ${harvestCount} 筆收割`;
           globalReason = `已有 ${harvestCount} 王達到當前水庫戰區的收割門檻，請依各王卡上的指令執行。`;
           globalHint = actionable.length ? actionable.join(' ｜ ') : '請查看王卡指令。';
@@ -1612,6 +1681,7 @@
         summary.push(`本月總彈藥：${formatMoney(ammoLimit)}｜已用：${formatMoney(usedAmmo)}｜剩餘：${formatMoney(ammoRemain)}｜本月觸發：${monthlyTriggerCount}/${effectiveTriggerLimit}`);
         summary.push(`資產階段：${phaseConfig.text}｜水庫目標：${formatMoney(phaseTarget)}`);
         summary.push(`飛輪戰區：${battle.label}｜規則：${battle.rule}`);
+        summary.push(`攻擊力保護：攻擊資產 ${(attackRatio * 100).toFixed(1)}%｜${attackLock ? '已啟動暫停收割' : '正常'}`);
         summary.push(`資金流向：${flowMode.mode}｜${flowMode.text}`);
         summary.push(actionable.length ? `今日可執行收割：<br>${actionable.map(x=>`• ${x}`).join('<br>')}` : '今日沒有達到收割門檻的王。請維持定投，收盤後再檢核。');
 
