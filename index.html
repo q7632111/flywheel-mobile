@@ -1,164 +1,935 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>飛輪系統 Mobile 完整版</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>飛輪操盤系統 Mobile 20.1 Pro</title>
+  <style>
+    :root{
+      --bg1:#04101d;
+      --bg2:#0a1426;
+      --bg3:#0f1b33;
+      --card:rgba(15,23,42,.84);
+      --line:rgba(255,255,255,.08);
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --cyan:#22d3ee;
+      --emerald:#34d399;
+      --amber:#fbbf24;
+      --rose:#fb7185;
+      --violet:#a78bfa;
+      --sky:#38bdf8;
+    }
 
-<style>
-body{background:#0b0b0b;color:#fff;font-family:Arial;padding:10px;}
-.card{background:#151515;border-radius:12px;padding:12px;margin-bottom:10px;}
-.title{font-size:14px;color:#aaa;margin-bottom:6px;}
-input,textarea{width:100%;padding:6px;border-radius:6px;border:none;margin-top:5px;background:#222;color:#fff;}
-.btn{margin-top:6px;padding:6px;border:none;border-radius:6px;background:#2a2a2a;color:#fff;}
-.green{color:#00e676;}
-.yellow{color:#ffd600;}
-.red{color:#ff5252;}
-</style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{
+      margin:0;padding:0;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(34,211,238,.16), transparent 24%),
+        radial-gradient(circle at 100% 10%, rgba(167,139,250,.12), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(56,189,248,.08), transparent 20%),
+        linear-gradient(180deg,var(--bg1),var(--bg2),var(--bg3));
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;
+    }
+
+    body{min-height:100vh;padding:14px 14px 34px}
+    .shell{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+
+    .glass{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:0 14px 40px rgba(0,0,0,.28);
+      backdrop-filter:blur(14px);
+      overflow:hidden;
+    }
+
+    .hero{
+      padding:18px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34,211,238,.14), transparent 28%),
+        linear-gradient(180deg, rgba(3,10,24,.92), rgba(8,14,30,.92));
+    }
+
+    .pill{
+      display:inline-flex;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.18em;
+      border:1px solid rgba(34,211,238,.22);
+      background:rgba(34,211,238,.1);
+      color:#a5f3fc;
+    }
+
+    h1{
+      margin:12px 0 0;
+      font-size:28px;
+      line-height:1.08;
+      letter-spacing:.01em;
+    }
+
+    p{
+      margin:10px 0 0;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:14px;
+    }
+
+    .section{padding:16px}
+    .section h2{margin:0 0 12px;font-size:18px;letter-spacing:.02em}
+
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
+    .box,.mini,.stat{
+      background:linear-gradient(180deg,rgba(5,10,24,.9),rgba(8,16,31,.9));
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;
+      padding:12px;
+    }
+
+    .label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .value{
+      font-weight:900;
+      font-size:20px;
+      line-height:1.15;
+    }
+
+    .mono{font-variant-numeric:tabular-nums}
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .toolbar3{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:8px;
+    }
+
+    button,.btn-link{
+      appearance:none;
+      border:none;
+      border-radius:18px;
+      padding:14px 14px;
+      font-weight:900;
+      font-size:15px;
+      cursor:pointer;
+      color:#02111e;
+      background:linear-gradient(180deg,#67f3ff,#2bd4e6);
+      box-shadow:0 12px 28px rgba(34,211,238,.22);
+      text-decoration:none;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    button.secondary{
+      background:rgba(34,211,238,.08);
+      color:#c8f8ff;
+      border:1px solid rgba(34,211,238,.26);
+      box-shadow:none;
+    }
+
+    button.dark,.btn-link.dark{
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:none;
+    }
+
+    input,textarea,select{
+      width:100%;
+      background:rgba(2,6,23,.76);
+      border:1px solid rgba(148,163,184,.18);
+      color:white;
+      border-radius:16px;
+      padding:13px 14px;
+      font-size:16px;
+      outline:none;
+    }
+
+    input:focus,textarea:focus,select:focus{
+      border-color:rgba(34,211,238,.8);
+      box-shadow:0 0 0 3px rgba(34,211,238,.12);
+    }
+
+    textarea{
+      min-height:84px;
+      resize:vertical;
+    }
+
+    .stack{display:flex;flex-direction:column;gap:10px}
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .chip.ok{
+      background:rgba(52,211,153,.16);
+      color:#b6f6df;
+      border:1px solid rgba(52,211,153,.24);
+    }
+
+    .chip.warn{
+      background:rgba(251,191,36,.16);
+      color:#fde7a5;
+      border:1px solid rgba(251,191,36,.22);
+    }
+
+    .chip.danger{
+      background:rgba(251,113,133,.14);
+      color:#fecdd6;
+      border:1px solid rgba(251,113,133,.22);
+    }
+
+    .chip.idle{
+      background:rgba(255,255,255,.06);
+      color:#e2e8f0;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .decision{
+      border-radius:18px;
+      padding:14px 14px;
+      font-size:14px;
+      font-weight:900;
+      line-height:1.7;
+    }
+
+    .decision.harvest{
+      background:linear-gradient(180deg, rgba(127,29,29,.42), rgba(76,29,49,.32));
+      border:1px solid rgba(251,113,133,.25);
+      color:#ffe4e8;
+    }
+    .decision.watch{
+      background:linear-gradient(180deg, rgba(120,53,15,.34), rgba(87,51,15,.22));
+      border:1px solid rgba(251,191,36,.22);
+      color:#fde7a5;
+    }
+    .decision.wait{
+      background:linear-gradient(180deg, rgba(30,41,59,.5), rgba(15,23,42,.36));
+      border:1px solid rgba(148,163,184,.18);
+      color:#e2e8f0;
+    }
+    .decision.cooldown{
+      background:linear-gradient(180deg, rgba(76,29,149,.28), rgba(55,28,99,.22));
+      border:1px solid rgba(167,139,250,.22);
+      color:#ddd6fe;
+    }
+
+    .summary{
+      font-size:14px;
+      line-height:1.72;
+      color:#def7ff;
+    }
+
+    .note{
+      font-size:12px;
+      line-height:1.58;
+      color:var(--muted);
+    }
+
+    .balance{
+      display:flex;
+      border-radius:999px;
+      overflow:hidden;
+      height:16px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .balance .attack{
+      background:linear-gradient(90deg,#38bdf8,#22d3ee);
+    }
+
+    .balance .defense{
+      background:linear-gradient(90deg,#fbbf24,#f59e0b);
+    }
+
+    .king{
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .king-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .king-title{
+      font-size:19px;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+
+    .king-sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .actions{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:8px;
+    }
+
+    .actions button,.actions .btn-link{
+      padding:12px 10px;
+      font-size:13px;
+    }
+
+    .actions .btn-link{
+      background:rgba(34,211,238,.08);
+      color:#c8f8ff;
+      border:1px solid rgba(34,211,238,.28);
+      box-shadow:none;
+    }
+
+    .stat-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .cool{
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+
+    .cool.ok{color:#86efac}
+    .cool.warn{color:#fde68a}
+    .cool.danger{color:#fda4af}
+
+    .warn-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .warn-item{
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(251,113,133,.1);
+      border:1px solid rgba(251,113,133,.18);
+      color:#ffd1d8;
+      font-size:13px;
+      line-height:1.6;
+      font-weight:800;
+    }
+
+    .ok-item{
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(52,211,153,.1);
+      border:1px solid rgba(52,211,153,.16);
+      color:#b6f6df;
+      font-size:13px;
+      line-height:1.6;
+      font-weight:800;
+    }
+
+
+    .actions2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .log-toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .log-entry{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:13px;line-height:1.65}
+    .tag{display:inline-flex;align-items:center;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:900;margin-right:6px}
+    .tag.ok{background:rgba(52,211,153,.14);color:#b6f6df;border:1px solid rgba(52,211,153,.22)}
+    .tag.warn{background:rgba(251,191,36,.14);color:#fde7a5;border:1px solid rgba(251,191,36,.22)}
+    .tag.danger{background:rgba(251,113,133,.14);color:#fecdd6;border:1px solid rgba(251,113,133,.22)}
+    .tag.info{background:rgba(56,189,248,.14);color:#bae6fd;border:1px solid rgba(56,189,248,.22)}
+    .muted-small{font-size:12px;color:var(--muted);line-height:1.55}
+
+  </style>
 </head>
-
 <body>
+  <div class="shell">
+    <section class="glass hero">
+      <div class="pill">FLYWHEEL MOBILE · V22.2</div>
+      <h1>飛輪操盤系統</h1>
+      <p>手機版專注在「打開就知道今天該做什麼」。保留三王決策、20MA 乖離、10日跌幅、冷卻與同步，但用更短的路徑完成判斷與操作。</p>
+    </section>
 
-<div class="card">
-<div class="title">總資產</div>
-<input id="totalAssets" oninput="update()">
-</div>
+    <section class="glass section">
+      <div class="grid2">
+        <div class="box">
+          <div class="label">同步狀態</div>
+          <div id="syncBadge" class="value" style="font-size:18px;color:#67e8f9">未同步</div>
+        </div>
+        <div class="box">
+          <div class="label">最後同步</div>
+          <div id="lastSyncTime" class="value mono" style="font-size:16px">—</div>
+        </div>
+        <div class="box">
+          <div class="label">本月狀態</div>
+          <div id="monthStatusText" class="value" style="font-size:18px;color:#86efac">綠燈</div>
+          <div id="monthStatusHint" class="note">節奏正常</div>
+        </div>
+        <div class="box">
+          <div class="label">資產階段</div>
+          <div id="phaseText" class="value" style="font-size:18px">基礎累積期</div>
+          <div class="note">月份鍵：<span id="monthKeyText">—</span></div>
+        </div>
+      </div>
 
-<div class="card">
-<div class="title">水庫</div>
-<input id="reservoir" oninput="update()">
-</div>
+      <div class="toolbar" style="margin-top:10px">
+        <button id="reloadBtn" class="secondary">重新載入</button>
+        <button id="saveBtn">儲存同步</button>
+      </div>
+    </section>
 
-<!-- 三王 -->
-<div class="card">
-<div class="title">王A</div>
-<textarea id="A_prices" oninput="update()"></textarea>
-<div id="A_result"></div>
-<button class="btn" onclick="logAction('A','收割')">收割</button>
-<button class="btn" onclick="logAction('A','加碼')">加碼</button>
-</div>
+    <section class="glass section">
+      <h2>今日唯一指令</h2>
+      <div id="globalCommandCard" class="decision wait">
+        <div id="globalCommandTitle" style="font-size:20px;margin-bottom:8px">等待資料</div>
+        <div id="globalCommandReason">系統正在整理你的三王與水庫狀態。</div>
+        <div id="globalCommandHint" class="note" style="margin-top:10px">讀取後，這裡會直接告訴你今天是收割、加碼還是不動。</div>
+      </div>
+    </section>
 
-<div class="card">
-<div class="title">王B</div>
-<textarea id="B_prices" oninput="update()"></textarea>
-<div id="B_result"></div>
-<button class="btn" onclick="logAction('B','收割')">收割</button>
-<button class="btn" onclick="logAction('B','加碼')">加碼</button>
-</div>
+    <section class="glass section">
+      <h2>飛輪戰區</h2>
+      <div id="battleZoneBadge" class="chip idle">等待判讀</div>
+      <div id="battleZoneRule" class="summary" style="margin-top:10px">等待資料</div>
+    </section>
 
-<div class="card">
-<div class="title">王C</div>
-<textarea id="C_prices" oninput="update()"></textarea>
-<div id="C_result"></div>
-<button class="btn" onclick="logAction('C','收割')">收割</button>
-<button class="btn" onclick="logAction('C','加碼')">加碼</button>
-</div>
+    <section class="glass section">
+      <h2>核心儀表</h2>
+      <div class="grid2">
+        <label class="stack"><span class="label">總資產</span><input id="totalAssets" type="number"></label>
+        <label class="stack"><span class="label">水庫</span><input id="reservoir" type="number"></label>
+        <label class="stack"><span class="label">每月定投</span><input id="monthlyInput" type="number"></label>
+        <label class="stack"><span class="label">每月回灌</span><input id="monthlyRecycle" type="number"></label>
+        <label class="stack"><span class="label">本月已加碼</span><input id="usedAmmo" type="number"></label>
+        <label class="stack"><span class="label">本月已觸發次數</span><input id="monthlyTriggerCount" type="number"></label>
+      </div>
 
-<!-- 操作紀錄 -->
-<div class="card">
-<div class="title">操作紀錄</div>
-<div id="logList"></div>
-<button class="btn" onclick="clearLog()">清空</button>
-</div>
+      <input id="monthKey" type="hidden">
+      <input id="kingCount" type="hidden" value="3">
+      <input id="currentDrawdown" type="hidden" value="0">
+      <input id="maxTriggerPerMonth" type="hidden" value="6">
+
+      <div class="grid2" style="margin-top:10px">
+        <div class="mini"><div class="label">本月總彈藥</div><div id="ammoLimit" class="value mono">0</div></div>
+        <div class="mini"><div class="label">剩餘可用</div><div id="ammoRemain" class="value mono" style="color:#67e8f9">0</div></div>
+        <div class="mini"><div class="label">本次建議</div><div id="ammoRecommend" class="value mono" style="color:#86efac">0</div></div>
+        <div class="mini"><div class="label">紀律分數</div><div id="disciplineText" class="value mono">100</div></div>
+      </div>
+
+      <div class="toolbar" style="margin-top:10px">
+        <button id="applyRecommendBtn">套用建議</button>
+        <button id="resetAmmoBtn" class="dark">本月歸零</button>
+      </div>
+    </section>
+
+    <section class="glass section">
+      <h2>戰力儀表板</h2>
+      <div class="grid2">
+        <div class="box">
+          <div class="label">水庫健康度</div>
+          <div id="reservoirLevelText" class="value mono">0%</div>
+          <div id="reservoirLevelHint" class="note">等待資料</div>
+        </div>
+        <div class="box">
+          <div class="label">攻守比例</div>
+          <div id="balanceRatioText" class="value" style="font-size:18px">前鋒 70% ｜ 水庫 30%</div>
+          <div class="balance" style="margin-top:10px">
+            <div id="balanceAttackBar" class="attack" style="width:70%"></div>
+            <div id="balanceReservoirBar" class="defense" style="width:30%"></div>
+          </div>
+        </div>
+        <div class="box">
+          <div class="label">彈藥剩餘</div>
+          <div id="ammoRemainPctText" class="value mono">0%</div>
+          <div class="note">本月可用火力剩餘率</div>
+        </div>
+        <div class="box">
+          <div class="label">今日戰力</div>
+          <div id="battlePowerText" class="value" style="font-size:18px">等待資料</div>
+          <div id="battlePowerHint" class="note">等待資料</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass section">
+      <h2>本次建議出手</h2>
+      <div id="recommendBoard" class="summary">等待計算…</div>
+    </section>
+
+    <section class="glass section">
+      <h2>三王決策總表</h2>
+      <div id="threeKingDecisionBoard" class="summary">等待資料</div>
+    </section>
+
+    <section id="kingCards" class="stack"></section>
+
+    <section class="glass section">
+      <h2>操作紀錄</h2>
+      <div class="muted-small">只在你真的有動作時記錄。平常不動作不用記，避免垃圾資料。</div>
+      <div class="log-toolbar" style="margin-top:10px">
+        <button id="copyLogBtn" class="secondary">複製紀錄</button>
+        <button id="exportLogBtn" class="dark">匯出文字</button>
+        <button id="clearLogBtn" class="dark">清空紀錄</button>
+      </div>
+      <div id="operationLogList" class="warn-list" style="margin-top:12px"></div>
+    </section>
+
+
+    <section class="glass section">
+      <h2>提醒</h2>
+      <div id="warningBoard" class="warn-list"></div>
+    </section>
+
+    <section class="glass section">
+      <h2>備註</h2>
+      <textarea id="notes" placeholder="記錄今日動作、收割、加碼、心法提醒"></textarea>
+    </section>
+  </div>
 
 <script>
+const API = "https://script.google.com/macros/s/AKfycbw_z3a9kbwrn7FcXxj8fL8tN-tmX7PNTrCVSmwS5g2knCgCWoaqeNwIHFPp9nZt8yQR/exec";
 
-// ===== 基本工具 =====
-function parsePrices(str){
-if(!str) return [];
-return str.split(',').map(Number).filter(n=>!isNaN(n));
+const kingDefs = [
+  { code: 'A32001', name: '野村優質', defaultTrigger: -10, anueLink: 'https://www.anuefund.com/fund/detail/A32001' },
+  { code: 'A20106', name: 'NASDAQ-100', defaultTrigger: -8, anueLink: 'https://www.anuefund.com/fund/detail/A20106' },
+  { code: 'B29037', name: '摩根品牌', defaultTrigger: -12, anueLink: 'https://www.anuefund.com/fund/detail/B29037' }
+];
+
+let isBuildingCards = false;
+let lastRecommendValue = 0;
+let lastTriggeredCandidateNames = [];
+
+function safeEl(id){ return document.getElementById(id); }
+function safeSetText(id, value){ const el=safeEl(id); if(el) el.textContent=value; }
+function safeSetHTML(id, value){ const el=safeEl(id); if(el) el.innerHTML=value; }
+function safeSetValue(id, value){ const el=safeEl(id); if(el) el.value=value; }
+function formatMoney(v){ return Number(v || 0).toLocaleString(); }
+
+function getCurrentMonthKey(){
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 }
 
-function deviation(prices){
-if(prices.length<20) return null;
-let sum=0;
-for(let i=prices.length-20;i<prices.length;i++){sum+=prices[i];}
-const ma=sum/20;
-const now=prices[prices.length-1];
-return ((now-ma)/ma)*100;
+function getNowText(){
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mi = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
 }
 
-// ===== 收割次數 =====
-function getCount(k){
-return Number(localStorage.getItem("count_"+k)||0);
-}
-function addCount(k){
-localStorage.setItem("count_"+k,getCount(k)+1);
-}
-
-// ===== 判斷 =====
-function judge(type,k,total,res){
-
-const attack=total-res;
-let result={text:"合理",cls:"green"};
-
-if(type==="收割"){
-if(total>0 && attack/total<0.6){
-return {text:"違規（攻擊不足）",cls:"red"};
-}
-if(getCount(k)>=2){
-return {text:"違規（超過次數）",cls:"red"};
-}
-if(res<150000){
-return {text:"警告（水庫偏低）",cls:"yellow"};
-}
-addCount(k);
+function parsePrices(text){
+  return String(text || '')
+    .replace(/[；;｜|]/g, ' ')
+    .replace(/\u3000/g, ' ')
+    .trim()
+    .split(/[\s,，\n\t]+/)
+    .map(v => Number(String(v).trim()))
+    .filter(n => !Number.isNaN(n) && n > 0);
 }
 
-return result;
+function calcDeviation(prices){
+  if(prices.length < 20) return null;
+  const recent20 = prices.slice(-20);
+  const current = recent20[recent20.length - 1];
+  const ma20 = recent20.reduce((a,b)=>a+b,0)/20;
+  const deviation = ((current - ma20) / ma20) * 100;
+  return { current, ma20, deviation, recent20 };
 }
 
-// ===== 更新 =====
-function update(){
-
-const total=Number(document.getElementById("totalAssets").value||0);
-const res=Number(document.getElementById("reservoir").value||0);
-
-["A","B","C"].forEach(k=>{
-const p=parsePrices(document.getElementById(k+"_prices").value);
-const d=deviation(p);
-if(d===null){
-document.getElementById(k+"_result").innerText="資料不足";
-return;
-}
-document.getElementById(k+"_result").innerText=`乖離:${d.toFixed(2)}%`;
-});
+function calcTenDayTrigger(prices, triggerPercent){
+  if(prices.length < 11) return null;
+  const today = prices[prices.length - 1];
+  const prev10 = prices[prices.length - 11];
+  const change = ((today - prev10) / prev10) * 100;
+  return { today, prev10, change, triggered: change <= triggerPercent };
 }
 
-// ===== 紀錄 =====
-function logAction(k,type){
-
-const total=Number(document.getElementById("totalAssets").value||0);
-const res=Number(document.getElementById("reservoir").value||0);
-
-const judgeResult=judge(type,k,total,res);
-
-const now=new Date().toLocaleString();
-
-const text=`${now}｜${k}｜${type}｜<span class="${judgeResult.cls}">${judgeResult.text}</span>｜水庫:${res}`;
-
-let logs=JSON.parse(localStorage.getItem("logs")||"[]");
-logs.unshift(text);
-
-localStorage.setItem("logs",JSON.stringify(logs));
-
-renderLog();
+function getBusinessDaysPassed(dateStr){
+  if(!dateStr) return null;
+  const start = new Date(dateStr + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  if(start > today) return 0;
+  let days = 0;
+  const cursor = new Date(start);
+  while(cursor < today){
+    cursor.setDate(cursor.getDate()+1);
+    const day = cursor.getDay();
+    if(day !== 0 && day !== 6) days++;
+  }
+  return days;
 }
 
-function renderLog(){
-const logs=JSON.parse(localStorage.getItem("logs")||"[]");
-document.getElementById("logList").innerHTML=
-logs.map(l=>`<div>${l}</div>`).join('');
+function getCooldownRemaining(dateStr){
+  if(!dateStr) return null;
+  const passed = getBusinessDaysPassed(dateStr);
+  if(passed === null) return null;
+  return Math.max(0, 5 - passed);
 }
 
-function clearLog(){
-localStorage.removeItem("logs");
-renderLog();
+function getPhaseText(totalAssets){
+  if(totalAssets < 3000000) return '基礎累積期';
+  if(totalAssets < 8000000) return '穩定成長期';
+  return '厚尾複利期';
 }
 
-renderLog();
+function getBattleZone(reservoir){
+  if(reservoir < 150000){
+    return {
+      key:'war',
+      chipText:'🔴 戰時狀態',
+      chipClass:'chip danger',
+      rule:'20MA乖離 +5% → 收割10%；+10% → 收至剩50%底倉；獲利100%回水庫'
+    };
+  }
+  if(reservoir >= 150000 && reservoir < 180000){
+    return {
+      key:'transition',
+      chipText:'🟡 過渡鎖定區',
+      chipClass:'chip warn',
+      rule:'20MA乖離 +5% → 收割10%；+10% → 收至剩50%底倉；獲利100%回水庫'
+    };
+  }
+  if(reservoir > 1000000){
+    return {
+      key:'thicktail',
+      chipText:'🚀 厚尾複利區',
+      chipClass:'chip ok',
+      rule:'20MA乖離 +15% → 收10%；+25% → 收20%；底倉至少保留85%'
+    };
+  }
+  return {
+    key:'ignite',
+    chipText:'⚡ 點火擴張區',
+    chipClass:'chip ok',
+    rule:'20MA乖離 +10% → 收10%；+15% → 收20%；+20% → 再收20%；獲利50/50分流'
+  };
+}
 
-</script>
+function getHarvestDecision(deviation, reservoir, cooldownRemain, name){
+  const zone = getBattleZone(reservoir);
 
-</body>
-</html>
+  if(cooldownRemain !== null && cooldownRemain > 0){
+    return {
+      signal:'冷卻',
+      cls:'cooldown',
+      text:`❄️ 冷卻中：還剩 ${cooldownRemain} 個交易日，禁止收割`,
+      reason:`${name} 已進入 5 個交易日冷卻，不論20MA乖離多高，今天都禁止收割。`
+    };
+  }
+
+  if(zone.key === 'war' || zone.key === 'transition'){
+    if(deviation >= 10) return {
+      signal:'收割', cls:'harvest',
+      text:'🔴 收至 50% 底倉｜獲利 100% 回水庫',
+      reason:`目前位於${zone.chipText}，且20MA乖離 ${deviation.toFixed(2)}% ≥ +10%，依戰時法典收至剩 50% 底倉。`
+    };
+    if(deviation >= 5) return {
+      signal:'收割', cls:'harvest',
+      text:'🟠 收割 10%｜獲利 100% 回水庫',
+      reason:`目前位於${zone.chipText}，且20MA乖離 ${deviation.toFixed(2)}% ≥ +5%，依戰時法典收割 10%。`
+    };
+    if(deviation > 0) return {
+      signal:'觀察', cls:'watch',
+      text:'🟡 正乖離但未達戰時門檻｜先觀察',
+      reason:`目前雖已轉正，但在${zone.chipText}下還沒達到戰時收割門檻。`
+    };
+  }
+
+  if(zone.key === 'thicktail'){
+    if(deviation >= 25) return {
+      signal:'收割', cls:'harvest',
+      text:'🔴 收割 20%｜底倉至少保留 85%',
+      reason:`目前位於厚尾複利區，20MA乖離 ${deviation.toFixed(2)}% ≥ +25%，依厚尾規則收割 20%。`
+    };
+    if(deviation >= 15) return {
+      signal:'收割', cls:'watch',
+      text:'🟠 收割 10%｜底倉至少保留 85%',
+      reason:`目前位於厚尾複利區，20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，依厚尾規則收割 10%。`
+    };
+    if(deviation >= 5) return {
+      signal:'觀察', cls:'watch',
+      text:'🟡 接近厚尾收割區｜先觀察',
+      reason:'已接近厚尾收割區，但未達正式門檻。'
+    };
+  }
+
+  if(zone.key === 'ignite'){
+    if(deviation >= 20) return {
+      signal:'收割', cls:'harvest',
+      text:'🔴 再收割 20%｜50% 水庫 / 50% 回原王',
+      reason:`目前位於點火擴張區，20MA乖離 ${deviation.toFixed(2)}% ≥ +20%，依規則再收割 20%。`
+    };
+    if(deviation >= 15) return {
+      signal:'收割', cls:'harvest',
+      text:'🟠 收割 20%｜50% 水庫 / 50% 回原王',
+      reason:`目前位於點火擴張區，20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，依規則收割 20%。`
+    };
+    if(deviation >= 10) return {
+      signal:'收割', cls:'watch',
+      text:'🟡 收割 10%｜50% 水庫 / 50% 回原王',
+      reason:`目前位於點火擴張區，20MA乖離 ${deviation.toFixed(2)}% ≥ +10%，依規則收割 10%。`
+    };
+    if(deviation >= 5) return {
+      signal:'觀察', cls:'watch',
+      text:'🟢 接近收割區｜先觀察',
+      reason:'20MA乖離已轉強，但仍未達點火區正式收割門檻。'
+    };
+  }
+
+  return {
+    signal:'等待', cls:'wait',
+    text:'⚪ 未達收割區，維持紀律',
+    reason:'目前未達你的法典執行門檻，維持定投即可。'
+  };
+}
+
+function updateBalanceRatio(totalAssets, reservoir){
+  const safeTotal = Math.max(0, Number(totalAssets || 0));
+  const safeReservoir = Math.max(0, Number(reservoir || 0));
+  const attack = Math.max(0, safeTotal - safeReservoir);
+  const attackPct = safeTotal > 0 ? Math.round((attack / safeTotal) * 100) : 0;
+  const reservoirPct = safeTotal > 0 ? Math.round((safeReservoir / safeTotal) * 100) : 0;
+  safeSetText('balanceRatioText', `前鋒 ${attackPct}% ｜ 水庫 ${reservoirPct}%`);
+  const attackBar = safeEl('balanceAttackBar');
+  const reservoirBar = safeEl('balanceReservoirBar');
+  if(attackBar) attackBar.style.width = `${attackPct}%`;
+  if(reservoirBar) reservoirBar.style.width = `${reservoirPct}%`;
+  return { attackPct, reservoirPct };
+}
+
+function resetMonthlyIfNeeded(){
+  const currentMonthKey = getCurrentMonthKey();
+  const savedMonthKey = String(safeEl('monthKey')?.value || '');
+  if(savedMonthKey !== currentMonthKey){
+    safeSetValue('monthKey', currentMonthKey);
+    safeSetValue('usedAmmo', 0);
+    safeSetValue('monthlyTriggerCount', 0);
+  }
+  safeSetText('monthKeyText', currentMonthKey);
+  clearOldHarvestCounts();
+}
+
+function setSync(text, ok=true){
+  const badge = safeEl('syncBadge');
+  safeSetText('syncBadge', text);
+  if(badge) badge.style.color = ok ? '#67e8f9' : '#fda4af';
+}
+
+function getCurrentDateText(){
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+  return `${yyyy}/${mm}/${dd}`;
+}
+
+function getOperationLog(){
+  try{
+    return JSON.parse(localStorage.getItem('flywheel_mobile_operation_log') || '[]');
+  }catch{
+    return [];
+  }
+}
+
+function setOperationLog(logs){
+  localStorage.setItem('flywheel_mobile_operation_log', JSON.stringify(logs));
+}
+
+function renderOperationLog(){
+  const wrap = safeEl('operationLogList');
+  if(!wrap) return;
+  const logs = getOperationLog();
+  if(!logs.length){
+    wrap.innerHTML = '<div class="ok-item">目前還沒有操作紀錄。真的有收割或加碼時再記，平常不動作不用記。</div>';
+    return;
+  }
+  wrap.innerHTML = logs.map(item => `
+    <div class="log-entry">
+      <div>${item.tagHtml}<span style="font-weight:900">${item.action}</span>｜${item.kingName}</div>
+      <div class="muted-small" style="margin-top:6px">${item.time}｜${item.reason}</div>
+      <div class="muted-small">20MA乖離：${item.deviation}｜水庫：${item.reservoir}｜戰區：${item.zone}</div>
+    </div>
+  `).join('');
+}
+
+function getHarvestCountMonthKey(){
+  return `harvest_count_${getCurrentMonthKey()}`;
+}
+
+function getHarvestCounts(){
+  try{
+    return JSON.parse(localStorage.getItem(getHarvestCountMonthKey()) || '{}');
+  }catch{
+    return {};
+  }
+}
+
+function setHarvestCounts(obj){
+  localStorage.setItem(getHarvestCountMonthKey(), JSON.stringify(obj));
+}
+
+function getSingleHarvestCount(code){
+  const counts = getHarvestCounts();
+  return Number(counts[code] || 0);
+}
+
+function incrementHarvestCount(code){
+  const counts = getHarvestCounts();
+  counts[code] = Number(counts[code] || 0) + 1;
+  setHarvestCounts(counts);
+}
+
+function clearOldHarvestCounts(){
+  const current = getHarvestCountMonthKey();
+  Object.keys(localStorage).forEach(key => {
+    if(key.startsWith('harvest_count_') && key !== current){
+      localStorage.removeItem(key);
+    }
+  });
+}
+
+function getZoneLabel(reservoir){
+  const zone = getBattleZone(reservoir);
+  return zone.chipText.replace(/^.[️]?\s*/, '');
+}
+
+function getKingNameByCode(code){
+  const found = kingDefs.find(k => k.code === code);
+  return found ? found.name : code;
+}
+
+function judgeOperation(code, actionType){
+  const totalAssets = Number(safeEl('totalAssets')?.value || 0);
+  const reservoir = Number(safeEl('reservoir')?.value || 0);
+  const devText = safeEl(`dev_${code}`)?.textContent || '—';
+  const decisionText = safeEl(`decision_${code}`)?.textContent || '等待判讀';
+  const cooldownText = safeEl(`cooldown_${code}`)?.textContent || '';
+  const attackRatio = totalAssets > 0 ? ((totalAssets - reservoir) / totalAssets) : 1;
+  const harvestCount = getSingleHarvestCount(code);
+
+  let level = 'ok';
+  let label = '合理';
+  let reason = actionType === '收割' ? '符合目前紀律，已留下收割紀錄。' : '符合目前紀律，已留下加碼紀錄。';
+
+  if(actionType === '收割'){
+    if(attackRatio < 0.6){
+      level = 'danger';
+      label = '違規';
+      reason = '目前前鋒資產低於 60%，照你的保護鎖不應再收割。';
+    }else if(harvestCount >= 2){
+      level = 'danger';
+      label = '違規';
+      reason = '同一王本月已收割 2 次，超過你設定的上限。';
+    }else if(cooldownText.includes('冷卻中')){
+      level = 'danger';
+      label = '違規';
+      reason = '目前仍在冷卻期，這筆收割不應執行。';
+    }else if(!(decisionText.includes('收割') || decisionText.includes('收至'))){
+      level = 'warn';
+      label = '警告';
+      reason = '系統目前沒有明確叫你收割，這筆屬於額外主觀操作。';
+    }
+  }else if(actionType === '加碼'){
+    if(reservoir < 80000){
+      level = 'warn';
+      label = '警告';
+      reason = '水庫低於 8 萬，保命模式下理應極度保守。';
+    }else if(!(decisionText.includes('加碼') || decisionText.includes('可加'))){
+      level = 'warn';
+      label = '警告';
+      reason = '系統目前沒有明確叫你加碼，這筆屬於額外主觀操作。';
+    }
+  }
+
+  return {
+    level,
+    label,
+    reason,
+    deviation: devText,
+    reservoir: formatMoney(reservoir),
+    zone: getZoneLabel(reservoir)
+  };
+}
+
+function addOperationLog(code, actionType){
+  const judge = judgeOperation(code, actionType);
+  const logs = getOperationLog();
+  if(actionType === '收割' && judge.level !== 'danger'){
+    incrementHarvestCount(code);
+  }
+  const tagHtml = `<span class="tag ${judge.level}">${judge.label}</span>`;
+  logs.unshift({
+    time: getNowText(),
+    date: getCurrentDateText(),
+    kingCode: code,
+    kingName: getKingNameByCode(code),
+    action: actionType,
+    reason: judge.reason,
+    deviation: judge.deviation,
+    reservoir: judge.reservoir,
+    zone: judge.zone,
+    level: judge.level,
+    tagHtml
+  });
+  setOperationLog(logs.slice(0, 200));
+  renderOperationLog();
+  updateVisuals();
+}
+
+function copyOperationLog(){
+  const logs = getOperationLog();
+  const text = logs.map(item => `${item.time}｜${item.kingName}｜${item.action}｜${item.label}｜${item.reason}｜20MA乖離 ${item.deviation}｜水庫 ${item.reservoir}｜${item.zone}`).join('
+');
+  if(!text){ alert('目前沒有操作紀錄可複製。'); return; }
+  navigator.clipboard.writeText(text).then(()=> alert('已複製操作紀錄')).catch(()=> alert('複製失敗，請手動複製。'));
+}
+
+function exportOperationLog(){
+  const logs = getOperationLog();
+  const text = logs.map(item => `${item.time}｜${item.kingName}｜${item.action}｜${item.label}｜${item.reason}｜20MA乖離 ${item.deviation}｜水庫 ${item.reservoir}｜${item.zone}`).join('
+');
+  if(!text){ alert('目前沒有操作紀錄可匯出。'); return; }
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `flywheel-operation-log-${getCurrentMonthKey()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearOperationLog(){
+  if(!confirm('確定要清空所有操作紀錄嗎？')) return;
+  localStorage.removeItem('flywheel_mobile_operation_log');
+  renderOperationLog();
+}
+
+>
