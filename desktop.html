@@ -380,7 +380,7 @@
             </div>
           </div>
 
-          <div class="mt-6 grid gap-4 xl:grid-cols-2 2xl:grid-cols-5">
+          <div class="mt-6 grid gap-4 xl:grid-cols-2 2xl:grid-cols-6">
             <div class="rounded-3xl border border-emerald-400/20 bg-emerald-500/10 p-5 glow-emerald">
               <div class="text-xs font-bold tracking-[0.18em] text-emerald-200">本月狀態</div>
               <div id="monthStatusText" class="mt-3 text-2xl font-black text-emerald-100">等待判讀</div>
@@ -399,6 +399,11 @@
             <div class="rounded-3xl border border-amber-400/20 bg-amber-500/10 p-5 glow-amber">
               <div class="text-xs font-bold tracking-[0.18em] text-amber-200">最強 / 最弱</div>
               <div id="strongWeakBoard" class="mt-3 text-sm leading-7 text-amber-50">等待資料</div>
+            </div>
+            <div class="rounded-3xl border border-rose-400/20 bg-rose-500/10 p-5 glow-rose">
+              <div class="text-xs font-bold tracking-[0.18em] text-rose-200">資金流向</div>
+              <div id="flowModeTitle" class="mt-3 text-lg font-black text-rose-50">等待資料</div>
+              <div id="flowModeText" class="mt-2 text-sm leading-6 text-rose-50">等待資料</div>
             </div>
             <div class="rounded-3xl border border-sky-400/20 bg-sky-500/10 p-5 glow-cyan">
               <div class="text-xs font-bold tracking-[0.18em] text-sky-200">攻守比例</div>
@@ -503,6 +508,28 @@
       const mi = String(now.getMinutes()).padStart(2, '0');
       const ss = String(now.getSeconds()).padStart(2, '0');
       return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+    }
+
+    function getFlowMode(totalAssets, reservoir){
+      if (totalAssets < 3000000) {
+        return {
+          mode: '建構期',
+          text: '收割：100% 回水庫',
+          colorClass: 'text-rose-50'
+        };
+      } else if (reservoir < 1000000) {
+        return {
+          mode: '擴張期',
+          text: '收割：50% 水庫 / 50% 回原王',
+          colorClass: 'text-amber-50'
+        };
+      } else {
+        return {
+          mode: '厚尾期',
+          text: '收割：50% 水庫 / 50% 回原王｜底倉至少 85%',
+          colorClass: 'text-emerald-50'
+        };
+      }
     }
 
     function resetMonthlyIfNeeded(auto = false){
@@ -1037,6 +1064,7 @@
         const ammoRemain = Math.max(0, ammoLimit - usedAmmo);
         const triggerRemain = Math.max(0, maxTriggerPerMonth - monthlyTriggerCount);
         const battle = getBattleState(reservoir);
+        const flowMode = getFlowMode(totalAssets, reservoir);
 
         safeSetText('heroAssets', formatMoney(totalAssets));
         safeSetText('heroReservoir', formatMoney(reservoir));
@@ -1061,6 +1089,7 @@
         safeSetClass('ammoState', usedAmmo > ammoLimit ? 'text-sm font-black text-rose-300' : ammoRemain <= 6000 ? 'text-sm font-black text-amber-300' : 'text-sm font-black text-emerald-300');
 
         safeSetText('phaseText', getPhaseText(totalAssets));
+
         safeSetText('modeText', battle.mode);
         safeSetText('riskTextTop', battle.risk);
         safeSetClass('riskTextTop', battle.risk==='紅燈' ? 'mt-1 text-sm font-black text-rose-300' : battle.risk==='黃燈' ? 'mt-1 text-sm font-black text-amber-300' : 'mt-1 text-sm font-black text-emerald-300');
@@ -1072,8 +1101,13 @@
         safeSetClass('reservoirBar', `h-full transition-all ${battle.key === 'war' ? 'bg-rose-500' : battle.key === 'lock' ? 'bg-orange-500' : battle.key === 'tail' ? 'bg-violet-500' : 'bg-emerald-500'}`);
 
         safeSetText('battleZoneBadge', battle.label);
-        safeSetClass('battleZoneBadge', `mt-3 decision-state ${battle.cls}`);
+        safeSetClass('battleZoneBadge', `decision-state ${battle.cls}`);
         safeSetText('battleZoneRule', battle.rule);
+
+        safeSetText('flowModeTitle', flowMode.mode);
+        safeSetText('flowModeText', flowMode.text);
+        safeSetClass('flowModeTitle', `mt-3 text-lg font-black ${flowMode.colorClass}`);
+        safeSetClass('flowModeText', `mt-2 text-sm leading-6 ${flowMode.colorClass}`);
 
         safeSetWidth('progress300Bar', `${Math.min(100,totalAssets/3000000*100)}%`);
         safeSetText('progress300Text', `${Math.min(100,totalAssets/3000000*100).toFixed(1)}%`);
@@ -1286,8 +1320,8 @@
           else recommend = Math.min(ammoRemain, 22000);
 
           const sorted = [...triggeredCandidates].sort((a,b)=>{
-            if(a.triggerChange !== b.triggerChange) return a.triggerChange - b.triggerChange; // 更負者優先
-            if(a.firstWaveDone !== b.firstWaveDone) return Number(a.firstWaveDone) - Number(b.firstWaveDone); // 未首波優先
+            if(a.triggerChange !== b.triggerChange) return a.triggerChange - b.triggerChange;
+            if(a.firstWaveDone !== b.firstWaveDone) return Number(a.firstWaveDone) - Number(b.firstWaveDone);
             return 0;
           });
 
@@ -1373,10 +1407,10 @@
         summary.push(`總資產：${formatMoney(totalAssets)}｜水庫：${formatMoney(reservoir)}｜月定投：${formatMoney(monthlyInput)}｜月回灌：${formatMoney(monthlyRecycle)}`);
         summary.push(`本月總彈藥：${formatMoney(ammoLimit)}｜已用：${formatMoney(usedAmmo)}｜剩餘：${formatMoney(ammoRemain)}｜本月觸發：${monthlyTriggerCount}/${maxTriggerPerMonth}`);
         summary.push(`飛輪戰區：${battle.label}｜規則：${battle.rule}`);
+        summary.push(`資金流向：${flowMode.mode}｜${flowMode.text}`);
         summary.push(actionable.length ? `今日可執行收割：<br>${actionable.map(x=>`• ${x}`).join('<br>')}` : '今日沒有達到收割門檻的王。請維持定投，收盤後再檢核。');
 
         safeSetHTML('summaryBoard', summary.join('<br><br>'));
-
         updateChart(totalAssets, reservoir, recommend);
       } catch (err) {
         console.error('updateVisuals error:', err);
