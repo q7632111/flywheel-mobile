@@ -351,6 +351,13 @@
       line-height:1.6;
       font-weight:800;
     }
+
+    .log-list{display:flex;flex-direction:column;gap:8px}
+    .log-item{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:13px;line-height:1.6;}
+    .log-item .meta{color:var(--muted);font-size:12px;margin-bottom:4px}
+    .log-item .main{font-weight:900;color:#f8fafc}
+    .log-item .sub{color:#cbd5e1;margin-top:4px}
+
   </style>
 </head>
 <body>
@@ -489,6 +496,18 @@
     </section>
 
     <section id="kingCards" class="stack"></section>
+
+
+
+    <section class="glass section">
+      <h2>操作紀錄</h2>
+      <div class="toolbar3" style="margin-bottom:10px">
+        <button id="exportLogBtn" class="secondary">匯出紀錄</button>
+        <button id="copyLogBtn" class="dark">複製文字</button>
+        <button id="clearLogBtn" class="dark">清空紀錄</button>
+      </div>
+      <div id="operationLogList" class="log-list"></div>
+    </section>
 
     <section class="glass section">
       <h2>提醒</h2>
@@ -834,6 +853,83 @@ function setSync(text, ok=true){
   if(badge) badge.style.color = ok ? '#67e8f9' : '#fda4af';
 }
 
+const OP_LOG_KEY = "flywheel_mobile_operation_logs_v1";
+
+function getOperationLogs(){
+  try{return JSON.parse(localStorage.getItem(OP_LOG_KEY) || '[]');}catch(e){return [];}
+}
+
+function saveOperationLogs(logs){ localStorage.setItem(OP_LOG_KEY, JSON.stringify(logs.slice(0,120))); }
+
+function renderOperationLogs(){
+  const wrap = safeEl('operationLogList');
+  if(!wrap) return;
+  const logs = getOperationLogs();
+  if(!logs.length){
+    wrap.innerHTML = '<div class="ok-item">目前還沒有操作紀錄。之後你在王卡按「一鍵記錄收割 / 加碼」，系統會自動保存。</div>';
+    return;
+  }
+  wrap.innerHTML = logs.map(log => `
+    <div class="log-item">
+      <div class="meta">${log.time}｜${log.king}｜${log.action}</div>
+      <div class="main">${log.summary}</div>
+      <div class="sub">水庫 ${log.reservoir}｜20MA乖離 ${log.deviation}｜戰區 ${log.zone}</div>
+      ${log.note ? `<div class="sub">備註：${log.note}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function getZoneLabel(zoneKey){
+  if(zoneKey === 'war') return '戰時';
+  if(zoneKey === 'transition') return '過渡鎖定';
+  if(zoneKey === 'ignite') return '點火擴張';
+  if(zoneKey === 'prepare') return '厚尾準備';
+  if(zoneKey === 'compound' || zoneKey === 'thicktail') return '厚尾複利';
+  return '待判定';
+}
+
+function addOperationLog(code, action){
+  const king = kingDefs.find(k => k.code === code);
+  if(!king) return;
+  const prices = parsePrices(safeEl(code+'_prices')?.value || '');
+  const calc = calcDeviation(prices);
+  const reservoir = Number(safeEl('reservoir')?.value || 0);
+  const zone = getBattleZone(reservoir);
+  const recommendation = safeEl('decision_'+code)?.textContent || safeEl('action_'+code)?.textContent || '—';
+  const note = window.prompt(`補充${king.name}本次${action}備註（可留空）`, '') || '';
+  const logs = getOperationLogs();
+  logs.unshift({
+    time: getNowText(), king: king.name, action, summary: recommendation,
+    reservoir: formatMoney(reservoir),
+    deviation: calc ? `${calc.deviation >= 0 ? '+' : ''}${calc.deviation.toFixed(2)}%` : '資料不足',
+    zone: getZoneLabel(zone.key), note
+  });
+  saveOperationLogs(logs);
+  renderOperationLogs();
+}
+
+function exportOperationLogs(){
+  const logs = getOperationLogs();
+  const lines = logs.map(log => `${log.time}｜${log.king}｜${log.action}｜${log.summary}｜水庫 ${log.reservoir}｜20MA乖離 ${log.deviation}｜戰區 ${log.zone}${log.note ? `｜備註 ${log.note}` : ''}`);
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `flywheel_mobile_logs_${getCurrentMonthKey()}.txt`;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+function copyOperationLogs(){
+  const logs = getOperationLogs();
+  const lines = logs.map(log => `${log.time}｜${log.king}｜${log.action}｜${log.summary}｜水庫 ${log.reservoir}｜20MA乖離 ${log.deviation}｜戰區 ${log.zone}${log.note ? `｜備註 ${log.note}` : ''}`);
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>alert('操作紀錄已複製')).catch(()=>alert('複製失敗，請改用匯出紀錄'));
+}
+
+function clearOperationLogs(){
+  if(!confirm('確定要清空所有操作紀錄嗎？')) return;
+  localStorage.removeItem(OP_LOG_KEY);
+  renderOperationLogs();
+}
+
 function appendTodayValue(code){
   const today = prompt('輸入今天淨值');
   if(!today) return;
@@ -875,6 +971,11 @@ function ensureKingCards(){
           <a class="btn-link" href="${k.anueLink}" target="_blank" rel="noopener noreferrer">鉅亨淨值</a>
         </div>
 
+        <div class="toolbar" style="margin-top:-2px">
+          <button class="dark log-action-btn" data-code="${k.code}" data-action="收割">一鍵記錄收割</button>
+          <button class="secondary log-action-btn" data-code="${k.code}" data-action="加碼">一鍵記錄加碼</button>
+        </div>
+
         <label class="stack">
           <span class="label">最近 20 筆淨值</span>
           <textarea id="${k.code}_prices" placeholder="由舊到新，今天放最後"></textarea>
@@ -905,6 +1006,9 @@ function ensureKingCards(){
 
     document.querySelectorAll('.append-btn').forEach(btn => {
       btn.addEventListener('click', ()=> appendTodayValue(btn.dataset.code));
+    });
+    document.querySelectorAll('.log-action-btn').forEach(btn => {
+      btn.addEventListener('click', ()=> addOperationLog(btn.dataset.code, btn.dataset.action));
     });
     document.querySelectorAll('.clear-btn').forEach(btn => {
       btn.addEventListener('click', ()=>{
@@ -1326,6 +1430,7 @@ async function loadData(){
     });
     safeSetText('lastSyncTime', data.lastSyncTime || '—');
     updateVisuals();
+    renderOperationLogs();
     setSync('已同步', true);
   }catch(err){
     console.error(err);
@@ -1416,6 +1521,10 @@ function bindGlobalEvents(){
     updateVisuals();
   });
 
+  safeEl('exportLogBtn')?.addEventListener('click', exportOperationLogs);
+  safeEl('copyLogBtn')?.addEventListener('click', copyOperationLogs);
+  safeEl('clearLogBtn')?.addEventListener('click', clearOperationLogs);
+
   document.addEventListener('input', (e)=>{
     if(e.target && e.target.id !== 'notes') updateVisuals();
   });
@@ -1428,6 +1537,7 @@ bindGlobalEvents();
 ensureKingCards();
 safeSetValue('monthKey', getCurrentMonthKey());
 updateVisuals();
+renderOperationLogs();
 loadData();
 </script>
 </body>
