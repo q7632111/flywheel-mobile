@@ -2,174 +2,188 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>飛輪系統 V22 UI（最終版）</title>
+<title>飛輪系統 V22.5（完整進階版）</title>
+
 <style>
 body {
-    font-family: "Segoe UI", sans-serif;
-    background: #0f172a;
-    color: #e2e8f0;
-    margin: 0;
-    padding: 20px;
+    background:#0f172a;
+    color:#e2e8f0;
+    font-family:sans-serif;
+    margin:0;
+    padding:20px;
 }
-.container {
-    max-width: 900px;
-    margin: auto;
-}
+.container { max-width:1200px; margin:auto; }
 .card {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
 }
-h1 {
-    text-align: center;
+h1 { text-align:center; }
+
+.grid {
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:15px;
 }
+
 input {
-    padding: 10px;
-    width: 100%;
-    margin-top: 5px;
-    border-radius: 10px;
-    border: none;
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:none;
 }
-.result {
-    font-size: 26px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 20px;
-}
+
 .big {
-    font-size: 40px;
-    text-align: center;
-    margin-top: 20px;
+    font-size:26px;
+    font-weight:bold;
+    text-align:center;
+    margin-top:10px;
 }
-.green { color: #22c55e; }
-.red { color: #ef4444; }
-.yellow { color: #facc15; }
+
+.red{color:#ef4444;}
+.green{color:#22c55e;}
+.yellow{color:#facc15;}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>🚀 飛輪決策系統 V22</h1>
+<h1>🚀 飛輪系統 V22.5 完整版</h1>
 
 <div class="card">
 <label>水庫金額（萬）</label>
-<input id="pool" type="number" placeholder="例如：30">
+<input id="pool">
 
-<label>20MA乖離（%）</label>
-<input id="bias" type="number" placeholder="例如：12">
+<label>總資產（萬）</label>
+<input id="asset">
+</div>
 
-<label>
-<input type="checkbox" id="cooldown"> 今日已收割（啟動冷卻）
-</label>
+<div class="card grid">
+<div>
+<h3>王1</h3>
+<input id="b1" placeholder="乖離%">
+<input type="checkbox" id="c1">冷卻
+<div id="r1" class="big"></div>
+</div>
+
+<div>
+<h3>王2</h3>
+<input id="b2">
+<input type="checkbox" id="c2">冷卻
+<div id="r2" class="big"></div>
+</div>
+
+<div>
+<h3>王3</h3>
+<input id="b3">
+<input type="checkbox" id="c3">冷卻
+<div id="r3" class="big"></div>
+</div>
 </div>
 
 <div class="card">
-<div id="zone"></div>
-<div id="action" class="big"></div>
-<div id="detail" class="result"></div>
+<h3>戰區判斷</h3>
+<div id="zone" class="big"></div>
+</div>
+
+<div class="card">
+<h3>防碎鑽判斷</h3>
+<div id="lock" class="big"></div>
 </div>
 
 </div>
 
 <script>
-function calc() {
-    let pool = parseFloat(document.getElementById("pool").value);
-    let bias = parseFloat(document.getElementById("bias").value);
-    let cooldown = document.getElementById("cooldown").checked;
+function getZone(pool){
+    if(pool<15) return "戰時";
+    if(pool<18) return "過渡";
+    if(pool<60) return "點火";
+    if(pool<=100) return "厚尾準備";
+    return "厚尾";
+}
 
-    let zone = "";
-    let action = "";
-    let detail = "";
+function getAction(bias,pool,cool){
+    if(cool) return ["⛔冷卻","yellow"];
 
-    if (cooldown) {
-        action = "⛔ 冷卻中（禁止操作）";
-        document.getElementById("action").className = "big yellow";
-        document.getElementById("zone").innerText = "冷卻鎖";
-        document.getElementById("detail").innerText = "等待5天";
-        return;
+    if(pool<15){
+        if(bias>=10) return ["🔴砍至50%","red"];
+        if(bias>=5) return ["🔴收10%","red"];
     }
 
-    // 判斷區域
-    if (pool < 15) {
-        zone = "🔴 戰時";
-        if (bias >= 10) {
-            action = "🔴 收割（砍至50%）";
-            detail = "100%回水庫";
-        } else if (bias >= 5) {
-            action = "🔴 收割10%";
-            detail = "100%回水庫";
-        } else {
-            action = "🟢 持有";
-        }
+    if(pool<18){
+        if(bias>=10) return ["🔴砍至50%","red"];
+        if(bias>=5) return ["🔴收10%","red"];
     }
 
-    else if (pool < 18) {
-        zone = "🟡 過渡";
-        if (bias >= 10) {
-            action = "🔴 收割（砍至50%）";
-        } else if (bias >= 5) {
-            action = "🔴 收割10%";
-        } else {
-            action = "🟢 持有";
-        }
-        detail = "100%回水庫";
+    if(pool<60){
+        if(bias>=20) return ["🔴收20%","red"];
+        if(bias>=15) return ["🔴收20%","red"];
+        if(bias>=10) return ["🔴收10%","red"];
     }
 
-    else if (pool < 60) {
-        zone = "⚡ 點火";
-        if (bias >= 20) {
-            action = "🔴 收割20%";
-        } else if (bias >= 15) {
-            action = "🔴 收割20%";
-        } else if (bias >= 10) {
-            action = "🔴 收割10%";
-        } else {
-            action = "🟢 持有";
-        }
-        detail = "50%水庫 / 50%原王";
+    if(pool<=100){
+        if(bias>=20) return ["🔴收20%","red"];
+        if(bias>=15) return ["🔴收20%","red"];
+        if(bias>=10) return ["🔴收10%","red"];
     }
 
-    else if (pool <= 100) {
-        zone = "🔥 厚尾準備";
-        if (bias >= 20) {
-            action = "🔴 收割20%";
-        } else if (bias >= 15) {
-            action = "🔴 收割20%";
-        } else if (bias >= 10) {
-            action = "🔴 收割10%";
-        } else {
-            action = "🟢 持有";
-        }
-        detail = "底倉≥70%｜50/50分流";
+    if(pool>100){
+        if(bias>=25) return ["🔴收20%","red"];
+        if(bias>=15) return ["🔴收10%","red"];
     }
 
-    else {
-        zone = "🚀 厚尾";
-        if (bias >= 25) {
-            action = "🔴 收割20%";
-        } else if (bias >= 15) {
-            action = "🔴 收割10%";
-        } else {
-            action = "🟢 持有";
-        }
-        detail = "底倉≥85%｜50/50分流";
+    return ["🟢持有","green"];
+}
+
+function calc(){
+    let pool=parseFloat(poolInput.value)||0;
+    let asset=parseFloat(assetInput.value)||0;
+
+    let zone=getZone(pool);
+    zoneDiv.innerText=zone;
+
+    let b=[b1.value,b2.value,b3.value];
+    let c=[c1.checked,c2.checked,c3.checked];
+    let r=[r1,r2,r3];
+
+    for(let i=0;i<3;i++){
+        let bias=parseFloat(b[i])||0;
+        let [txt,color]=getAction(bias,pool,c[i]);
+        r[i].innerText=txt;
+        r[i].className="big "+color;
     }
 
-    document.getElementById("zone").innerText = zone;
-    document.getElementById("action").innerText = action;
-    document.getElementById("detail").innerText = detail;
-
-    if (action.includes("收割")) {
-        document.getElementById("action").className = "big red";
-    } else {
-        document.getElementById("action").className = "big green";
+    // 防碎鑽
+    if(asset<300 || pool<60){
+        lock.innerText="⛔禁止開新王";
+        lock.className="big red";
+    }else{
+        lock.innerText="🟢可評估開新王";
+        lock.className="big green";
     }
 }
 
-document.querySelectorAll("input").forEach(i => {
-    i.addEventListener("input", calc);
+let poolInput=document.getElementById("pool");
+let assetInput=document.getElementById("asset");
+let zoneDiv=document.getElementById("zone");
+let lock=document.getElementById("lock");
+
+let b1=document.getElementById("b1");
+let b2=document.getElementById("b2");
+let b3=document.getElementById("b3");
+
+let c1=document.getElementById("c1");
+let c2=document.getElementById("c2");
+let c3=document.getElementById("c3");
+
+let r1=document.getElementById("r1");
+let r2=document.getElementById("r2");
+let r3=document.getElementById("r3");
+
+document.querySelectorAll("input").forEach(i=>{
+    i.addEventListener("input",calc);
 });
 </script>
 
