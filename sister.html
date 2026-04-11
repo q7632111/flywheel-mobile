@@ -64,19 +64,8 @@
       color:#a5f3fc;
     }
 
-    h1{
-      margin:12px 0 0;
-      font-size:28px;
-      line-height:1.08;
-      letter-spacing:.01em;
-    }
-
-    p{
-      margin:10px 0 0;
-      color:var(--muted);
-      line-height:1.7;
-      font-size:14px;
-    }
+    h1{margin:12px 0 0;font-size:28px;line-height:1.08;letter-spacing:.01em}
+    p{margin:10px 0 0;color:var(--muted);line-height:1.7;font-size:14px}
 
     .section{padding:16px}
     .section h2{margin:0 0 12px;font-size:18px;letter-spacing:.02em}
@@ -91,84 +80,43 @@
       padding:12px;
     }
 
-    .label{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .value{
-      font-weight:900;
-      font-size:20px;
-      line-height:1.15;
-    }
-
+    .label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .value{font-weight:900;font-size:20px;line-height:1.15}
     .mono{font-variant-numeric:tabular-nums}
 
-    .toolbar{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .toolbar3{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:8px;
-    }
+    .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .toolbar3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 
     button,.btn-link{
-      appearance:none;
-      border:none;
-      border-radius:18px;
-      padding:14px 14px;
-      font-weight:900;
-      font-size:15px;
-      cursor:pointer;
-      color:#02111e;
+      appearance:none;border:none;border-radius:18px;padding:14px 14px;
+      font-weight:900;font-size:15px;cursor:pointer;color:#02111e;
       background:linear-gradient(180deg,#67f3ff,#2bd4e6);
       box-shadow:0 12px 28px rgba(34,211,238,.22);
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      text-decoration:none;display:flex;align-items:center;justify-content:center;
     }
 
     button.secondary{
-      background:rgba(34,211,238,.08);
-      color:#c8f8ff;
-      border:1px solid rgba(34,211,238,.26);
-      box-shadow:none;
+      background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.26);box-shadow:none;
     }
 
     button.dark,.btn-link.dark{
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow:none;
+      background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(255,255,255,.08);box-shadow:none;
     }
 
     button.action-harvest{
       background:linear-gradient(180deg,#ff8aa1,#fb7185);
-      color:#1b0b12;
-      box-shadow:0 12px 28px rgba(251,113,133,.22);
+      color:#1b0b12;box-shadow:0 12px 28px rgba(251,113,133,.22);
     }
 
     button.action-add{
       background:linear-gradient(180deg,#6ee7b7,#34d399);
-      color:#041b12;
-      box-shadow:0 12px 28px rgba(52,211,153,.22);
+      color:#041b12;box-shadow:0 12px 28px rgba(52,211,153,.22);
     }
 
     input,textarea,select{
-      width:100%;
-      background:rgba(2,6,23,.76);
-      border:1px solid rgba(148,163,184,.18);
-      color:white;
-      border-radius:16px;
-      padding:13px 14px;
-      font-size:16px;
-      outline:none;
+      width:100%;background:rgba(2,6,23,.76);
+      border:1px solid rgba(148,163,184,.18);color:white;
+      border-radius:16px;padding:13px 14px;font-size:16px;outline:none;
     }
 
     input:focus,textarea:focus,select:focus{
@@ -176,209 +124,81 @@
       box-shadow:0 0 0 3px rgba(34,211,238,.12);
     }
 
-    textarea{
-      min-height:84px;
-      resize:vertical;
-    }
-
+    textarea{min-height:84px;resize:vertical}
     .stack{display:flex;flex-direction:column;gap:10px}
 
     .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:12px;
-      font-weight:900;
+      display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+      padding:8px 12px;font-size:12px;font-weight:900;
     }
-
-    .chip.ok{
-      background:rgba(52,211,153,.16);
-      color:#b6f6df;
-      border:1px solid rgba(52,211,153,.24);
-    }
-
-    .chip.warn{
-      background:rgba(251,191,36,.16);
-      color:#fde7a5;
-      border:1px solid rgba(251,191,36,.22);
-    }
-
-    .chip.danger{
-      background:rgba(251,113,133,.14);
-      color:#fecdd6;
-      border:1px solid rgba(251,113,133,.22);
-    }
-
-    .chip.idle{
-      background:rgba(255,255,255,.06);
-      color:#e2e8f0;
-      border:1px solid rgba(255,255,255,.08);
-    }
+    .chip.ok{background:rgba(52,211,153,.16);color:#b6f6df;border:1px solid rgba(52,211,153,.24)}
+    .chip.warn{background:rgba(251,191,36,.16);color:#fde7a5;border:1px solid rgba(251,191,36,.22)}
+    .chip.danger{background:rgba(251,113,133,.14);color:#fecdd6;border:1px solid rgba(251,113,133,.22)}
+    .chip.idle{background:rgba(255,255,255,.06);color:#e2e8f0;border:1px solid rgba(255,255,255,.08)}
 
     .decision{
-      border-radius:18px;
-      padding:14px 14px;
-      font-size:14px;
-      font-weight:900;
-      line-height:1.7;
+      border-radius:18px;padding:14px 14px;font-size:14px;font-weight:900;line-height:1.7;
     }
-
     .decision.harvest{
       background:linear-gradient(180deg, rgba(127,29,29,.42), rgba(76,29,49,.32));
-      border:1px solid rgba(251,113,133,.25);
-      color:#ffe4e8;
+      border:1px solid rgba(251,113,133,.25);color:#ffe4e8;
     }
     .decision.watch{
       background:linear-gradient(180deg, rgba(120,53,15,.34), rgba(87,51,15,.22));
-      border:1px solid rgba(251,191,36,.22);
-      color:#fde7a5;
+      border:1px solid rgba(251,191,36,.22);color:#fde7a5;
     }
     .decision.wait{
       background:linear-gradient(180deg, rgba(30,41,59,.5), rgba(15,23,42,.36));
-      border:1px solid rgba(148,163,184,.18);
-      color:#e2e8f0;
+      border:1px solid rgba(148,163,184,.18);color:#e2e8f0;
     }
     .decision.cooldown{
       background:linear-gradient(180deg, rgba(76,29,149,.28), rgba(55,28,99,.22));
-      border:1px solid rgba(167,139,250,.22);
-      color:#ddd6fe;
+      border:1px solid rgba(167,139,250,.22);color:#ddd6fe;
     }
     .decision.locked{
       background:linear-gradient(180deg, rgba(55,65,81,.55), rgba(17,24,39,.42));
-      border:1px solid rgba(148,163,184,.18);
-      color:#cbd5e1;
+      border:1px solid rgba(148,163,184,.18);color:#cbd5e1;
     }
 
-    .summary{
-      font-size:14px;
-      line-height:1.72;
-      color:#def7ff;
-    }
-
-    .note{
-      font-size:12px;
-      line-height:1.58;
-      color:var(--muted);
-    }
+    .summary{font-size:14px;line-height:1.72;color:#def7ff}
+    .note{font-size:12px;line-height:1.58;color:var(--muted)}
 
     .balance{
-      display:flex;
-      border-radius:999px;
-      overflow:hidden;
-      height:16px;
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.05);
+      display:flex;border-radius:999px;overflow:hidden;height:16px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05);
     }
+    .balance .attack{background:linear-gradient(90deg,#38bdf8,#22d3ee)}
+    .balance .defense{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
 
-    .balance .attack{
-      background:linear-gradient(90deg,#38bdf8,#22d3ee);
-    }
-
-    .balance .defense{
-      background:linear-gradient(90deg,#fbbf24,#f59e0b);
-    }
-
-    .king{
-      padding:16px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    .king-head{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .king-title{
-      font-size:19px;
-      font-weight:900;
-      letter-spacing:.01em;
-    }
-
-    .king-sub{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:4px;
-    }
-
-    .actions{
-      display:grid;
-      grid-template-columns:1fr 1fr 1fr;
-      gap:8px;
-    }
-
-    .actions button,.actions .btn-link{
-      padding:12px 10px;
-      font-size:13px;
-    }
-
+    .king{padding:16px;display:flex;flex-direction:column;gap:12px}
+    .king-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .king-title{font-size:19px;font-weight:900;letter-spacing:.01em}
+    .king-sub{font-size:12px;color:var(--muted);margin-top:4px}
+    .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .actions button,.actions .btn-link{padding:12px 10px;font-size:13px}
     .actions .btn-link{
-      background:rgba(34,211,238,.08);
-      color:#c8f8ff;
-      border:1px solid rgba(34,211,238,.28);
-      box-shadow:none;
+      background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.28);box-shadow:none;
     }
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-    .stat-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .cool{
-      font-size:13px;
-      font-weight:900;
-      letter-spacing:.01em;
-    }
-
+    .cool{font-size:13px;font-weight:900;letter-spacing:.01em}
     .cool.ok{color:#86efac}
     .cool.warn{color:#fde68a}
     .cool.danger{color:#fda4af}
 
-    .warn-list{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-top:10px;
-    }
-
+    .warn-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
     .warn-item{
-      padding:10px 12px;
-      border-radius:14px;
-      background:rgba(251,113,133,.1);
-      border:1px solid rgba(251,113,133,.18);
-      color:#ffd1d8;
-      font-size:13px;
-      line-height:1.6;
-      font-weight:800;
+      padding:10px 12px;border-radius:14px;background:rgba(251,113,133,.1);
+      border:1px solid rgba(251,113,133,.18);color:#ffd1d8;font-size:13px;line-height:1.6;font-weight:800;
     }
-
     .ok-item{
-      padding:10px 12px;
-      border-radius:14px;
-      background:rgba(52,211,153,.1);
-      border:1px solid rgba(52,211,153,.16);
-      color:#b6f6df;
-      font-size:13px;
-      line-height:1.6;
-      font-weight:800;
+      padding:10px 12px;border-radius:14px;background:rgba(52,211,153,.1);
+      border:1px solid rgba(52,211,153,.16);color:#b6f6df;font-size:13px;line-height:1.6;font-weight:800;
     }
-
     .log-item{
-      padding:10px 12px;
-      border-radius:14px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-      color:#e2e8f0;
-      font-size:12px;
-      line-height:1.7;
+      padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);color:#e2e8f0;font-size:12px;line-height:1.7;
     }
-
     .judge-ok{color:#86efac;font-weight:900}
     .judge-warn{color:#fde68a;font-weight:900}
     .judge-bad{color:#fda4af;font-weight:900}
@@ -389,7 +209,7 @@
     <section class="glass hero">
       <div class="pill">FEIYU MODE · 一鍵決策模式</div>
       <h1>肥瑜專用投資系統</h1>
-      <p>這版保留最重要的判斷：今日要不要動、20MA 乖離是否達到收割區、10日跌幅是否可加碼、水庫是否安全。畫面比完整版簡單，但核心法典照樣守。</p>
+      <p>目前採 1 王 + 1 水庫穩定版。加碼固定 3000 制，收割以溫和版為主：+10 / +15 / +20 分段收，底倉固定保留 75%。</p>
     </section>
 
     <section class="glass section">
@@ -413,7 +233,6 @@
           <div class="note">月份鍵：<span id="monthKeyText">—</span></div>
         </div>
       </div>
-
       <div class="toolbar" style="margin-top:10px">
         <button id="reloadBtn" class="secondary">重新載入</button>
         <button id="saveBtn">儲存同步</button>
@@ -424,7 +243,7 @@
       <h2>今日唯一指令</h2>
       <div id="globalCommandCard" class="decision wait">
         <div id="globalCommandTitle" style="font-size:20px;margin-bottom:8px">等待資料</div>
-        <div id="globalCommandReason">系統正在整理目前主王與水庫狀態。</div>
+        <div id="globalCommandReason">系統正在整理主王與水庫狀態。</div>
         <div id="globalCommandHint" class="note" style="margin-top:10px">讀取後，這裡會直接告訴你今天是收割、加碼還是不動。</div>
       </div>
     </section>
@@ -448,7 +267,6 @@
 
       <input id="monthKey" type="hidden">
       <input id="kingCount" type="hidden" value="1">
-      <input id="currentDrawdown" type="hidden" value="0">
       <input id="maxTriggerPerMonth" type="hidden" value="6">
 
       <div class="grid2" style="margin-top:10px">
@@ -623,7 +441,7 @@ function getBattleZone(reservoir){
       key:'war',
       chipText:'🔴 戰時狀態',
       chipClass:'chip danger',
-      rule:'20MA乖離 +5% → 收割10%；+10% → 收至剩50%底倉；獲利100%回水庫'
+      rule:'保守守水位，收割只做溫和版：+10% 才開始小收，所有收割先回水庫。'
     };
   }
   if(reservoir >= 150000 && reservoir < 180000){
@@ -631,7 +449,7 @@ function getBattleZone(reservoir){
       key:'transition',
       chipText:'🟡 過渡鎖定區',
       chipClass:'chip warn',
-      rule:'20MA乖離 +5% → 收割10%；+10% → 收至剩50%底倉；獲利100%回水庫'
+      rule:'仍以保守收割為主，優先守住水位，不要連續動作。'
     };
   }
   if(reservoir >= 600000 && reservoir <= 1000000){
@@ -639,7 +457,7 @@ function getBattleZone(reservoir){
       key:'prepare',
       chipText:'🔥 厚尾準備區',
       chipClass:'chip ok',
-      rule:'20MA乖離 +10% → 收10%；+15% → 收20%；+20% → 再收20%；底倉至少保留70%'
+      rule:'+10% 收10%；+15% 收15%；+20% 收20%；單王底倉至少保留75%。'
     };
   }
   if(reservoir > 1000000){
@@ -647,14 +465,14 @@ function getBattleZone(reservoir){
       key:'thicktail',
       chipText:'🚀 厚尾複利區',
       chipClass:'chip ok',
-      rule:'20MA乖離 +15% → 收10%；+25% → 收20%；底倉至少保留85%'
+      rule:'+10% 收10%；+15% 收15%；+20% 收20%；單王底倉至少保留75%。'
     };
   }
   return {
     key:'ignite',
     chipText:'⚡ 點火擴張區',
     chipClass:'chip ok',
-    rule:'20MA乖離 +10% → 收10%；+15% → 收20%；+20% → 再收20%；獲利50/50分流'
+    rule:'+10% 收10%；+15% 收15%；+20% 收20%；單王底倉至少保留75%，收割100%回水庫。'
   };
 }
 
@@ -683,16 +501,15 @@ function getEmergencyLimit(reservoir){
 }
 
 function getHarvestDecision(deviation, reservoir, cooldownRemain, name, totalAssets, code){
-  const zone = getBattleZone(reservoir);
-  const attackRatio = totalAssets > 0 ? ((totalAssets - reservoir) / totalAssets) : 1;
   const harvestCount = getHarvestCount(code);
+  const attackRatio = totalAssets > 0 ? ((totalAssets - reservoir) / totalAssets) : 1;
 
-  if(attackRatio < 0.6){
+  if(attackRatio < 0.45){
     return {
       signal:'鎖定',
       cls:'locked',
-      text:'🛑 攻擊力不足，暫停收割',
-      reason:`目前前鋒資產占比低於60%，今天優先保留攻擊力，不執行收割。`
+      text:'🛑 攻擊部位太薄，暫停收割',
+      reason:'目前只有1王，攻擊部位再收會太薄，今天先不收。'
     };
   }
 
@@ -710,63 +527,38 @@ function getHarvestDecision(deviation, reservoir, cooldownRemain, name, totalAss
       signal:'冷卻',
       cls:'cooldown',
       text:`❄️ 冷卻中：還剩 ${cooldownRemain} 個交易日`,
-      reason:`${name} 已進入 5 個交易日冷卻，不論20MA乖離多高，今天都禁止收割。`
+      reason:`${name} 已進入 5 個交易日冷卻，不論乖離多高，今天都禁止收割。`
     };
   }
 
-  if(zone.key === 'war' || zone.key === 'transition'){
-    if(deviation >= 10) return {
+  if(deviation >= 20){
+    return {
       signal:'收割', cls:'harvest',
-      text:'🔴 收至 50% 底倉｜100%回水庫',
-      reason:`目前位於${zone.chipText}，且20MA乖離 ${deviation.toFixed(2)}% ≥ +10%，依戰時法典收至剩50%底倉。`
-    };
-    if(deviation >= 5) return {
-      signal:'收割', cls:'harvest',
-      text:'🟠 收割 10%｜100%回水庫',
-      reason:`目前位於${zone.chipText}，且20MA乖離 ${deviation.toFixed(2)}% ≥ +5%，依戰時法典收割10%。`
+      text:'🔴 收割 20%｜保留75%底倉｜100%回水庫',
+      reason:`20MA乖離 ${deviation.toFixed(2)}% ≥ +20%，建議收割 20%，單王底倉至少保留 75%。`
     };
   }
-
-  if(zone.key === 'ignite' || zone.key === 'prepare'){
-    if(deviation >= 20) return {
+  if(deviation >= 15){
+    return {
       signal:'收割', cls:'harvest',
-      text:'🔴 收割 20%｜50%水庫 / 50%回原王',
-      reason:`目前位於${zone.chipText}，20MA乖離 ${deviation.toFixed(2)}% ≥ +20%，依規則收割20%。`
+      text:'🟠 收割 15%｜保留75%底倉｜100%回水庫',
+      reason:`20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，建議收割 15%，單王底倉至少保留 75%。`
     };
-    if(deviation >= 15) return {
-      signal:'收割', cls:'harvest',
-      text:'🟠 收割 20%｜50%水庫 / 50%回原王',
-      reason:`目前位於${zone.chipText}，20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，依規則收割20%。`
-    };
-    if(deviation >= 10) return {
+  }
+  if(deviation >= 10){
+    return {
       signal:'收割', cls:'watch',
-      text:'🟡 收割 10%｜50%水庫 / 50%回原王',
-      reason:`目前位於${zone.chipText}，20MA乖離 ${deviation.toFixed(2)}% ≥ +10%，依規則收割10%。`
+      text:'🟡 收割 10%｜保留75%底倉｜100%回水庫',
+      reason:`20MA乖離 ${deviation.toFixed(2)}% ≥ +10%，建議先小收 10%，單王底倉至少保留 75%。`
     };
   }
-
-  if(zone.key === 'thicktail'){
-    if(deviation >= 25) return {
-      signal:'收割', cls:'harvest',
-      text:'🔴 收割 20%｜底倉至少保留85%',
-      reason:`目前位於厚尾複利區，20MA乖離 ${deviation.toFixed(2)}% ≥ +25%，依厚尾規則收割20%。`
-    };
-    if(deviation >= 15) return {
-      signal:'收割', cls:'watch',
-      text:'🟠 收割 10%｜底倉至少保留85%',
-      reason:`目前位於厚尾複利區，20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，依厚尾規則收割10%。`
-    };
-  }
-
   if(deviation >= 5){
     return {
-      signal:'觀察',
-      cls:'watch',
+      signal:'觀察', cls:'watch',
       text:'🟡 接近收割區，先觀察',
-      reason:`目前乖離已轉強，但尚未正式進入收割門檻。`
+      reason:'目前乖離已轉強，但尚未正式進入收割門檻。'
     };
   }
-
   return {
     signal:'等待',
     cls:'wait',
@@ -857,15 +649,14 @@ function clearLogs(){
 function judgeOperation(action, totalAssets, reservoir, decisionText, code){
   const attackRatio = totalAssets > 0 ? ((totalAssets - reservoir) / totalAssets) : 1;
   if(action === '收割'){
-    if(attackRatio < 0.6) return { text:'❌ 違規：攻擊力不足還收割', cls:'judge-bad' };
+    if(attackRatio < 0.45) return { text:'❌ 違規：攻擊部位太薄還收割', cls:'judge-bad' };
     if(getHarvestCount(code) >= 2) return { text:'❌ 違規：本月已超過收割上限', cls:'judge-bad' };
-    if(reservoir < 150000) return { text:'⚠️ 警告：水庫偏低，收割要更保守', cls:'judge-warn' };
     return { text:'✅ 合理：當下收割條件正常', cls:'judge-ok' };
   }
   if(action === '加碼'){
     if(reservoir < 80000) return { text:'⚠️ 警告：保命模式下加碼要很克制', cls:'judge-warn' };
     if(String(decisionText || '').includes('未達')) return { text:'⚠️ 警告：今天未必需要加碼', cls:'judge-warn' };
-    return { text:'✅ 合理：可記為正常加碼', cls:'judge-ok' };
+    return { text:'✅ 合理：固定 3000 加碼制', cls:'judge-ok' };
   }
   return { text:'✅ 已記錄', cls:'judge-ok' };
 }
@@ -994,7 +785,7 @@ function updateVisuals(){
     if(usedAmmo > ammoLimit || triggerRemain <= 0 || ammoRemain <= 0){
       monthStatusText = '紅燈';
       monthStatusHint = '本月額度或次數已用盡，停止加碼';
-    } else if(ammoRemain <= Math.max(6000, ammoLimit * 0.3)){
+    } else if(ammoRemain <= 3000){
       monthStatusText = '黃燈';
       monthStatusHint = '本月彈藥偏緊，請保守使用';
     }
@@ -1005,11 +796,11 @@ function updateVisuals(){
     if(monthlyInput < 3000) warnings.push('每月定投偏低，至少維持 3000 比較穩定。');
     if(usedAmmo > ammoLimit) warnings.push('本月加碼已超過水庫15%上限。');
     if(totalAssets < 3000000 && reservoir < 180000) warnings.push('目前水庫偏低，先守住水位比較重要。');
+    if(Number(safeEl('kingCount')?.value || 1) > 1 && monthlyInput < 6000) warnings.push('目前月扣只有3000，暫時不建議太早開第二王。');
 
     const discipline = Math.max(0,100 - warnings.length * 8);
     safeSetText('disciplineText', String(discipline));
 
-    const summaryLines = [];
     const recommendLines = [];
     const decisionLines = [];
     const triggeredCandidates = [];
@@ -1046,7 +837,7 @@ function updateVisuals(){
         safeSetText('decision_'+k.code, '這一王目前尚未啟用');
         const dec = safeEl('decision_'+k.code);
         if(dec) dec.className = 'decision locked';
-        safeSetText('action_'+k.code, '目前只需要專注已啟用的王即可。');
+        safeSetText('action_'+k.code, '目前先專注已啟用的王即可。');
         return;
       }
 
@@ -1079,7 +870,6 @@ function updateVisuals(){
       else if(reboundPct >= 5) wave='反彈觀察期';
 
       let triggerText='待判定';
-
       if(triggerCheck){
         safeSetText('chg10_'+k.code, `${triggerCheck.change>=0?'+':''}${triggerCheck.change.toFixed(2)}%`);
         if(triggerCheck.triggered){
@@ -1126,9 +916,7 @@ function updateVisuals(){
       safeSetText('wave_'+k.code, wave);
       safeSetText('action_'+k.code, decision.reason);
 
-      summaryLines.push(`${k.name}｜20MA乖離 ${deviation>=0?'+':''}${deviation.toFixed(2)}%｜${decision.text}`);
       decisionLines.push(`• ${k.name}：${decision.text}`);
-
       if(decision.signal === '收割' || decision.signal === '觀察'){
         recommendLines.push(`• ${k.name}：${decision.text}`);
       }
@@ -1138,23 +926,14 @@ function updateVisuals(){
     let recommendText = '';
 
     if(ammoRemain <= 0 || triggerRemain <= 0 || triggeredCandidates.length === 0){
-      recommend = 0;
       recommendText = '今天沒有明確加碼指令，維持紀律即可。';
     } else {
       const emergencyLimit = getEmergencyLimit(reservoir);
-      if(reservoir < 150000){
-        recommend = Math.min(ammoRemain, 3000);
-      } else if(triggeredCandidates.length === 1){
-        recommend = Math.min(ammoRemain, 6000);
-      } else {
-        recommend = Math.min(ammoRemain, 12000);
-      }
-
       if(monthlyTriggerCount >= emergencyLimit && emergencyLimit !== Infinity){
-        recommend = 0;
         recommendText = '目前屬於保命模式，當月加碼次數已滿，今天停止加碼。';
       } else {
-        recommendText = `今天若要加碼，建議出手 ${formatMoney(recommend)} 元。候選：${triggeredCandidates.map(x => x.name).join('、')}`;
+        recommend = Math.min(ammoRemain, 3000 * Math.min(triggeredCandidates.length, 3));
+        recommendText = `今天若要加碼，建議出手 ${formatMoney(recommend)} 元（以 3000 為基本單位）。候選：${triggeredCandidates.map(x => x.name).join('、')}`;
       }
     }
 
@@ -1170,18 +949,18 @@ function updateVisuals(){
 
     if (harvestCountAll > 0) {
       globalTitle = `👉 今天可執行 ${harvestCountAll} 筆收割`;
-      globalReason = `已有主王進入目前水庫戰區的收割門檻。`;
+      globalReason = '這版收割採溫和版：只收 10% / 15% / 20%，並固定保留 75% 底倉。';
       globalHint = recommendLines.length ? recommendLines.join(' ｜ ') : '請查看王卡提示。';
       globalClass = 'decision harvest';
     } else if (cooldownCount > 0) {
       globalTitle = '👉 今天以冷卻優先，不追操作';
-      globalReason = `目前有王處於冷卻中，冷卻期間禁止收割。`;
+      globalReason = '目前有王處於冷卻中，冷卻期間禁止收割。';
       globalHint = '先守紀律，不要因為焦躁亂動。';
       globalClass = 'decision cooldown';
     } else if (triggeredCandidates.length > 0 && recommend > 0) {
       globalTitle = `👉 今天可加碼，建議 ${formatMoney(recommend)} 元`;
-      globalReason = `已達 10日跌幅觸發門檻，且本月仍有可用彈藥。`;
-      globalHint = `候選：${lastTriggeredCandidateNames.join('、')}`;
+      globalReason = '已達 10日跌幅觸發門檻，且本月仍有可用彈藥。';
+      globalHint = `候選：${lastTriggeredCandidateNames.join('、')}｜固定 3000 制`;
       globalClass = 'decision watch';
     }
 
@@ -1220,7 +999,7 @@ function updateVisuals(){
       if(warnings.length){
         warningBoard.innerHTML = warnings.map(x => `<div class="warn-item">${x}</div>`).join('');
       } else {
-        warningBoard.innerHTML = `<div class="ok-item">目前輸入與水庫節奏符合專屬法典，可持續照系統執行。</div>`;
+        warningBoard.innerHTML = `<div class="ok-item">目前輸入與專屬法典一致：單王穩定版、3000 加碼制、收割保留 75% 底倉。</div>`;
       }
     }
 
@@ -1289,7 +1068,6 @@ async function saveData(){
       monthlyInput: safeEl('monthlyInput')?.value || 0,
       monthlyRecycle: safeEl('monthlyRecycle')?.value || 0,
       kingCount: safeEl('kingCount')?.value || 1,
-      currentDrawdown: 0,
       usedAmmo: safeEl('usedAmmo')?.value || 0,
       monthlyTriggerCount: safeEl('monthlyTriggerCount')?.value || 0,
       maxTriggerPerMonth: safeEl('maxTriggerPerMonth')?.value || 6,
