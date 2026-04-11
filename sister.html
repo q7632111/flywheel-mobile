@@ -2,434 +2,961 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>飛輪投資系統 V22 · 肥瑜專用版</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>肥瑜投資系統 V22</title>
   <style>
     :root{
-      --bg:#020617; --card:#0f172a; --cyan:#22d3ee; --rose:#fb7185; --emerald:#34d399; --amber:#fbbf24;
+      --bg1:#04101d;
+      --bg2:#0a1426;
+      --bg3:#0f1b33;
+      --card:rgba(15,23,42,.84);
+      --line:rgba(255,255,255,.08);
+      --text:#f8fafc;
+      --muted:#94a3b8;
+      --cyan:#22d3ee;
+      --emerald:#34d399;
+      --amber:#fbbf24;
+      --rose:#fb7185;
+      --violet:#a78bfa;
+      --sky:#38bdf8;
     }
-    body{ background: radial-gradient(circle at 50% 0%, #1e293b, #020617); color:#f8fafc; font-family: sans-serif; }
-    .glass{ background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); border-radius: 24px; }
-    .input-dark{ background: #020617; border: 1px solid #1e293b; color: white; border-radius: 12px; padding: 10px; width: 100%; }
-    .cmd-box { border-left: 4px solid var(--cyan); background: rgba(34, 211, 238, 0.05); padding: 16px; border-radius: 0 16px 16px 0; }
-    .mono { font-variant-numeric: tabular-nums; }
-    .soft-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{
+      margin:0;padding:0;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(34,211,238,.16), transparent 24%),
+        radial-gradient(circle at 100% 10%, rgba(167,139,250,.12), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(56,189,248,.08), transparent 20%),
+        linear-gradient(180deg,var(--bg1),var(--bg2),var(--bg3));
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;
+    }
+    body{min-height:100vh;padding:14px 14px 34px}
+    .shell{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+    .glass{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:0 14px 40px rgba(0,0,0,.28);
+      backdrop-filter:blur(14px);
+      overflow:hidden;
+    }
+    .hero{
+      padding:18px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(34,211,238,.14), transparent 28%),
+        linear-gradient(180deg, rgba(3,10,24,.92), rgba(8,14,30,.92));
+    }
+    .pill{
+      display:inline-flex;padding:7px 12px;border-radius:999px;font-size:11px;font-weight:900;letter-spacing:.18em;
+      border:1px solid rgba(34,211,238,.22);background:rgba(34,211,238,.1);color:#a5f3fc;
+    }
+    h1{margin:12px 0 0;font-size:28px;line-height:1.08;letter-spacing:.01em}
+    p{margin:10px 0 0;color:var(--muted);line-height:1.7;font-size:14px}
+    .section{padding:16px}
+    .section h2{margin:0 0 12px;font-size:18px;letter-spacing:.02em}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .box,.mini,.stat{
+      background:linear-gradient(180deg,rgba(5,10,24,.9),rgba(8,16,31,.9));
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:18px;
+      padding:12px;
+    }
+    .label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .value{font-weight:900;font-size:20px;line-height:1.15}
+    .mono{font-variant-numeric:tabular-nums}
+    .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .toolbar3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    button,.btn-link{
+      appearance:none;border:none;border-radius:18px;padding:14px 14px;font-weight:900;font-size:15px;cursor:pointer;color:#02111e;
+      background:linear-gradient(180deg,#67f3ff,#2bd4e6);box-shadow:0 12px 28px rgba(34,211,238,.22);
+      text-decoration:none;display:flex;align-items:center;justify-content:center;
+    }
+    button.secondary{
+      background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.26);box-shadow:none;
+    }
+    button.dark,.btn-link.dark{
+      background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(255,255,255,.08);box-shadow:none;
+    }
+    button.action-harvest{
+      background:linear-gradient(180deg,#ff8aa1,#fb7185);color:#1b0b12;box-shadow:0 12px 28px rgba(251,113,133,.22);
+    }
+    button.action-add{
+      background:linear-gradient(180deg,#6ee7b7,#34d399);color:#041b12;box-shadow:0 12px 28px rgba(52,211,153,.22);
+    }
+    input,textarea,select{
+      width:100%;background:rgba(2,6,23,.76);border:1px solid rgba(148,163,184,.18);color:white;
+      border-radius:16px;padding:13px 14px;font-size:16px;outline:none;
+    }
+    input:focus,textarea:focus,select:focus{
+      border-color:rgba(34,211,238,.8);box-shadow:0 0 0 3px rgba(34,211,238,.12);
+    }
+    textarea{min-height:84px;resize:vertical}
+    .stack{display:flex;flex-direction:column;gap:10px}
+    .chip{
+      display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:900;
+    }
+    .chip.ok{background:rgba(52,211,153,.16);color:#b6f6df;border:1px solid rgba(52,211,153,.24)}
+    .chip.warn{background:rgba(251,191,36,.16);color:#fde7a5;border:1px solid rgba(251,191,36,.22)}
+    .chip.danger{background:rgba(251,113,133,.14);color:#fecdd6;border:1px solid rgba(251,113,133,.22)}
+    .chip.idle{background:rgba(255,255,255,.06);color:#e2e8f0;border:1px solid rgba(255,255,255,.08)}
+    .decision{
+      border-radius:18px;padding:14px 14px;font-size:14px;font-weight:900;line-height:1.7;
+    }
+    .decision.harvest{
+      background:linear-gradient(180deg, rgba(127,29,29,.42), rgba(76,29,49,.32));
+      border:1px solid rgba(251,113,133,.25);color:#ffe4e8;
+    }
+    .decision.watch{
+      background:linear-gradient(180deg, rgba(120,53,15,.34), rgba(87,51,15,.22));
+      border:1px solid rgba(251,191,36,.22);color:#fde7a5;
+    }
+    .decision.wait{
+      background:linear-gradient(180deg, rgba(30,41,59,.5), rgba(15,23,42,.36));
+      border:1px solid rgba(148,163,184,.18);color:#e2e8f0;
+    }
+    .decision.cooldown{
+      background:linear-gradient(180deg, rgba(76,29,149,.28), rgba(55,28,99,.22));
+      border:1px solid rgba(167,139,250,.22);color:#ddd6fe;
+    }
+    .decision.locked{
+      background:linear-gradient(180deg, rgba(55,65,81,.55), rgba(17,24,39,.42));
+      border:1px solid rgba(148,163,184,.18);color:#cbd5e1;
+    }
+    .summary{font-size:14px;line-height:1.72;color:#def7ff}
+    .note{font-size:12px;line-height:1.58;color:var(--muted)}
+    .balance{
+      display:flex;border-radius:999px;overflow:hidden;height:16px;background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.05);
+    }
+    .balance .attack{background:linear-gradient(90deg,#38bdf8,#22d3ee)}
+    .balance .defense{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+    .king{padding:16px;display:flex;flex-direction:column;gap:12px}
+    .king-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .king-title{font-size:19px;font-weight:900;letter-spacing:.01em}
+    .king-sub{font-size:12px;color:var(--muted);margin-top:4px}
+    .actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .actions button,.actions .btn-link{padding:12px 10px;font-size:13px}
+    .actions .btn-link{background:rgba(34,211,238,.08);color:#c8f8ff;border:1px solid rgba(34,211,238,.28);box-shadow:none}
+    .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .cool{font-size:13px;font-weight:900;letter-spacing:.01em}
+    .cool.ok{color:#86efac}.cool.warn{color:#fde68a}.cool.danger{color:#fda4af}
+    .warn-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .warn-item{
+      padding:10px 12px;border-radius:14px;background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.18);
+      color:#ffd1d8;font-size:13px;line-height:1.6;font-weight:800;
+    }
+    .ok-item{
+      padding:10px 12px;border-radius:14px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.16);
+      color:#b6f6df;font-size:13px;line-height:1.6;font-weight:800;
+    }
+    .log-item{
+      padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+      color:#e2e8f0;font-size:12px;line-height:1.7;
+    }
   </style>
 </head>
-<body class="p-4 lg:p-8">
-  <div class="max-w-6xl mx-auto space-y-6">
-    <header class="flex flex-col lg:flex-row justify-between items-end gap-4">
-      <div>
-        <div class="inline-block px-3 py-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-xs font-bold text-cyan-400 tracking-widest mb-2">SISTER EDITION V22+</div>
-        <h1 class="text-3xl font-black italic">飛輪投資系統 <span class="text-cyan-400">肥瑜專用版</span></h1>
-      </div>
-      <div class="text-right">
-        <div class="text-xs text-slate-400">目前模式</div>
-        <div id="activeMode" class="text-xl font-black text-emerald-400">讀取中...</div>
-        <div id="syncStatus" class="text-xs text-slate-500 mt-1">尚未同步</div>
-        <div id="lastSync" class="text-[10px] text-slate-500 mt-1">最後同步：—</div>
-      </div>
-    </header>
+<body>
+  <div class="shell">
+    <section class="glass hero">
+      <div class="pill">FEIYU MOBILE · V22</div>
+      <h1>肥瑜投資系統 V22</h1>
+      <p>手機版專注在「打開就知道今天該做什麼」。固定雙王：統一奔騰 + 摩根環球品牌。每月各 3000，總共 6000。保留你熟悉的手機版外觀，但換成妹妹專屬邏輯。</p>
+    </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="glass p-5">
-        <div class="text-xs text-slate-400">總資產</div>
-        <div id="dispTotal" class="text-2xl font-black mono text-white">0</div>
+    <section class="glass section">
+      <div class="grid2">
+        <div class="box">
+          <div class="label">同步狀態</div>
+          <div id="syncBadge" class="value" style="font-size:18px;color:#67e8f9">未同步</div>
+        </div>
+        <div class="box">
+          <div class="label">最後同步</div>
+          <div id="lastSyncTime" class="value mono" style="font-size:16px">—</div>
+        </div>
+        <div class="box">
+          <div class="label">本月狀態</div>
+          <div id="monthStatusText" class="value" style="font-size:18px;color:#86efac">綠燈</div>
+          <div id="monthStatusHint" class="note">節奏正常</div>
+        </div>
+        <div class="box">
+          <div class="label">資產階段</div>
+          <div id="phaseText" class="value" style="font-size:18px">模式一</div>
+          <div class="note">月份鍵：<span id="monthKeyText">—</span></div>
+        </div>
       </div>
-      <div class="glass p-5 border-l-4 border-amber-500">
-        <div class="text-xs text-slate-400">水庫血量</div>
-        <div id="dispReservoir" class="text-2xl font-black mono text-white">0</div>
-      </div>
-      <div class="glass p-5">
-        <div class="text-xs text-slate-400">銀行備用金</div>
-        <div id="dispBank" class="text-2xl font-black mono text-slate-500">50,000</div>
-        <div class="text-[10px] text-slate-500 mt-1">※ 不計入戰略水庫</div>
-      </div>
-      <div class="glass p-5">
-        <div class="text-xs text-slate-400">本月加碼次數</div>
-        <div id="dispTrigger" class="text-2xl font-black mono text-rose-400">0 / 3</div>
-      </div>
-    </div>
 
-    <section class="glass p-6 border-t-4 border-cyan-500">
-      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-        今日唯一指令
-      </h2>
-      <div id="commandCard" class="cmd-box">
-        <div id="cmdTitle" class="text-xl font-black">等待資料輸入</div>
-        <div id="cmdDesc" class="text-sm text-slate-300 mt-2">請先輸入今日雙王淨值與系統數據。</div>
+      <div class="toolbar" style="margin-top:10px">
+        <button id="reloadBtn" class="secondary">重新載入</button>
+        <button id="saveBtn">儲存同步</button>
       </div>
     </section>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="space-y-6">
-        <section class="glass p-6 space-y-4">
-          <h3 class="font-bold text-slate-400 border-b border-slate-800 pb-2">核心數據同步</h3>
-          <label class="block">
-            <span class="text-xs font-bold text-slate-400">總資產（精準模式切換用）</span>
-            <input id="totalAssets" type="number" class="input-dark mt-1" value="330000" oninput="updateUI()">
-          </label>
-          <label class="block">
-            <span class="text-xs font-bold text-slate-400">水庫目前總額 (安聯收益成長)</span>
-            <input id="reservoir" type="number" class="input-dark mt-1" value="150000" oninput="updateUI()">
-          </label>
-          <label class="block">
-            <span class="text-xs font-bold text-slate-400">銀行備用金</span>
-            <input id="bankReserve" type="number" class="input-dark mt-1" value="50000" oninput="updateUI()">
-          </label>
-          <label class="block">
-            <span class="text-xs font-bold text-slate-400">本月已加碼次數（雙王合計）</span>
-            <input id="triggerCount" type="number" class="input-dark mt-1" value="0" oninput="updateUI()">
-          </label>
-          <div class="grid grid-cols-2 gap-3 pt-2">
-            <button onclick="loadData()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-xl">重新載入</button>
-            <button onclick="saveData()" class="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-black py-3 px-4 rounded-xl">儲存同步</button>
-          </div>
-        </section>
+    <section class="glass section">
+      <h2>今日唯一指令</h2>
+      <div id="globalCommandCard" class="decision wait">
+        <div id="globalCommandTitle" style="font-size:20px;margin-bottom:8px">等待資料</div>
+        <div id="globalCommandReason">系統正在整理雙王與水庫狀態。</div>
+        <div id="globalCommandHint" class="note" style="margin-top:10px">讀取後，這裡會直接告訴你今天是收割、加碼還是不動。</div>
+      </div>
+    </section>
 
-        <section class="glass p-6 space-y-4">
-          <h3 class="font-bold text-slate-400 border-b border-slate-800 pb-2">雙王淨值序列</h3>
-          <div class="space-y-4">
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="font-bold text-cyan-400">1. 統一奔騰 (A09012)</span>
-                <a href="https://www.anuefund.com/fund/detail/A09012" target="_blank" class="text-slate-500 hover:text-cyan-400">鉅亨連結</a>
-              </div>
-              <textarea id="pricesA" class="input-dark text-xs h-20" placeholder="貼上最近20筆淨值" oninput="updateUI()"></textarea>
-            </div>
-            <div>
-              <div class="flex justify-between text-xs mb-1">
-                <span class="font-bold text-amber-400">2. 摩根環球品牌 (B29037)</span>
-                <a href="https://www.anuefund.com/fund/detail/B29037" target="_blank" class="text-slate-500 hover:text-amber-400">鉅亨連結</a>
-              </div>
-              <textarea id="pricesB" class="input-dark text-xs h-20" placeholder="貼上最近20筆淨值" oninput="updateUI()"></textarea>
-            </div>
-          </div>
-        </section>
+    <section class="glass section">
+      <h2>飛輪戰區</h2>
+      <div id="battleZoneBadge" class="chip idle">等待判讀</div>
+      <div id="battleZoneRule" class="summary" style="margin-top:10px">等待資料</div>
+    </section>
+
+    <section class="glass section">
+      <h2>核心儀表</h2>
+      <div class="grid2">
+        <label class="stack"><span class="label">總資產</span><input id="totalAssets" type="number" value="330000"></label>
+        <label class="stack"><span class="label">水庫</span><input id="reservoir" type="number" value="150000"></label>
+        <label class="stack"><span class="label">每月定投</span><input id="monthlyInput" type="number" value="6000"></label>
+        <label class="stack"><span class="label">銀行備用金</span><input id="bankReserve" type="number" value="50000"></label>
+        <label class="stack"><span class="label">本月已加碼</span><input id="usedAmmo" type="number" value="0"></label>
+        <label class="stack"><span class="label">本月已加碼次數</span><input id="monthlyTriggerCount" type="number" value="0"></label>
       </div>
 
-      <div class="lg:col-span-2 space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="glass p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="font-bold">戰王決策卡：奔騰</h3>
-              <div id="statA" class="text-xs font-bold px-2 py-1 rounded bg-slate-800">—</div>
-            </div>
-            <div id="boxA" class="p-4 rounded-xl border border-white/5 bg-white/5 space-y-2">
-              <div class="text-xs text-slate-400">20MA 乖離 / 10日跌幅 / 收割指令</div>
-              <div class="flex justify-between items-end">
-                <div id="devA" class="text-xl font-black mono">—</div>
-                <div id="chgA" class="text-sm font-bold mono">—</div>
-              </div>
-              <div id="harvestA" class="text-xs font-bold text-rose-300">—</div>
-            </div>
-          </div>
-          <div class="glass p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="font-bold">戰王決策卡：品牌</h3>
-              <div id="statB" class="text-xs font-bold px-2 py-1 rounded bg-slate-800">—</div>
-            </div>
-            <div id="boxB" class="p-4 rounded-xl border border-white/5 bg-white/5 space-y-2">
-              <div class="text-xs text-slate-400">20MA 乖離 / 10日跌幅 / 收割指令</div>
-              <div class="flex justify-between items-end">
-                <div id="devB" class="text-xl font-black mono">—</div>
-                <div id="chgB" class="text-sm font-bold mono">—</div>
-              </div>
-              <div id="harvestB" class="text-xs font-bold text-rose-300">—</div>
-            </div>
+      <input id="monthKey" type="hidden">
+
+      <div class="grid2" style="margin-top:10px">
+        <div class="mini"><div class="label">本月總彈藥</div><div id="ammoLimit" class="value mono">0</div></div>
+        <div class="mini"><div class="label">剩餘可用</div><div id="ammoRemain" class="value mono" style="color:#67e8f9">0</div></div>
+        <div class="mini"><div class="label">本次建議</div><div id="ammoRecommend" class="value mono" style="color:#86efac">0</div></div>
+        <div class="mini"><div class="label">本月最大加碼次數</div><div id="maxTriggerText" class="value mono">0</div></div>
+      </div>
+
+      <div class="toolbar" style="margin-top:10px">
+        <button id="applyRecommendBtn">套用建議</button>
+        <button id="resetAmmoBtn" class="dark">本月歸零</button>
+      </div>
+    </section>
+
+    <section class="glass section">
+      <h2>戰力儀表板</h2>
+      <div class="grid2">
+        <div class="box">
+          <div class="label">水庫健康度</div>
+          <div id="reservoirLevelText" class="value mono">0%</div>
+          <div id="reservoirLevelHint" class="note">等待資料</div>
+        </div>
+        <div class="box">
+          <div class="label">攻守比例</div>
+          <div id="balanceRatioText" class="value" style="font-size:18px">前鋒 55% ｜ 水庫 45%</div>
+          <div class="balance" style="margin-top:10px">
+            <div id="balanceAttackBar" class="attack" style="width:55%"></div>
+            <div id="balanceReservoirBar" class="defense" style="width:45%"></div>
           </div>
         </div>
-
-        <section class="glass p-6">
-          <h3 class="font-bold mb-4">模式規則摘要</h3>
-          <div id="ruleBoard" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs"></div>
-        </section>
-
-        <section class="glass p-6">
-          <h3 class="font-bold mb-4">操作鐵律</h3>
-          <div id="lawBoard" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs"></div>
-        </section>
-
-        <div class="glass p-6 h-64">
-          <canvas id="myChart"></canvas>
+        <div class="box">
+          <div class="label">彈藥剩餘</div>
+          <div id="ammoRemainPctText" class="value mono">0%</div>
+          <div class="note">本月可用火力剩餘率</div>
+        </div>
+        <div class="box">
+          <div class="label">今日戰力</div>
+          <div id="battlePowerText" class="value" style="font-size:18px">等待資料</div>
+          <div id="battlePowerHint" class="note">等待資料</div>
         </div>
       </div>
-    </div>
+    </section>
+
+    <section class="glass section">
+      <h2>本次建議出手</h2>
+      <div id="recommendBoard" class="summary">等待計算…</div>
+    </section>
+
+    <section class="glass section">
+      <h2>雙王決策總表</h2>
+      <div id="twoKingDecisionBoard" class="summary">等待資料</div>
+    </section>
+
+    <section id="kingCards" class="stack"></section>
+
+    <section class="glass section">
+      <h2>提醒</h2>
+      <div id="warningBoard" class="warn-list"></div>
+    </section>
+
+    <section class="glass section">
+      <h2>操作紀錄</h2>
+      <div class="toolbar3">
+        <button id="copyLogBtn" class="secondary">複製紀錄</button>
+        <button id="exportLogBtn" class="secondary">匯出紀錄</button>
+        <button id="clearLogBtn" class="dark">清空紀錄</button>
+      </div>
+      <div id="operationLogEmpty" class="note" style="margin-top:10px">目前沒有紀錄。只有真的收割 / 加碼時才需要記錄。</div>
+      <div id="operationLogList" class="warn-list" style="margin-top:10px"></div>
+    </section>
+
+    <section class="glass section">
+      <h2>備註</h2>
+      <textarea id="notes" placeholder="記錄今日動作、收割、加碼、心法提醒"></textarea>
+    </section>
   </div>
 
-  <script>
-    const API = "https://script.google.com/macros/s/AKfycbw_z3a9kbwrn7FcXxj8fL8tN-tmX7PNTrCVSmwS5g2knCgCWoaqeNwIHFPp9nZt8yQR/exec?profile=sister";
-    let chart;
+<script>
+const API = "https://script.google.com/macros/s/AKfycbw_z3a9kbwrn7FcXxj8fL8tN-tmX7PNTrCVSmwS5g2knCgCWoaqeNwIHFPp9nZt8yQR/exec?profile=sister";
 
-    function format(num) {
-      return Number(num || 0).toLocaleString();
-    }
+const kingDefs = [
+  { code: 'A09012', name: '統一奔騰', defaultTrigger: -10, anueLink: 'https://www.anuefund.com/fund/detail/A09012' },
+  { code: 'B29037', name: '摩根品牌', defaultTrigger: -10, anueLink: 'https://www.anuefund.com/fund/detail/B29037' }
+];
 
-    function parse(str) {
-      return String(str || "")
-        .trim()
-        .split(/[\\s,，\\n\\t]+/)
-        .map(v => Number(v))
-        .filter(n => !isNaN(n) && n > 0);
-    }
+let isBuildingCards = false;
+let lastRecommendValue = 0;
+let lastTriggeredCandidateCodes = [];
+let lastTriggeredCandidateNames = [];
 
-    function analyze(prices) {
-      if (prices.length < 20) return null;
-      const current = prices[prices.length - 1];
-      const ma20 = prices.slice(-20).reduce((a,b)=>a+b, 0) / 20;
-      const dev = ((current - ma20) / ma20) * 100;
-      const prev10 = prices[prices.length - 11];
-      const chg10 = ((current - prev10) / prev10) * 100;
-      return { dev, chg10 };
-    }
+function safeEl(id){ return document.getElementById(id); }
+function safeSetText(id, value){ const el=safeEl(id); if(el) el.textContent=value; }
+function safeSetHTML(id, value){ const el=safeEl(id); if(el) el.innerHTML=value; }
+function safeSetValue(id, value){ const el=safeEl(id); if(el) el.value=value; }
+function formatMoney(v){ return Number(v || 0).toLocaleString(); }
 
-    function getMode(totalAssets, reservoir){
-      if (totalAssets < 500000) {
-        return {
-          key: "mode1",
-          name: "Mode 1：生存保命",
-          harvest: "100% 回水庫",
-          base: "75% 底倉",
-          triggerMax: reservoir < 120000 ? 2 : 3,
-          harvestText: "10% / 15% / 20%",
-          summary: "50萬以下優先補水，不追求前鋒擴張。"
-        };
-      }
-      if (totalAssets < 1500000) {
-        return {
-          key: "mode2",
-          name: "Mode 2：平衡擴張",
-          harvest: "70%水庫 / 30%回王",
-          base: "75% 底倉",
-          triggerMax: reservoir < 120000 ? 3 : 4,
-          harvestText: "10% / 15% / 20%",
-          summary: "50萬到150萬，開始兼顧補水與前鋒成長。"
-        };
-      }
-      return {
-        key: "mode3",
-        name: "Mode 3：穩定複利",
-        harvest: "50%水庫 / 50%回王",
-        base: "80% 底倉",
-        triggerMax: reservoir < 120000 ? 4 : 6,
-        harvestText: "10% / 15% / 20%",
-        summary: "150萬到500萬，雙王正式進入複利階段。"
-      };
-    }
+function getCurrentMonthKey(){
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+}
 
-    function getHarvestAction(dev, mode){
-      if (dev == null) return "—";
-      if (dev >= 20) return `收割 20%｜${mode.harvest}`;
-      if (dev >= 15) return `收割 15%｜${mode.harvest}`;
-      if (dev >= 10) return `收割 10%｜${mode.harvest}`;
-      if (dev >= 5) return "接近收割區，先觀察";
-      return "未達收割區";
-    }
+function getNowText(){
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth()+1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mi = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
+}
 
-    function setSyncStatus(text, colorClass="text-slate-500"){
-      const el = document.getElementById("syncStatus");
-      el.className = "text-xs mt-1 " + colorClass;
-      el.textContent = text;
-    }
+function parsePrices(text){
+  return String(text || '')
+    .replace(/[；;｜|]/g, ' ')
+    .replace(/\u3000/g, ' ')
+    .trim()
+    .split(/[\s,，\n\t]+/)
+    .map(v => Number(String(v).trim()))
+    .filter(n => !Number.isNaN(n) && n > 0);
+}
 
-    function updateRuleBoard(mode){
-      document.getElementById('ruleBoard').innerHTML = `
-        <div class="bg-white/5 p-3 rounded-lg">
-          <p class="text-slate-500">獲利分流</p>
-          <p class="font-bold">${mode.harvest}</p>
+function calcDeviation(prices){
+  if(prices.length < 20) return null;
+  const recent20 = prices.slice(-20);
+  const current = recent20[recent20.length - 1];
+  const ma20 = recent20.reduce((a,b)=>a+b,0)/20;
+  const deviation = ((current - ma20) / ma20) * 100;
+  return { current, ma20, deviation };
+}
+
+function calcTenDayTrigger(prices, triggerPercent){
+  if(prices.length < 11) return null;
+  const today = prices[prices.length - 1];
+  const prev10 = prices[prices.length - 11];
+  const change = ((today - prev10) / prev10) * 100;
+  return { change, triggered: change <= triggerPercent };
+}
+
+function getBusinessDaysPassed(dateStr){
+  if(!dateStr) return null;
+  const start = new Date(dateStr + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  if(start > today) return 0;
+  let days = 0;
+  const cursor = new Date(start);
+  while(cursor < today){
+    cursor.setDate(cursor.getDate()+1);
+    const day = cursor.getDay();
+    if(day !== 0 && day !== 6) days++;
+  }
+  return days;
+}
+function getCooldownRemaining(dateStr){
+  const passed = getBusinessDaysPassed(dateStr);
+  return passed === null ? null : Math.max(0, 5 - passed);
+}
+
+function getMode(totalAssets){
+  if(totalAssets < 500000){
+    return {
+      key:'mode1',
+      name:'模式一｜保命補水期',
+      phaseText:'模式一',
+      split:'100% 回水庫',
+      bottom:75,
+      addCountBase:3,
+      summary:'50萬以下先活下來，任何收割優先補水庫。'
+    };
+  }
+  if(totalAssets < 1500000){
+    return {
+      key:'mode2',
+      name:'模式二｜平衡擴張期',
+      phaseText:'模式二',
+      split:'70% 水庫 / 30% 回原王',
+      bottom:75,
+      addCountBase:4,
+      summary:'50萬到150萬，補水庫，也要讓王開始長大。'
+    };
+  }
+  return {
+    key:'mode3',
+    name:'模式三｜穩定複利期',
+    phaseText:'模式三',
+    split:'50% 水庫 / 50% 回原王',
+    bottom:80,
+    addCountBase:5,
+    summary:'150萬到500萬，正式進入穩定複利。'
+  };
+}
+
+function getBattleZone(reservoir){
+  if(reservoir < 150000){
+    return {
+      chipText:'🔴 戰時狀態',
+      chipClass:'chip danger',
+      rule:'水庫 < 15萬：加碼固定 3000，雙王合計次數嚴控；所有收割優先補水。'
+    };
+  }
+  if(reservoir < 180000){
+    return {
+      chipText:'🟡 過渡鎖定區',
+      chipClass:'chip warn',
+      rule:'15萬～18萬：仍偏保守，收割先補水，雙王同時觸發時只打一王。'
+    };
+  }
+  return {
+    chipText:'⚡ 點火擴張區',
+    chipClass:'chip ok',
+    rule:'水庫 > 18萬：開始允許依模式做收割分流，但加碼仍固定 3000。'
+  };
+}
+
+function getMaxAddCount(totalAssets, reservoir){
+  const mode = getMode(totalAssets);
+  if(reservoir < 80000) return 1;
+  if(reservoir < 120000) return 2;
+  if(reservoir < 180000) return 3;
+  return mode.addCountBase;
+}
+
+function getHarvestAction(dev, mode, cooldownRemain){
+  if(cooldownRemain !== null && cooldownRemain > 0) return `冷卻中 ${cooldownRemain} 天`;
+  if(dev == null) return '—';
+  if(dev >= 20) return `收割 20%｜底倉 ${mode.bottom}%｜${mode.split}`;
+  if(dev >= 15) return `收割 15%｜底倉 ${mode.bottom}%｜${mode.split}`;
+  if(dev >= 10) return `收割 10%｜底倉 ${mode.bottom}%｜${mode.split}`;
+  if(dev >= 5) return '接近收割區，先觀察';
+  return '未達收割區';
+}
+
+const OP_LOG_KEY = 'feiyu_mobile_v22_logs';
+function getOperationLogs(){
+  try{
+    const raw = localStorage.getItem(OP_LOG_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  }catch{
+    return [];
+  }
+}
+function saveOperationLogs(logs){
+  localStorage.setItem(OP_LOG_KEY, JSON.stringify(logs));
+}
+function addOperationLog(type, code){
+  const name = kingDefs.find(k => k.code === code)?.name || code;
+  const entry = {
+    ts: getNowText(),
+    type,
+    code,
+    name,
+    zone: safeEl('battleZoneBadge')?.textContent || '未知',
+    reservoir: safeEl('reservoir')?.value || '0',
+    decision: safeEl('decision_'+code)?.textContent || '—',
+    deviation: safeEl('dev_'+code)?.textContent || '—',
+    tenDay: safeEl('chg10_'+code)?.textContent || '—'
+  };
+  const logs = getOperationLogs();
+  logs.unshift(entry);
+  saveOperationLogs(logs);
+  renderOperationLogs();
+}
+function renderOperationLogs(){
+  const logs = getOperationLogs();
+  const list = safeEl('operationLogList');
+  const empty = safeEl('operationLogEmpty');
+  if(!list || !empty) return;
+  if(!logs.length){
+    empty.style.display = '';
+    list.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = logs.map(log => `
+    <div class="log-item">
+      <div><strong>${log.ts}</strong>｜${log.name}｜${log.type}</div>
+      <div>戰區：${log.zone}｜水庫：${formatMoney(log.reservoir)}｜20MA乖離：${log.deviation}｜10日跌幅：${log.tenDay}</div>
+      <div>判斷：${log.decision}</div>
+    </div>
+  `).join('');
+}
+async function copyOperationLogs(){
+  const logs = getOperationLogs();
+  if(!logs.length){ alert('目前沒有操作紀錄。'); return; }
+  const text = logs.map(log => `${log.ts}｜${log.name}｜${log.type}｜戰區:${log.zone}｜水庫:${log.reservoir}｜20MA乖離:${log.deviation}｜10日跌幅:${log.tenDay}｜判斷:${log.decision}`).join('\n');
+  try{ await navigator.clipboard.writeText(text); alert('已複製操作紀錄。'); }catch{ alert('複製失敗。'); }
+}
+function exportOperationLogs(){
+  const logs = getOperationLogs();
+  if(!logs.length){ alert('目前沒有操作紀錄。'); return; }
+  const text = logs.map(log => `${log.ts}｜${log.name}｜${log.type}｜戰區:${log.zone}｜水庫:${log.reservoir}｜20MA乖離:${log.deviation}｜10日跌幅:${log.tenDay}｜判斷:${log.decision}`).join('\n');
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `feiyu_logs_${getCurrentMonthKey()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function clearOperationLogs(){
+  if(!confirm('確定要清空所有操作紀錄嗎？')) return;
+  localStorage.removeItem(OP_LOG_KEY);
+  renderOperationLogs();
+}
+
+function appendTodayValue(code){
+  const today = prompt('輸入今天淨值');
+  if(!today) return;
+  const num = Number(today);
+  if(Number.isNaN(num) || num <= 0){ alert('請輸入正確數字'); return; }
+  const el = safeEl(code + '_prices');
+  let arr = parsePrices(el.value);
+  arr.push(num);
+  if(arr.length > 20) arr = arr.slice(-20);
+  el.value = arr.join(' ');
+  updateVisuals();
+}
+
+function resetMonthlyIfNeeded(){
+  const currentMonthKey = getCurrentMonthKey();
+  const savedMonthKey = String(safeEl('monthKey')?.value || '');
+  if(savedMonthKey !== currentMonthKey){
+    safeSetValue('monthKey', currentMonthKey);
+    safeSetValue('usedAmmo', 0);
+    safeSetValue('monthlyTriggerCount', 0);
+  }
+  safeSetText('monthKeyText', currentMonthKey);
+}
+
+function setSync(text, ok=true){
+  const badge = safeEl('syncBadge');
+  safeSetText('syncBadge', text);
+  if(badge) badge.style.color = ok ? '#67e8f9' : '#fda4af';
+}
+
+function ensureKingCards(){
+  if(isBuildingCards) return;
+  isBuildingCards = true;
+  try{
+    const wrap = safeEl('kingCards');
+    wrap.innerHTML = kingDefs.map(k => `
+      <section class="glass king">
+        <div class="king-head">
+          <div>
+            <div class="king-title">${k.name}</div>
+            <div class="king-sub">${k.code}</div>
+          </div>
+          <div id="signal_${k.code}" class="chip idle">待判讀</div>
         </div>
-        <div class="bg-white/5 p-3 rounded-lg">
-          <p class="text-slate-500">底倉限制</p>
-          <p class="font-bold">${mode.base}</p>
+
+        <div id="decision_${k.code}" class="decision wait">等待判讀</div>
+
+        <div class="actions">
+          <button class="secondary append-btn" data-code="${k.code}">記錄今天淨值</button>
+          <button class="dark clear-btn" data-code="${k.code}">清空</button>
+          <a class="btn-link" href="${k.anueLink}" target="_blank" rel="noopener noreferrer">鉅亨淨值</a>
+          <button class="secondary log-harvest-btn" data-code="${k.code}">紀錄收割</button>
+          <button class="secondary log-add-btn" data-code="${k.code}">紀錄加碼</button>
+          <button class="dark export-king-btn" data-code="${k.code}">複製王況</button>
         </div>
-        <div class="bg-white/5 p-3 rounded-lg">
-          <p class="text-slate-500">月加碼上限</p>
-          <p class="font-bold">${mode.triggerMax} 次</p>
+
+        <label class="stack">
+          <span class="label">最近 20 筆淨值</span>
+          <textarea id="${k.code}_prices" placeholder="由舊到新，今天放最後"></textarea>
+        </label>
+
+        <div class="grid2">
+          <label class="stack"><span class="label">10日跌幅觸發門檻（負數）</span><input id="${k.code}_trigger" type="number" step="1" value="${k.defaultTrigger}"></label>
+          <label class="stack"><span class="label">最後收割日期</span><input id="${k.code}_lastHarvestDate" type="date"></label>
         </div>
-      `;
-      document.getElementById('lawBoard').innerHTML = `
-        <div class="bg-white/5 p-3 rounded-lg">
-          <p class="text-slate-500">收割矩陣</p>
-          <p class="font-bold">${mode.harvestText}</p>
+
+        <div id="cooldown_${k.code}" class="cool warn">未設定收割日</div>
+
+        <div class="stat-grid">
+          <div class="stat"><div class="label">20MA</div><div id="ma_${k.code}" class="value mono">—</div></div>
+          <div class="stat"><div class="label">20MA乖離</div><div id="dev_${k.code}" class="value mono">—</div></div>
+          <div class="stat"><div class="label">10日跌幅</div><div id="chg10_${k.code}" class="value mono">—</div></div>
+          <div class="stat"><div class="label">觸發狀態</div><div id="trigger_${k.code}" class="value" style="font-size:16px">—</div></div>
+          <div class="stat"><div class="label">加碼</div><div id="add_${k.code}" class="value" style="font-size:16px">—</div></div>
+          <div class="stat"><div class="label">收割</div><div id="harvest_${k.code}" class="value" style="font-size:16px">—</div></div>
         </div>
-        <div class="bg-white/5 p-3 rounded-lg">
-          <p class="text-slate-500">模式摘要</p>
-          <p class="font-bold">${mode.summary}</p>
-        </div>
-        <div class="bg-white/5 p-3 rounded-lg">
-          <p class="text-slate-500">加碼鐵律</p>
-          <p class="font-bold">固定 3,000，雙王同時觸發時只打跌最深那一王</p>
-        </div>
-      `;
-    }
 
-    function updateKingCard(prefix, res, name, mode){
-      const devEl = document.getElementById(`dev${prefix}`);
-      const chgEl = document.getElementById(`chg${prefix}`);
-      const statEl = document.getElementById(`stat${prefix}`);
-      const harvestEl = document.getElementById(`harvest${prefix}`);
+        <div id="action_${k.code}" class="summary" style="background:rgba(2,6,23,.55);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:12px">等待判讀</div>
+      </section>
+    `).join('');
 
-      if(!res){
-        devEl.textContent = "—";
-        chgEl.textContent = "—";
-        statEl.textContent = "—";
-        harvestEl.textContent = "—";
-        return;
-      }
-
-      devEl.textContent = res.dev.toFixed(2) + "%";
-      chgEl.textContent = res.chg10.toFixed(2) + "%";
-      harvestEl.textContent = getHarvestAction(res.dev, mode);
-
-      if (res.dev >= 10) statEl.textContent = "可收割";
-      else if (res.chg10 <= -10) statEl.textContent = "可加碼";
-      else statEl.textContent = "待命";
-    }
-
-    function updateUI() {
-      const totalAssets = Number(document.getElementById('totalAssets').value || 0);
-      const resVal = Number(document.getElementById('reservoir').value || 0);
-      const bankReserve = Number(document.getElementById('bankReserve').value || 0);
-      const trigCount = Number(document.getElementById('triggerCount').value || 0);
-
-      const pA = parse(document.getElementById('pricesA').value);
-      const pB = parse(document.getElementById('pricesB').value);
-      const resA = analyze(pA);
-      const resB = analyze(pB);
-
-      document.getElementById('dispTotal').textContent = format(totalAssets);
-      document.getElementById('dispReservoir').textContent = format(resVal);
-      document.getElementById('dispBank').textContent = format(bankReserve);
-
-      const mode = getMode(totalAssets, resVal);
-      document.getElementById('activeMode').textContent = mode.name;
-      document.getElementById('dispTrigger').textContent = `${trigCount} / ${mode.triggerMax}`;
-      updateRuleBoard(mode);
-
-      let finalCmd = "☕ 維持定投，不需動作";
-      let finalDesc = "目前兩王均未達收割 (+10%) 或超底 (-10%) 門檻。";
-
-      const addList = [];
-      if (resA && resA.chg10 <= -10) addList.push({ name: "統一奔騰", chg: resA.chg10 });
-      if (resB && resB.chg10 <= -10) addList.push({ name: "摩根品牌", chg: resB.chg10 });
-
-      if (addList.length > 0) {
-        if (trigCount >= mode.triggerMax) {
-          finalCmd = "🚫 次數已滿，禁止加碼";
-          finalDesc = "本月加碼次數已達模式上限，請依紀律收手。";
-        } else {
-          addList.sort((a,b) => a.chg - b.chg);
-          const target = addList[0];
-          finalCmd = `🔥 加碼指令：${target.name}`;
-          finalDesc = `今日 ${target.name} 10日跌幅達 ${target.chg.toFixed(2)}%。請手動執行加碼：3,000 元。`;
-        }
-      }
-
-      const harvests = [];
-      if (resA && resA.dev >= 10) harvests.push({ name: "統一奔騰", dev: resA.dev });
-      if (resB && resB.dev >= 10) harvests.push({ name: "摩根品牌", dev: resB.dev });
-
-      if (harvests.length > 0) {
-        const detail = harvests
-          .map(h => `${h.name}：${getHarvestAction(h.dev, mode)}`)
-          .join("｜");
-        finalCmd = `✂️ 收割指令：${harvests.map(h=>h.name).join(' & ')}`;
-        finalDesc = `觸發 20MA 乖離門檻。${detail}。底倉限制：${mode.base}。`;
-      }
-
-      document.getElementById('cmdTitle').textContent = finalCmd;
-      document.getElementById('cmdDesc').textContent = finalDesc;
-
-      updateKingCard('A', resA, '統一奔騰', mode);
-      updateKingCard('B', resB, '摩根品牌', mode);
-
-      const chartData = pA.length ? pA.slice(-20) : Array.from({length:20}, ()=>null);
-      chart.data.datasets[0].data = chartData;
-      chart.update();
-    }
-
-    async function loadData() {
-      try {
-        setSyncStatus("讀取中...", "text-cyan-400");
-        const res = await fetch(API);
-        const text = await res.text();
-        const data = JSON.parse(text);
-
-        document.getElementById('totalAssets').value = data.totalAssets || 330000;
-        document.getElementById('reservoir').value = data.reservoir || 150000;
-        document.getElementById('bankReserve').value = data.bankReserve || 50000;
-        document.getElementById('triggerCount').value = data.monthlyTriggerCount || data.triggerCount || 0;
-        document.getElementById('pricesA').value = data.A09012_prices || data.pricesA || "";
-        document.getElementById('pricesB').value = data.B29037_prices || data.pricesB || "";
-        document.getElementById('lastSync').textContent = "最後同步：" + (data.lastSyncTime || "—");
-
-        updateUI();
-        setSyncStatus("已同步", "text-emerald-400");
-      } catch (err) {
-        console.error(err);
-        setSyncStatus("讀取失敗", "text-rose-400");
-        alert("讀取失敗：" + err.message);
-      }
-    }
-
-    async function saveData() {
-      try {
-        setSyncStatus("儲存中...", "text-cyan-400");
-        const payload = {
-          profile: "sister",
-          totalAssets: document.getElementById('totalAssets').value,
-          reservoir: document.getElementById('reservoir').value,
-          bankReserve: document.getElementById('bankReserve').value,
-          monthlyTriggerCount: document.getElementById('triggerCount').value,
-          triggerCount: document.getElementById('triggerCount').value,
-          A09012_prices: document.getElementById('pricesA').value,
-          B29037_prices: document.getElementById('pricesB').value,
-          pricesA: document.getElementById('pricesA').value,
-          pricesB: document.getElementById('pricesB').value,
-          lastSyncTime: new Date().toLocaleString('zh-TW', { hour12: false })
-        };
-
-        const res = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(payload)
-        });
-
-        const text = await res.text();
-        const data = JSON.parse(text);
-
-        document.getElementById('lastSync').textContent = "最後同步：" + (data.lastSyncTime || payload.lastSyncTime);
-        setSyncStatus("已儲存", "text-emerald-400");
-      } catch (err) {
-        console.error(err);
-        setSyncStatus("儲存失敗", "text-rose-400");
-        alert("儲存失敗：" + err.message);
-      }
-    }
-
-    const ctx = document.getElementById('myChart').getContext('2d');
-    chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: Array.from({length:20}, (_,i)=>i+1),
-        datasets: [{ label: '前鋒走勢參考', data: [], borderColor: '#22d3ee', tension: 0.4 }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.06)' } },
-          y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.06)' } }
-        }
+    document.querySelectorAll('.append-btn').forEach(btn => btn.addEventListener('click', ()=> appendTodayValue(btn.dataset.code)));
+    document.querySelectorAll('.clear-btn').forEach(btn => btn.addEventListener('click', ()=>{ safeEl(btn.dataset.code + '_prices').value = ''; updateVisuals(); }));
+    document.querySelectorAll('.log-harvest-btn').forEach(btn => btn.addEventListener('click', ()=> addOperationLog('收割', btn.dataset.code)));
+    document.querySelectorAll('.log-add-btn').forEach(btn => btn.addEventListener('click', ()=> addOperationLog('加碼', btn.dataset.code)));
+    document.querySelectorAll('.export-king-btn').forEach(btn => btn.addEventListener('click', async ()=>{
+      const code = btn.dataset.code;
+      const text = `${safeEl('signal_'+code).textContent}｜${kingDefs.find(k=>k.code===code)?.name}｜20MA乖離:${safeEl('dev_'+code).textContent}｜10日跌幅:${safeEl('chg10_'+code).textContent}｜加碼:${safeEl('add_'+code).textContent}｜收割:${safeEl('harvest_'+code).textContent}`;
+      try{ await navigator.clipboard.writeText(text); alert('已複製王況。'); }catch{ alert('複製失敗。'); }
+    }));
+    document.querySelectorAll('textarea, input').forEach(el => {
+      if(el.id !== 'notes'){
+        el.addEventListener('input', updateVisuals);
+        el.addEventListener('change', updateVisuals);
       }
     });
+  } finally {
+    isBuildingCards = false;
+  }
+}
 
-    updateUI();
-    loadData();
-  </script>
+function updateBalanceRatio(totalAssets, reservoir){
+  const attack = Math.max(0, totalAssets - reservoir);
+  const attackPct = totalAssets > 0 ? Math.round((attack / totalAssets) * 100) : 0;
+  const reservoirPct = totalAssets > 0 ? Math.round((reservoir / totalAssets) * 100) : 0;
+  safeSetText('balanceRatioText', `前鋒 ${attackPct}% ｜ 水庫 ${reservoirPct}%`);
+  safeEl('balanceAttackBar').style.width = `${attackPct}%`;
+  safeEl('balanceReservoirBar').style.width = `${reservoirPct}%`;
+  return { attackPct, reservoirPct };
+}
+
+function updateVisuals(){
+  resetMonthlyIfNeeded();
+
+  const totalAssets = Number(safeEl('totalAssets').value || 0);
+  const reservoir = Number(safeEl('reservoir').value || 0);
+  const monthlyInput = Number(safeEl('monthlyInput').value || 0);
+  const usedAmmo = Number(safeEl('usedAmmo').value || 0);
+  const monthlyTriggerCount = Number(safeEl('monthlyTriggerCount').value || 0);
+
+  const mode = getMode(totalAssets);
+  const zone = getBattleZone(reservoir);
+  const maxAddCount = getMaxAddCount(totalAssets, reservoir);
+  const ammoLimit = Math.floor(reservoir * 0.15);
+  const ammoRemain = Math.max(0, ammoLimit - usedAmmo);
+  const triggerRemain = Math.max(0, maxAddCount - monthlyTriggerCount);
+
+  safeSetText('phaseText', mode.phaseText);
+  safeSetText('ammoLimit', formatMoney(ammoLimit));
+  safeSetText('ammoRemain', formatMoney(ammoRemain));
+  safeSetText('maxTriggerText', `${maxAddCount} 次`);
+
+  safeSetText('battleZoneBadge', zone.chipText);
+  safeEl('battleZoneBadge').className = zone.chipClass;
+  safeSetText('battleZoneRule', `${zone.rule}｜模式：${mode.name}｜分流：${mode.split}`);
+
+  let monthStatusText = '綠燈';
+  let monthStatusHint = '本月節奏正常，可依規則操作';
+  if(triggerRemain <= 0 || ammoRemain <= 0){
+    monthStatusText = '紅燈';
+    monthStatusHint = '本月額度或次數已用盡，停止加碼';
+  } else if(ammoRemain <= 3000){
+    monthStatusText = '黃燈';
+    monthStatusHint = '本月彈藥偏緊，請保守使用';
+  }
+  safeSetText('monthStatusText', monthStatusText);
+  safeSetText('monthStatusHint', monthStatusHint);
+
+  const warnings = [];
+  if(monthlyInput !== 6000) warnings.push('妹妹版每月定投應維持 6000。');
+  if(reservoir < 150000) warnings.push('水庫已跌回 15 萬以下，請把收割優先補水。');
+  if(totalAssets < 500000) warnings.push('目前仍在模式一，重點不是衝快，而是先活下來。');
+
+  const recommendLines = [];
+  const decisionLines = [];
+  const triggeredCandidates = [];
+  let harvestCount = 0;
+  let cooldownCount = 0;
+
+  kingDefs.forEach(k => {
+    const prices = parsePrices(safeEl(k.code+'_prices').value);
+    const calc = calcDeviation(prices);
+    const triggerCheck = calcTenDayTrigger(prices, Number(safeEl(k.code+'_trigger').value || k.defaultTrigger));
+    const cooldownRemain = getCooldownRemaining(safeEl(k.code+'_lastHarvestDate').value || '');
+
+    if(cooldownRemain === null){
+      safeSetText('cooldown_'+k.code, '未設定收割日');
+      safeEl('cooldown_'+k.code).className = 'cool warn';
+    } else if(cooldownRemain > 0){
+      safeSetText('cooldown_'+k.code, `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日`);
+      safeEl('cooldown_'+k.code).className = 'cool danger';
+    } else {
+      safeSetText('cooldown_'+k.code, '✅ 冷卻完成，可操作');
+      safeEl('cooldown_'+k.code).className = 'cool ok';
+    }
+
+    if(!calc){
+      safeSetText('signal_'+k.code, '資料不足');
+      safeEl('signal_'+k.code).className = 'chip idle';
+      safeSetText('decision_'+k.code, '請補滿 20 筆淨值');
+      safeEl('decision_'+k.code).className = 'decision wait';
+      safeSetText('ma_'+k.code, `${prices.length}/20`);
+      safeSetText('dev_'+k.code, '—');
+      safeSetText('chg10_'+k.code, prices.length >= 11 ? '待算' : '需11筆');
+      safeSetText('trigger_'+k.code, '待判定');
+      safeSetText('add_'+k.code, '待判定');
+      safeSetText('harvest_'+k.code, '待判定');
+      safeSetText('action_'+k.code, '請先輸入最近20筆淨值');
+      return;
+    }
+
+    safeSetText('ma_'+k.code, calc.ma20.toFixed(2));
+    safeSetText('dev_'+k.code, `${calc.deviation >= 0 ? '+' : ''}${calc.deviation.toFixed(2)}%`);
+
+    if(triggerCheck){
+      safeSetText('chg10_'+k.code, `${triggerCheck.change >= 0 ? '+' : ''}${triggerCheck.change.toFixed(2)}%`);
+      if(triggerCheck.triggered){
+        safeSetText('trigger_'+k.code, '✅ 已觸發');
+        triggeredCandidates.push({ name:k.name, code:k.code, change:triggerCheck.change });
+      } else {
+        safeSetText('trigger_'+k.code, '❌ 未觸發');
+      }
+    } else {
+      safeSetText('chg10_'+k.code, '需11筆');
+      safeSetText('trigger_'+k.code, '待判定');
+    }
+
+    const harvestText = getHarvestAction(calc.deviation, mode, cooldownRemain);
+    safeSetText('harvest_'+k.code, harvestText);
+
+    if(triggerCheck && triggerCheck.triggered && triggerRemain > 0 && ammoRemain > 0){
+      safeSetText('add_'+k.code, '✅ 可加碼');
+    } else if(triggerCheck && triggerCheck.triggered){
+      safeSetText('add_'+k.code, '🚫 禁止');
+    } else {
+      safeSetText('add_'+k.code, '❌ 不加碼');
+    }
+
+    let signal = '等待';
+    let cls = 'wait';
+    let reason = '目前未達執行門檻，維持紀律即可。';
+
+    if(cooldownRemain !== null && cooldownRemain > 0){
+      signal = '冷卻';
+      cls = 'cooldown';
+      reason = `${k.name} 正在冷卻中，今天禁止收割。`;
+      cooldownCount++;
+    } else if(calc.deviation >= 10){
+      signal = '收割';
+      cls = calc.deviation >= 15 ? 'harvest' : 'watch';
+      reason = `${k.name} 已達收割區，請依模式分流：${mode.split}。`;
+      harvestCount++;
+    } else if(triggerCheck && triggerCheck.triggered && triggerRemain > 0 && ammoRemain > 0){
+      signal = '加碼';
+      cls = 'watch';
+      reason = `${k.name} 已達 10日跌幅門檻，可列入加碼候選。`;
+    }
+
+    safeSetText('signal_'+k.code, signal);
+    safeEl('signal_'+k.code).className = signal === '收割' ? 'chip danger' : signal === '加碼' ? 'chip warn' : signal === '冷卻' ? 'chip warn' : 'chip idle';
+    safeSetText('decision_'+k.code, signal === '收割' ? harvestText : signal === '加碼' ? '🟡 可加碼｜固定 3000' : signal === '冷卻' ? `❄️ 冷卻中：還剩 ${cooldownRemain} 個交易日` : '⚪ 未達收割區，維持紀律');
+    safeEl('decision_'+k.code).className = `decision ${cls}`;
+    safeSetText('action_'+k.code, reason);
+
+    decisionLines.push(`• ${k.name}：${safeEl('decision_'+k.code).textContent}`);
+    if(signal === '收割') recommendLines.push(`• ${k.name}：${harvestText}`);
+  });
+
+  triggeredCandidates.sort((a,b) => a.change - b.change);
+
+  let recommend = 0;
+  let recommendText = '今天沒有明確加碼指令，維持紀律即可。';
+  lastTriggeredCandidateCodes = [];
+  lastTriggeredCandidateNames = [];
+
+  if(triggeredCandidates.length > 0 && triggerRemain > 0 && ammoRemain > 0){
+    const chosen = triggeredCandidates[0];
+    recommend = Math.min(3000, ammoRemain);
+    recommendText = `今天若要加碼，只打一王：${chosen.name}。建議金額 ${formatMoney(recommend)} 元。雙王同時觸發時，固定優先打跌更深那一王。`;
+    lastTriggeredCandidateCodes = [chosen.code];
+    lastTriggeredCandidateNames = [chosen.name];
+  }
+
+  safeSetText('ammoRecommend', formatMoney(recommend));
+  safeSetHTML('recommendBoard', recommendText);
+
+  let globalTitle = '👉 今日維持紀律，不動作';
+  let globalReason = '目前沒有必須立刻執行的操作，照常定投並觀察即可。';
+  let globalHint = '今天重點：照常定投，收盤後再檢核。';
+  let globalClass = 'decision wait';
+
+  if(harvestCount > 0){
+    globalTitle = `👉 今日執行 ${harvestCount} 筆收割`;
+    globalReason = `已有雙王中的 ${harvestCount} 王達到收割門檻，請依模式分流：${mode.split}。`;
+    globalHint = recommendLines.join(' ｜ ') || '請查看雙王卡片。';
+    globalClass = 'decision harvest';
+  } else if(cooldownCount > 0){
+    globalTitle = '👉 今日以冷卻優先，不追操作';
+    globalReason = `目前有 ${cooldownCount} 王處於冷卻中，冷卻期間禁止收割。`;
+    globalHint = '先守紀律，不要因為焦躁亂動。';
+    globalClass = 'decision cooldown';
+  } else if(recommend > 0){
+    globalTitle = `👉 今日可加碼，建議 ${formatMoney(recommend)} 元`;
+    globalReason = `已有王達到 10日跌幅觸發門檻，且本月仍有彈藥與次數。`;
+    globalHint = `候選：${lastTriggeredCandidateNames.join('、')}`;
+    globalClass = 'decision watch';
+  }
+
+  safeEl('globalCommandCard').className = globalClass;
+  safeSetText('globalCommandTitle', globalTitle);
+  safeSetText('globalCommandReason', globalReason);
+  safeSetText('globalCommandHint', globalHint);
+
+  safeSetHTML('twoKingDecisionBoard', decisionLines.join('<br>') || '等待資料');
+
+  const ratio = updateBalanceRatio(totalAssets, reservoir);
+  const reservoirLevelPct = Math.min(100, reservoir / 300000 * 100);
+  const ammoRemainPct = ammoLimit > 0 ? (ammoRemain / ammoLimit * 100) : 0;
+  let battleScore = reservoirLevelPct * 0.4 + ammoRemainPct * 0.25 + ratio.attackPct * 0.15 + (recommend > 0 ? 10 : 0) + ((triggerRemain / Math.max(1, maxAddCount)) * 10);
+  battleScore = Math.max(0, Math.min(100, battleScore));
+  safeSetText('reservoirLevelText', `${reservoirLevelPct.toFixed(1)}%`);
+  safeSetText('reservoirLevelHint', '以 30 萬視為妹妹版安全滿格');
+  safeSetText('ammoRemainPctText', `${ammoRemainPct.toFixed(1)}%`);
+  safeSetText('battlePowerText', `${battleScore.toFixed(1)}%`);
+  safeSetText('battlePowerHint', battleScore >= 75 ? '可積極執行' : battleScore >= 45 ? '可保守出手' : '優先防守');
+
+  safeEl('warningBoard').innerHTML = warnings.length
+    ? warnings.map(x => `<div class="warn-item">${x}</div>`).join('')
+    : `<div class="ok-item">目前輸入與妹妹法典一致：雙王穩定版、每月 6000、加碼固定 3000、收割依模式分流。</div>`;
+
+  renderOperationLogs();
+}
+
+async function parseJsonResponse(res){
+  const text = await res.text();
+  try{ return JSON.parse(text); }
+  catch{ throw new Error('後端回傳不是 JSON：' + text); }
+}
+
+async function loadData(){
+  try{
+    setSync('讀取中...', true);
+    const res = await fetch(API);
+    const data = await parseJsonResponse(res);
+
+    safeSetValue('monthKey', data.monthKey || '');
+    safeSetValue('totalAssets', data.totalAssets || 330000);
+    safeSetValue('reservoir', data.reservoir || 150000);
+    safeSetValue('monthlyInput', data.monthlyInput || 6000);
+    safeSetValue('bankReserve', data.bankReserve || 50000);
+    safeSetValue('usedAmmo', data.usedAmmo || 0);
+    safeSetValue('monthlyTriggerCount', data.monthlyTriggerCount || 0);
+    safeSetValue('notes', data.notes || '');
+
+    ensureKingCards();
+
+    kingDefs.forEach(k => {
+      safeSetValue(k.code+'_prices', data[k.code+'_prices'] || '');
+      safeSetValue(k.code+'_trigger', data[k.code+'_trigger'] ?? k.defaultTrigger);
+      safeSetValue(k.code+'_lastHarvestDate', data[k.code+'_lastHarvestDate'] || '');
+    });
+
+    resetMonthlyIfNeeded();
+    safeSetText('lastSyncTime', data.lastSyncTime || '—');
+    updateVisuals();
+    setSync('已同步', true);
+  }catch(err){
+    console.error(err);
+    setSync('讀取失敗', false);
+    alert('讀取失敗：' + err.message);
+  }
+}
+
+async function saveData(){
+  try{
+    resetMonthlyIfNeeded();
+    setSync('儲存中...', true);
+
+    const payload = {
+      profile: "sister",
+      monthKey: safeEl('monthKey').value || getCurrentMonthKey(),
+      totalAssets: safeEl('totalAssets').value || 330000,
+      reservoir: safeEl('reservoir').value || 150000,
+      monthlyInput: safeEl('monthlyInput').value || 6000,
+      bankReserve: safeEl('bankReserve').value || 50000,
+      usedAmmo: safeEl('usedAmmo').value || 0,
+      monthlyTriggerCount: safeEl('monthlyTriggerCount').value || 0,
+      notes: safeEl('notes').value || '',
+      lastSyncTime: getNowText()
+    };
+
+    kingDefs.forEach(k => {
+      payload[k.code+'_prices'] = safeEl(k.code+'_prices').value || '';
+      payload[k.code+'_trigger'] = safeEl(k.code+'_trigger').value || k.defaultTrigger;
+      payload[k.code+'_lastHarvestDate'] = safeEl(k.code+'_lastHarvestDate').value || '';
+    });
+
+    const res = await fetch(API, {
+      method:'POST',
+      headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await parseJsonResponse(res);
+    safeSetText('lastSyncTime', data.lastSyncTime || payload.lastSyncTime);
+    setSync('已儲存', true);
+  }catch(err){
+    console.error(err);
+    setSync('儲存失敗', false);
+    alert('儲存失敗：' + err.message);
+  }
+}
+
+function bindGlobalEvents(){
+  safeEl('reloadBtn').addEventListener('click', loadData);
+  safeEl('saveBtn').addEventListener('click', saveData);
+  safeEl('copyLogBtn').addEventListener('click', copyOperationLogs);
+  safeEl('exportLogBtn').addEventListener('click', exportOperationLogs);
+  safeEl('clearLogBtn').addEventListener('click', clearOperationLogs);
+
+  safeEl('applyRecommendBtn').addEventListener('click', ()=>{
+    if(lastRecommendValue <= 0){
+      alert('目前沒有可套用的建議金額。');
+      return;
+    }
+    safeSetValue('usedAmmo', Number(safeEl('usedAmmo').value || 0) + lastRecommendValue);
+    safeSetValue('monthlyTriggerCount', Number(safeEl('monthlyTriggerCount').value || 0) + 1);
+    const noteEl = safeEl('notes');
+    const line = `[${getNowText()}] 套用建議 ${formatMoney(lastRecommendValue)} 元｜只打 ${lastTriggeredCandidateNames.join('、') || '無'}`;
+    noteEl.value = noteEl.value ? `${noteEl.value}\n${line}` : line;
+    updateVisuals();
+    setSync('已套用待儲存', true);
+  });
+
+  safeEl('resetAmmoBtn').addEventListener('click', ()=>{
+    safeSetValue('usedAmmo', 0);
+    safeSetValue('monthlyTriggerCount', 0);
+    updateVisuals();
+  });
+
+  document.addEventListener('input', (e)=>{ if(e.target && e.target.id !== 'notes') updateVisuals(); });
+  document.addEventListener('change', (e)=>{ if(e.target && e.target.id !== 'notes') updateVisuals(); });
+}
+
+bindGlobalEvents();
+ensureKingCards();
+safeSetValue('monthKey', getCurrentMonthKey());
+renderOperationLogs();
+updateVisuals();
+loadData();
+</script>
 </body>
 </html>
