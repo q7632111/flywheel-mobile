@@ -155,6 +155,80 @@
       letter-spacing:.01em;
     }
 
+
+    .command-grid{
+      display:grid;
+      gap:16px;
+      grid-template-columns:1.25fr .75fr;
+    }
+    .command-side{
+      display:grid;
+      gap:16px;
+      grid-template-columns:1fr;
+    }
+    .command-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+    .command-line{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      padding:12px 14px;
+    }
+    .command-line .k{
+      font-size:12px;
+      letter-spacing:.18em;
+      font-weight:900;
+      color:#94a3b8;
+    }
+    .command-line .v{
+      flex:1;
+      text-align:right;
+      font-size:15px;
+      line-height:1.7;
+      font-weight:900;
+      color:#fff;
+    }
+    .command-stack{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+    .mini-cmd{
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(2,6,23,.42);
+      padding:14px 16px;
+    }
+    .mini-cmd .tag{
+      font-size:12px;
+      letter-spacing:.16em;
+      font-weight:900;
+      color:#94a3b8;
+    }
+    .mini-cmd .big{
+      margin-top:8px;
+      font-size:20px;
+      line-height:1.4;
+      font-weight:900;
+      color:#fff;
+    }
+    .mini-cmd .sub{
+      margin-top:6px;
+      font-size:13px;
+      line-height:1.8;
+      color:#cbd5e1;
+    }
+    .cmd-ok{ color:#86efac; }
+    .cmd-warn{ color:#fde68a; }
+    .cmd-danger{ color:#fda4af; }
+
     .metric-box{
       border-radius:18px;
       border:1px solid rgba(255,255,255,.08);
@@ -234,20 +308,53 @@
         <div class="rounded-2xl border border-cyan-400/20 bg-cyan-500/10 px-4 py-3 text-sm font-black text-cyan-200">讓未來的你不用靠記憶</div>
       </div>
 
-      <div class="mt-5 grid gap-4 xl:grid-cols-[1.3fr_.7fr]">
+      <div class="mt-5 command-grid">
         <div id="globalCommandCard" class="decision-big cmd-wait">
           <div class="text-xs font-black tracking-[0.2em] text-slate-300">GLOBAL COMMAND</div>
           <div id="globalCommandTitle" class="mt-3 text-3xl font-black text-white">等待資料</div>
           <div id="globalCommandReason" class="mt-3 text-base leading-8 text-slate-200">系統正在整理你的三王與水庫狀態。</div>
           <div id="globalCommandHint" class="mt-4 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-7 text-slate-300">等待讀取後，這裡會直接告訴你今天是否要收割、是否要加碼、或是全部不動。</div>
+
+          <div class="command-list">
+            <div class="command-line">
+              <div class="k">TODAY · 收割</div>
+              <div id="commandHarvestLine" class="v">等待資料</div>
+            </div>
+            <div class="command-line">
+              <div class="k">TODAY · 回灌</div>
+              <div id="commandReboundLine" class="v">等待資料</div>
+            </div>
+            <div class="command-line">
+              <div class="k">TODAY · 加碼</div>
+              <div id="commandAddLine" class="v">等待資料</div>
+            </div>
+            <div class="command-line">
+              <div class="k">TODAY · 禁止</div>
+              <div id="commandBlockedLine" class="v">等待資料</div>
+            </div>
+          </div>
         </div>
 
-        <div class="grid gap-4">
+        <div class="command-side">
           <div class="decision-card">
             <div class="text-xs font-black tracking-[0.18em] text-emerald-200">飛輪戰區</div>
             <div id="battleZoneBadge" class="mt-3 decision-state state-ignite">⚡ 點火擴張區</div>
             <div id="battleZoneRule" class="mt-3 text-sm leading-7 text-slate-300">等待資料</div>
           </div>
+
+          <div class="mini-cmd">
+            <div class="tag">REBOUND TARGET</div>
+            <div id="reboundTargetName" class="big">等待資料</div>
+            <div id="reboundTargetReason" class="sub">等待資料</div>
+            <div id="reboundTargetGuard" class="sub cmd-warn">等待資料</div>
+          </div>
+
+          <div class="mini-cmd">
+            <div class="tag">BLOCK / COOLDOWN</div>
+            <div id="commandBlockSummary" class="big">等待資料</div>
+            <div id="commandBlockReason" class="sub">等待資料</div>
+          </div>
+
           <div class="decision-card">
             <div class="text-xs font-black tracking-[0.18em] text-violet-200">三王決策總表</div>
             <div id="threeKingDecisionBoard" class="mt-3 text-sm leading-7 text-slate-100">等待資料</div>
@@ -582,6 +689,8 @@
         payload[k.code+'_firstwave'] = !!safeEl(k.code+'_firstwave')?.checked;
         payload[k.code+'_trigger'] = safeEl(k.code+'_trigger')?.value || k.defaultTrigger;
         payload[k.code+'_lastHarvestDate'] = safeEl(k.code+'_lastHarvestDate')?.value || '';
+        payload[getHarvestCountField(k.code)] = getMonthlyHarvestCount(k.code);
+        payload[k.code+'_lastHarvestCountedDate'] = safeEl(k.code+'_lastHarvestCountedDate')?.value || '';
       }
       return payload;
     }
@@ -639,35 +748,140 @@
       }
     }
 
-    function getFlowMode(totalAssets, reservoir){
-      const battle = getBattleState(reservoir);
-      if (battle.key === 'war' || battle.key === 'lock') {
-        return {
-          mode: '保命補水期',
-          text: '收割：100% 回水庫｜禁止任何形式分流',
-          colorClass: 'text-rose-50'
-        };
-      }
-      if (battle.key === 'ignite') {
-        return {
-          mode: '點火擴張期',
-          text: '收割：50% 水庫 / 50% 回原王',
-          colorClass: 'text-amber-50'
-        };
-      }
-      if (battle.key === 'prep') {
-        return {
-          mode: '厚尾準備期',
-          text: '收割：50% 水庫 / 50% 回原王｜底倉至少 70%',
-          colorClass: 'text-violet-50'
-        };
-      }
-      return {
-        mode: '厚尾複利期',
-        text: '收割：50% 水庫 / 50% 回原王｜底倉至少 85%',
-        colorClass: 'text-emerald-50'
-      };
+    
+function getFlowMode(totalAssets, reservoir){
+  const battle = getBattleState(reservoir);
+  if (battle.key === 'war' || battle.key === 'lock') {
+    return {
+      mode: '保命補水期',
+      text: '收割：100% 回水庫｜禁止任何形式分流',
+      colorClass: 'text-rose-50'
+    };
+  }
+  if (battle.key === 'ignite' || battle.key === 'prep') {
+    return {
+      mode: battle.key === 'ignite' ? '點火擴張期' : '厚尾準備期',
+      text: '收割：50% 水庫 / 50% 灌最弱王',
+      colorClass: battle.key === 'ignite' ? 'text-amber-50' : 'text-violet-50'
+    };
+  }
+  return {
+    mode: '厚尾複利期',
+    text: '收割：50% 水庫 / 50% 灌最弱王｜底倉至少 85%',
+    colorClass: 'text-emerald-50'
+  };
+}
+
+    
+const WEAKEST_STATE_KEY = 'flywheel_v23_weakest_state';
+const COOLDOWN_META_KEY = 'flywheel_v23_cooldown_meta';
+
+function getWeakestState(){
+  try{
+    const raw = localStorage.getItem(WEAKEST_STATE_KEY);
+    const data = raw ? JSON.parse(raw) : {};
+    return data && typeof data === 'object' ? data : {};
+  }catch{
+    return {};
+  }
+}
+
+function saveWeakestState(state){
+  try{ localStorage.setItem(WEAKEST_STATE_KEY, JSON.stringify(state || {})); }catch{}
+}
+
+function getCooldownMeta(){
+  try{
+    const raw = localStorage.getItem(COOLDOWN_META_KEY);
+    const data = raw ? JSON.parse(raw) : {};
+    return data && typeof data === 'object' ? data : {};
+  }catch{
+    return {};
+  }
+}
+
+function saveCooldownMeta(meta){
+  try{ localStorage.setItem(COOLDOWN_META_KEY, JSON.stringify(meta || {})); }catch{}
+}
+
+function getCooldownRemainingByCode(code, dateStr){
+  if(!dateStr) return null;
+  const meta = getCooldownMeta();
+  const info = meta[code] || {};
+  const days = Number(info.days || 5);
+  const action = String(info.action || '');
+  const startDate = String(info.date || dateStr);
+  const passed = getBusinessDaysPassed(startDate);
+  if(passed === null) return null;
+  return { remaining: Math.max(0, days - passed), days, action };
+}
+
+function getReboundPriority(stats){
+  const negatives = stats.filter(x => x.triggerChange !== null && x.triggerChange < 0).sort((a,b)=>a.triggerChange - b.triggerChange);
+  if(negatives.length) return negatives;
+  return [...stats].sort((a,b)=>a.deviation - b.deviation);
+}
+
+function pickWeakestTarget(stats){
+  const ranking = getReboundPriority(stats);
+  if(!ranking.length) return { target:null, blocked:false, ranking:[] };
+  const state = getWeakestState();
+  let target = ranking[0];
+  let blocked = false;
+  if(state.code && state.code === target.code && Number(state.streak || 0) >= 3 && ranking.length > 1){
+    target = ranking[1];
+    blocked = true;
+  }
+  return { target, blocked, ranking };
+}
+
+function getCooldownDaysFromAction(action){
+  const txt = String(action || '');
+  if(txt.includes('收至 50% 底倉')) return 10;
+  if(txt.includes('20%')) return 10;
+  if(txt.includes('10%')) return 5;
+  return 5;
+}
+
+function recordHarvestFromCurrentDecision(code){
+  const action = String(safeEl('action_'+code)?.textContent || '');
+  const cmd = String(safeEl('cmdTitle_'+code)?.textContent || '') + ' ' + String(safeEl('cmdReason_'+code)?.textContent || '');
+  const full = action + ' ' + cmd;
+  if(!full.includes('收割') && !full.includes('收至 50% 底倉')){
+    alert('目前這一王沒有收割指令，不能記錄收割。');
+    return;
+  }
+  const today = getCurrentMonthKey() + '-' + String(new Date().getDate()).padStart(2,'0');
+  safeSetValue(code+'_lastHarvestDate', today);
+  const count = getMonthlyHarvestCount(code) + 1;
+  setMonthlyHarvestCount(code, count);
+  safeSetValue(code+'_lastHarvestCountedDate', today);
+  const days = getCooldownDaysFromAction(full);
+  const meta = getCooldownMeta();
+  meta[code] = { date: today, days, action: full.includes('20%') || full.includes('收至 50% 底倉') ? '20' : '10' };
+  saveCooldownMeta(meta);
+
+  const reboundName = safeEl('reboundTargetName')?.textContent || '';
+  const target = kingDefs.find(k => reboundName.includes(k.name));
+  if(target){
+    const state = getWeakestState();
+    const sameDay = state.date === today;
+    let streak = Number(state.streak || 0);
+    if(!sameDay){
+      streak = state.code === target.code ? streak + 1 : 1;
     }
+    saveWeakestState({ code: target.code, name: target.name, streak, date: today });
+  }
+
+  const noteEl = safeEl('notes');
+  if(noteEl){
+    const line = `[${getNowText()}] ${kingDefs.find(k=>k.code===code)?.name || code} 已記錄收割｜冷卻 ${days} 天`;
+    noteEl.value = noteEl.value ? `${noteEl.value}\n${line}` : line;
+  }
+  saveLocalBackup();
+  updateVisuals();
+  setSync('已記錄收割待儲存', 'text-amber-300');
+}
 
     function resetMonthlyIfNeeded(auto = false){
       const currentMonthKey = getCurrentMonthKey();
@@ -864,131 +1078,141 @@
       };
     }
 
-    function getKingDecision({ deviation, cooldownRemain, battle, name, attackLock = false, harvestLock = false, monthlyHarvestCount = 0, attackRatio = 0 }){
-      let signal = '待命';
-      let signalClass = 'signal-chip bg-slate-700 text-white';
-      let action = '不動作';
-      let cmdClass = 'cmd-wait';
-      let title = '等待';
-      let reason = '目前未達法典執行門檻，維持定投與觀察即可。';
+    
+function getKingDecision({ deviation, cooldownRemain, battle, name, attackLock = false, harvestLock = false, monthlyHarvestCount = 0, attackRatio = 0 }){
+  let signal = '待命';
+  let signalClass = 'signal-chip bg-slate-700 text-white';
+  let action = '不動作';
+  let cmdClass = 'cmd-wait';
+  let title = '等待';
+  let reason = '目前未達法典執行門檻，維持定投與觀察即可。';
+  let harvestPct = 0;
+  let cooldownDays = 0;
+  let splitText = '';
 
-      if (cooldownRemain !== null && cooldownRemain > 0) {
-        signal = '冷卻';
-        signalClass = 'signal-chip bg-violet-500 text-white';
-        action = `❄️ 冷卻中：還剩 ${cooldownRemain} 個交易日，禁止收割`;
-        cmdClass = 'cmd-cooldown';
-        title = '冷卻中';
-        reason = `${name} 已進入 5 個交易日冷卻，不論20MA乖離多高，今天都禁止收割。`;
-        return { signal, signalClass, action, cmdClass, title, reason };
-      }
+  if (cooldownRemain && cooldownRemain.remaining > 0) {
+    signal = '冷卻';
+    signalClass = 'signal-chip bg-violet-500 text-white';
+    action = `❄️ 冷卻中：還剩 ${cooldownRemain.remaining} 個交易日，禁止收割`;
+    cmdClass = 'cmd-cooldown';
+    title = '冷卻中';
+    reason = `${name} 因前次 ${cooldownRemain.days} 天冷卻規則尚未結束，今天禁止收割。`;
+    return { signal, signalClass, action, cmdClass, title, reason, harvestPct, cooldownDays, splitText };
+  }
 
-      if (attackLock) {
-        signal = '保護鎖';
-        signalClass = 'signal-chip bg-rose-700 text-white';
-        action = `🛡️ 攻擊力保護鎖啟動｜攻擊資產僅 ${(attackRatio * 100).toFixed(1)}%｜暫停收割`;
-        cmdClass = 'cmd-cooldown';
-        title = '停止收割';
-        reason = `${name} 雖可能達收割門檻，但目前整體攻擊比低於 60%，依法典補強層先保住攻擊力。`;
-        return { signal, signalClass, action, cmdClass, title, reason };
-      }
+  if (attackLock) {
+    signal = '保護鎖';
+    signalClass = 'signal-chip bg-rose-700 text-white';
+    action = `🛡️ 攻擊力保護鎖啟動｜攻擊資產僅 ${(attackRatio * 100).toFixed(1)}%｜暫停收割`;
+    cmdClass = 'cmd-cooldown';
+    title = '停止收割';
+    reason = `${name} 雖可能達收割門檻，但目前整體攻擊比低於 55%，依法典先保住攻擊力。`;
+    return { signal, signalClass, action, cmdClass, title, reason, harvestPct, cooldownDays, splitText };
+  }
 
-      if (harvestLock) {
-        signal = '月限鎖';
-        signalClass = 'signal-chip bg-amber-600 text-slate-950';
-        action = `🟡 本月已收割 ${monthlyHarvestCount} 次｜當月停止本王收割`;
-        cmdClass = 'cmd-watch';
-        title = '本月停收';
-        reason = `${name} 本月已達每王最多 2 次收割上限，避免強勢行情被連續削弱部位。`;
-        return { signal, signalClass, action, cmdClass, title, reason };
-      }
+  if (harvestLock) {
+    signal = '月限鎖';
+    signalClass = 'signal-chip bg-amber-600 text-slate-950';
+    action = `🟡 本月已收割 ${monthlyHarvestCount} 次｜當月停止本王收割`;
+    cmdClass = 'cmd-watch';
+    title = '本月停收';
+    reason = `${name} 本月已達每王最多 2 次收割上限，避免強勢行情被連續削弱部位。`;
+    return { signal, signalClass, action, cmdClass, title, reason, harvestPct, cooldownDays, splitText };
+  }
 
-      if (battle.key === 'war' || battle.key === 'lock') {
-        if (deviation >= 10) {
-          signal = '收割';
-          signalClass = 'signal-chip bg-rose-600 text-white';
-          action = '🔴 收至 50% 底倉｜獲利 100% 回水庫';
-          cmdClass = 'cmd-harvest';
-          title = '立即收割';
-          reason = `目前位於${battle.label}，且20MA乖離 ${deviation.toFixed(2)}% ≥ +10%，依法典收至剩 50% 底倉。`;
-        } else if (deviation >= 5) {
-          signal = '收割';
-          signalClass = 'signal-chip bg-orange-500 text-white';
-          action = '🟠 收割 10%｜獲利 100% 回水庫';
-          cmdClass = 'cmd-harvest';
-          title = '立即收割';
-          reason = `目前位於${battle.label}，且20MA乖離 ${deviation.toFixed(2)}% ≥ +5%，依法典收割 10%。`;
-        } else if (deviation > 0) {
-          signal = '觀察';
-          signalClass = 'signal-chip bg-amber-500 text-slate-950';
-          action = '🟡 正乖離但未達戰時門檻｜先觀察';
-          cmdClass = 'cmd-watch';
-          title = '先觀察';
-          reason = `目前雖已轉正，但在${battle.label}下還沒達到正式收割門檻。`;
-        }
-        return { signal, signalClass, action, cmdClass, title, reason };
-      }
-
-      if (battle.key === 'ignite' || battle.key === 'prep') {
-        const baseText = battle.key === 'prep'
-          ? '｜底倉至少保留 70%'
-          : '';
-        if (deviation >= 20) {
-          signal = '收割';
-          signalClass = 'signal-chip bg-rose-600 text-white';
-          action = `🔴 再收割 20%｜50% 水庫 / 50% 回原王${baseText}`;
-          cmdClass = 'cmd-harvest';
-          title = '立即收割';
-          reason = `目前位於${battle.label}，20MA乖離 ${deviation.toFixed(2)}% ≥ +20%，依原網格執行再收割 20%。`;
-        } else if (deviation >= 15) {
-          signal = '收割';
-          signalClass = 'signal-chip bg-orange-500 text-white';
-          action = `🟠 收割 20%｜50% 水庫 / 50% 回原王${baseText}`;
-          cmdClass = 'cmd-harvest';
-          title = '立即收割';
-          reason = `目前位於${battle.label}，20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，依原網格收割 20%。`;
-        } else if (deviation >= 10) {
-          signal = '收割';
-          signalClass = 'signal-chip bg-amber-500 text-slate-950';
-          action = `🟡 收割 10%｜50% 水庫 / 50% 回原王${baseText}`;
-          cmdClass = 'cmd-watch';
-          title = '執行收割';
-          reason = `目前位於${battle.label}，20MA乖離 ${deviation.toFixed(2)}% ≥ +10%，依原網格收割 10%。`;
-        } else if (deviation >= 5) {
-          signal = '準備';
-          signalClass = 'signal-chip bg-emerald-600 text-white';
-          action = '🟢 接近收割區｜先觀察';
-          cmdClass = 'cmd-watch';
-          title = '先觀察';
-          reason = `20MA乖離已轉強，但仍未達${battle.label}正式收割門檻。`;
-        }
-        return { signal, signalClass, action, cmdClass, title, reason };
-      }
-
-      if (deviation >= 25) {
-        signal = '收割';
-        signalClass = 'signal-chip bg-rose-600 text-white';
-        action = '🔴 收割 20%｜底倉至少保留 85%｜50% 水庫 / 50% 回原王';
-        cmdClass = 'cmd-harvest';
-        title = '立即收割';
-        reason = `目前位於厚尾複利區，20MA乖離 ${deviation.toFixed(2)}% ≥ +25%，依厚尾規則收割 20%。`;
-      } else if (deviation >= 15) {
-        signal = '收割';
-        signalClass = 'signal-chip bg-amber-500 text-slate-950';
-        action = '🟠 收割 10%｜底倉至少保留 85%｜50% 水庫 / 50% 回原王';
-        cmdClass = 'cmd-watch';
-        title = '執行收割';
-        reason = `目前位於厚尾複利區，20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，依厚尾規則收割 10%。`;
-      } else if (deviation >= 5) {
-        signal = '觀察';
-        signalClass = 'signal-chip bg-emerald-600 text-white';
-        action = '🟡 接近厚尾收割區｜先觀察';
-        cmdClass = 'cmd-watch';
-        title = '先觀察';
-        reason = '目前位於厚尾複利區，已接近高階收割區但未達執行門檻。';
-      }
-
-      return { signal, signalClass, action, cmdClass, title, reason };
+  if (battle.key === 'war' || battle.key === 'lock') {
+    splitText = '100% 回水庫';
+    if (deviation >= 10) {
+      signal = '收割';
+      signalClass = 'signal-chip bg-rose-600 text-white';
+      action = '🔴 收至 50% 底倉｜獲利 100% 回水庫';
+      cmdClass = 'cmd-harvest';
+      title = '立即收割';
+      reason = `目前位於${battle.label}，且20MA乖離 ${deviation.toFixed(2)}% ≥ +10%，依法典收至剩 50% 底倉。`;
+      harvestPct = 50;
+      cooldownDays = 10;
+    } else if (deviation >= 5) {
+      signal = '收割';
+      signalClass = 'signal-chip bg-orange-500 text-white';
+      action = '🟠 收割 10%｜獲利 100% 回水庫';
+      cmdClass = 'cmd-harvest';
+      title = '立即收割';
+      reason = `目前位於${battle.label}，且20MA乖離 ${deviation.toFixed(2)}% ≥ +5%，依法典收割 10%。`;
+      harvestPct = 10;
+      cooldownDays = 5;
+    } else if (deviation > 0) {
+      signal = '觀察';
+      signalClass = 'signal-chip bg-amber-500 text-slate-950';
+      action = '🟡 正乖離但未達戰時門檻｜先觀察';
+      cmdClass = 'cmd-watch';
+      title = '先觀察';
+      reason = `目前雖已轉正，但在${battle.label}下還沒達到正式收割門檻。`;
     }
+    return { signal, signalClass, action, cmdClass, title, reason, harvestPct, cooldownDays, splitText };
+  }
+
+  if (battle.key === 'ignite' || battle.key === 'prep') {
+    splitText = '50% 水庫 / 50% 灌最弱王';
+    const baseText = battle.key === 'prep' ? '｜底倉至少保留 70%' : '';
+    if (deviation >= 20) {
+      signal = '收割';
+      signalClass = 'signal-chip bg-rose-600 text-white';
+      action = `🔴 收割 20%｜50% 水庫 / 50% 灌最弱王${baseText}`;
+      cmdClass = 'cmd-harvest';
+      title = '立即收割';
+      reason = `目前位於${battle.label}，20MA乖離 ${deviation.toFixed(2)}% ≥ +20%，執行收割 20%。`;
+      harvestPct = 20;
+      cooldownDays = 10;
+    } else if (deviation >= 15) {
+      signal = '收割';
+      signalClass = 'signal-chip bg-orange-500 text-white';
+      action = `🟠 收割 10%｜50% 水庫 / 50% 灌最弱王${baseText}`;
+      cmdClass = 'cmd-harvest';
+      title = '立即收割';
+      reason = `目前位於${battle.label}，20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，執行收割 10%。`;
+      harvestPct = 10;
+      cooldownDays = 5;
+    } else if (deviation >= 8) {
+      signal = '準備';
+      signalClass = 'signal-chip bg-emerald-600 text-white';
+      action = '🟢 接近收割區｜先觀察';
+      cmdClass = 'cmd-watch';
+      title = '先觀察';
+      reason = `20MA乖離已轉強，但仍未達${battle.label}正式收割門檻。`;
+    }
+    return { signal, signalClass, action, cmdClass, title, reason, harvestPct, cooldownDays, splitText };
+  }
+
+  splitText = '50% 水庫 / 50% 灌最弱王';
+  if (deviation >= 25) {
+    signal = '收割';
+    signalClass = 'signal-chip bg-rose-600 text-white';
+    action = '🔴 收割 20%｜底倉至少保留 85%｜50% 水庫 / 50% 灌最弱王';
+    cmdClass = 'cmd-harvest';
+    title = '立即收割';
+    reason = `目前位於厚尾複利區，20MA乖離 ${deviation.toFixed(2)}% ≥ +25%，依厚尾規則收割 20%。`;
+    harvestPct = 20;
+    cooldownDays = 10;
+  } else if (deviation >= 15) {
+    signal = '收割';
+    signalClass = 'signal-chip bg-amber-500 text-slate-950';
+    action = '🟠 收割 10%｜底倉至少保留 85%｜50% 水庫 / 50% 灌最弱王';
+    cmdClass = 'cmd-watch';
+    title = '執行收割';
+    reason = `目前位於厚尾複利區，20MA乖離 ${deviation.toFixed(2)}% ≥ +15%，依厚尾規則收割 10%。`;
+    harvestPct = 10;
+    cooldownDays = 5;
+  } else if (deviation >= 8) {
+    signal = '觀察';
+    signalClass = 'signal-chip bg-emerald-600 text-white';
+    action = '🟡 接近厚尾收割區｜先觀察';
+    cmdClass = 'cmd-watch';
+    title = '先觀察';
+    reason = '目前位於厚尾複利區，已接近高階收割區但未達執行門檻。';
+  }
+
+  return { signal, signalClass, action, cmdClass, title, reason, harvestPct, cooldownDays, splitText };
+}
 
     function appendTodayValue(code){
       const today = prompt('輸入今天淨值');
@@ -1023,6 +1247,10 @@
     function bindKingCardEvents(){
       document.querySelectorAll('.append-btn').forEach(btn=>{
         btn.onclick = () => appendTodayValue(btn.dataset.code);
+      });
+
+      document.querySelectorAll('.record-harvest-btn').forEach(btn=>{
+        btn.onclick = () => recordHarvestFromCurrentDecision(btn.dataset.code);
       });
 
       document.querySelectorAll('.clear-btn').forEach(btn=>{
@@ -1109,9 +1337,10 @@
                 <div class="mt-1 text-sm font-medium text-slate-200" id="cmdReason_${k.code}">系統尚未取得足夠資料判斷。</div>
               </div>
 
-              <div class="mt-4 grid grid-cols-4 gap-3">
+              <div class="mt-4 grid grid-cols-5 gap-3">
                 <button class="paste-btn rounded-2xl bg-slate-800 px-4 py-3 text-sm font-black" data-code="${k.code}">貼上20筆</button>
                 <button class="append-btn rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-black text-slate-950" data-code="${k.code}">記錄今天</button>
+                <button class="record-harvest-btn rounded-2xl bg-rose-500 px-4 py-3 text-sm font-black text-white" data-code="${k.code}">紀錄收割</button>
                 <button class="clear-btn rounded-2xl border border-slate-600 bg-slate-900 px-4 py-3 text-sm font-black" data-code="${k.code}">清空</button>
                 <input id="${k.code}_trigger" type="number" step="1" value="${k.defaultTrigger}" class="input-dark rounded-2xl px-3 py-3 text-sm font-black mono" />
                 <input id="${k.code}_monthlyHarvestCount" type="hidden" value="0" />
@@ -1338,7 +1567,7 @@
 
         const ratioData = updateBalanceRatio(totalAssets, reservoir);
         const attackRatio = totalAssets > 0 ? Math.max(0, (totalAssets - reservoir) / totalAssets) : 0;
-        const attackLock = attackRatio < 0.60;
+        const attackLock = attackRatio < 0.55;
 
         safeSetText('ammoState', usedAmmo > ammoLimit ? '超限' : ammoRemain <= 6000 ? '緊繃' : '安全');
         safeSetClass('ammoState', usedAmmo > ammoLimit ? 'text-sm font-black text-rose-300' : ammoRemain <= 6000 ? 'text-sm font-black text-amber-300' : 'text-sm font-black text-emerald-300');
@@ -1428,15 +1657,15 @@
           const kingTrigger = Number(safeEl(k.code+'_trigger')?.value || k.defaultTrigger);
           const triggerCheck = calcTenDayTrigger(prices, kingTrigger);
           const harvestDate = safeEl(k.code+'_lastHarvestDate')?.value || '';
-          const cooldownRemain = getCooldownRemaining(harvestDate);
+          const cooldownRemain = getCooldownRemainingByCode(k.code, harvestDate);
           const monthlyHarvestCount = getMonthlyHarvestCount(k.code);
           const harvestLock = monthlyHarvestCount >= 2;
 
           if(cooldownRemain === null){
             safeSetText(`cooldown_${k.code}`, `未設定收割日｜本月已收 ${monthlyHarvestCount} 次`);
             safeSetClass(`cooldown_${k.code}`, 'mt-3 text-sm font-black text-slate-300');
-          } else if(cooldownRemain > 0){
-            safeSetText(`cooldown_${k.code}`, `🔒 冷卻中：還剩 ${cooldownRemain} 個交易日｜本月已收 ${monthlyHarvestCount} 次`);
+          } else if(cooldownRemain.remaining > 0){
+            safeSetText(`cooldown_${k.code}`, `🔒 因前次收割冷卻 ${cooldownRemain.days} 天｜還剩 ${cooldownRemain.remaining} 個交易日｜本月已收 ${monthlyHarvestCount} 次`);
             safeSetClass(`cooldown_${k.code}`, 'mt-3 text-sm font-black text-amber-300');
           } else {
             safeSetText(`cooldown_${k.code}`, `✅ 冷卻完成，可再次收割｜本月已收 ${monthlyHarvestCount} 次`);
@@ -1536,7 +1765,10 @@
             deviation,
             triggerChange: triggerCheck ? triggerCheck.change : null,
             distanceValue,
-            distanceText
+            distanceText,
+            decision,
+            cooldownRemain,
+            monthlyHarvestCount
           });
 
           if(i < 3) deviationLines.push(`${k.name}：20MA乖離 ${deviation>=0?'+':''}${deviation.toFixed(2)}%`);
@@ -1548,25 +1780,57 @@
 
         safeSetHTML('deviationSummary', deviationLines.length ? deviationLines.join('<br>') : '等待王卡資料…');
 
-        if(kingStats.length){
-          const closest = [...kingStats].sort((a,b)=>a.distanceValue - b.distanceValue)[0];
-          const strongest = [...kingStats].sort((a,b)=>b.deviation - a.deviation)[0];
-          const weakest = [...kingStats]
-            .filter(x => x.triggerChange !== null)
-            .sort((a,b)=>a.triggerChange - b.triggerChange)[0] || [...kingStats].sort((a,b)=>a.deviation - b.deviation)[0];
 
-          safeSetText('closestTriggerKing', closest?.name || '—');
-          safeSetText('closestTriggerHint', closest ? closest.distanceText : '等待資料');
-          safeSetHTML('strongWeakBoard',
-            strongest && weakest
-              ? `最強王：${strongest.name}（20MA乖離 ${strongest.deviation>=0?'+':''}${strongest.deviation.toFixed(2)}%）<br>最弱王：${weakest.name}（${weakest.triggerChange !== null ? `10日跌幅 ${weakest.triggerChange.toFixed(2)}%` : `20MA乖離 ${weakest.deviation.toFixed(2)}%`})`
-              : '等待資料'
-          );
-        } else {
-          safeSetText('closestTriggerKing', '—');
-          safeSetText('closestTriggerHint', '等待資料');
-          safeSetHTML('strongWeakBoard', '等待資料');
-        }
+let reboundTarget = null;
+let reboundBlocked = false;
+let reboundRanking = [];
+
+if(kingStats.length){
+  const closest = [...kingStats].sort((a,b)=>a.distanceValue - b.distanceValue)[0];
+  const strongest = [...kingStats].sort((a,b)=>b.deviation - a.deviation)[0];
+  const weakestPick = pickWeakestTarget(kingStats);
+  reboundTarget = weakestPick.target;
+  reboundBlocked = weakestPick.blocked;
+  reboundRanking = weakestPick.ranking;
+
+  const plainWeakest = reboundRanking[0] || null;
+
+  safeSetText('closestTriggerKing', closest?.name || '—');
+  safeSetText('closestTriggerHint', closest ? closest.distanceText : '等待資料');
+  safeSetHTML('strongWeakBoard',
+    strongest && plainWeakest
+      ? `最強王：${strongest.name}（20MA乖離 ${strongest.deviation>=0?'+':''}${strongest.deviation.toFixed(2)}%）<br>最弱王：${plainWeakest.name}（${plainWeakest.triggerChange !== null ? `10日跌幅 ${plainWeakest.triggerChange.toFixed(2)}%` : `20MA乖離 ${plainWeakest.deviation.toFixed(2)}%`})${reboundBlocked && reboundTarget ? `<br>防爆改灌：${reboundTarget.name}` : ''}`
+      : '等待資料'
+  );
+
+  if(reboundTarget){
+    const reason = reboundTarget.triggerChange !== null && reboundTarget.triggerChange < 0
+      ? `因 10日跌幅最深 ${reboundTarget.triggerChange.toFixed(2)}%，今日回灌優先指向 ${reboundTarget.name}`
+      : `因 20MA乖離最低 ${reboundTarget.deviation.toFixed(2)}%，今日回灌優先指向 ${reboundTarget.name}`;
+    safeSetText('reboundTargetName', reboundTarget.name);
+    safeSetText('reboundTargetReason', reason);
+
+    const state = getWeakestState();
+    const streakText = state.code === reboundTarget.code
+      ? `連續被灌紀錄：${Number(state.streak || 0)} 次`
+      : `連續被灌紀錄：0 次`;
+
+    safeSetText('reboundTargetGuard', reboundBlocked
+      ? `${streakText}｜最弱王防爆啟動，今日降權改灌次弱王`
+      : `${streakText}｜防爆正常`);
+  } else {
+    safeSetText('reboundTargetName', '暫無回灌目標');
+    safeSetText('reboundTargetReason', '目前沒有需要承接回灌的王。');
+    safeSetText('reboundTargetGuard', '防爆正常');
+  }
+} else {
+  safeSetText('closestTriggerKing', '—');
+  safeSetText('closestTriggerHint', '等待資料');
+  safeSetHTML('strongWeakBoard', '等待資料');
+  safeSetText('reboundTargetName', '等待資料');
+  safeSetText('reboundTargetReason', '等待資料');
+  safeSetText('reboundTargetGuard', '等待資料');
+}
 
         const globalTrigger = triggeredCount > 0 ? `已觸發 ${triggeredCount} 王｜本月有效上限 ${effectiveTriggerLimit} 次` : `未達任何王門檻｜本月有效上限 ${effectiveTriggerLimit} 次`;
         const globalAdd = (ammoRemain <= 0 || triggerRemain <= 0) ? '🚫 禁止加碼' : triggeredCount > 0 ? '✅ 可依觸發王分配' : '❌ 本次不加碼';
@@ -1632,7 +1896,7 @@
             </div>
           `).join('');
 
-          recommendText = `本次建議出手 ${formatMoney(recommend)} 元。<br>` + allocs.map((a, idx) => `• ${idx+1}. ${a.name}：${formatMoney(a.amount)} 元（10日跌幅 ${a.triggerChange.toFixed(2)}%｜跌幅排名第 ${idx+1}）`).join('<br>');
+          recommendText = `本次建議出手 ${formatMoney(recommend)} 元。<br>` + allocs.map((a, idx) => `• ${idx+1}. ${a.name}：${formatMoney(a.amount)} 元（10日跌幅 ${a.triggerChange.toFixed(2)}%｜跌幅排名第 ${idx+1}）`).join('<br>') + (reboundTarget ? `<br><br>若今天有收割，回灌目標：${reboundTarget.name}` : '');
         }
 
         safeSetText('ammoRecommend', formatMoney(recommend));
@@ -1642,37 +1906,68 @@
         lastRecommendValue = recommend;
         lastTriggeredCandidateNames = triggeredCandidates.map(x => x.name);
 
-        let globalTitle = '👉 今日維持紀律，不動作';
-        let globalReason = '目前沒有任何收割指令優先於冷卻與法典條件，也沒有必須立刻執行的動作。';
-        let globalHint = '今天重點：照常定投，收盤後再檢核。';
-        let globalClass = 'decision-big cmd-wait';
 
-        if (attackLock) {
-          globalTitle = '👉 今日停止收割，先恢復攻擊力';
-          globalReason = `目前攻擊資產僅 ${(attackRatio * 100).toFixed(1)}%，已低於 60% 防線。所有收割邏輯暫停，避免部位被自己削弱。`;
-          globalHint = '今天重點：只觀察與加碼，不做任何收割。';
-          globalClass = 'decision-big cmd-cooldown';
-        } else if (harvestCount > 0) {
-          globalTitle = `👉 今日執行 ${harvestCount} 筆收割`;
-          globalReason = `已有 ${harvestCount} 王達到當前水庫戰區的收割門檻，請依各王卡上的指令執行。`;
-          globalHint = actionable.length ? actionable.join(' ｜ ') : '請查看王卡指令。';
-          globalClass = 'decision-big cmd-harvest';
-        } else if (cooldownCount > 0) {
-          globalTitle = '👉 今日以冷卻優先，不追操作';
-          globalReason = `目前有 ${cooldownCount} 王處於冷卻中，冷卻期間禁止收割，避免你自己手滑。`;
-          globalHint = '今天優先遵守冷卻鐵律。';
-          globalClass = 'decision-big cmd-cooldown';
-        } else if (triggeredCandidates.length > 0 && recommend > 0) {
-          globalTitle = `👉 今日可加碼，建議 ${formatMoney(recommend)} 元`;
-          globalReason = `有 ${triggeredCandidates.length} 王達到 10日跌幅觸發門檻，且本月仍有剩餘彈藥與次數。`;
-          globalHint = `候選：${lastTriggeredCandidateNames.join('、')}`;
-          globalClass = 'decision-big cmd-watch';
-        }
+let globalTitle = '👉 今日維持紀律，不動作';
+let globalReason = '目前沒有任何收割指令優先於冷卻與法典條件，也沒有必須立刻執行的動作。';
+let globalHint = '今天重點：照常定投，收盤後再檢核。';
+let globalClass = 'decision-big cmd-wait';
 
-        safeSetClass('globalCommandCard', globalClass);
-        safeSetText('globalCommandTitle', globalTitle);
-        safeSetText('globalCommandReason', globalReason);
-        safeSetText('globalCommandHint', globalHint);
+if (attackLock) {
+  globalTitle = '👉 今日停止收割，先恢復攻擊力';
+  globalReason = `目前攻擊資產僅 ${(attackRatio * 100).toFixed(1)}%，已低於 55% 防線。所有收割邏輯暫停，避免部位被自己削弱。`;
+  globalHint = '今天重點：只觀察與加碼，不做任何收割。';
+  globalClass = 'decision-big cmd-cooldown';
+} else if (harvestCount > 0) {
+  globalTitle = `👉 今日執行 ${harvestCount} 筆收割`;
+  globalReason = `已有 ${harvestCount} 王達到當前水庫戰區的收割門檻，請依各王卡上的指令執行。`;
+  globalHint = actionable.length ? actionable.join(' ｜ ') : '請查看王卡指令。';
+  globalClass = 'decision-big cmd-harvest';
+} else if (cooldownCount > 0) {
+  globalTitle = '👉 今日以冷卻優先，不追操作';
+  globalReason = `目前有 ${cooldownCount} 王處於冷卻中，冷卻期間禁止收割，避免你自己手滑。`;
+  globalHint = '今天優先遵守冷卻鐵律。';
+  globalClass = 'decision-big cmd-cooldown';
+} else if (triggeredCandidates.length > 0 && recommend > 0) {
+  globalTitle = `👉 今日可加碼，建議 ${formatMoney(recommend)} 元`;
+  globalReason = `有 ${triggeredCandidates.length} 王達到 10 日跌幅觸發門檻，但只照排序與額度出手。`;
+  globalHint = recommendText.replace(/<br>/g, '｜');
+  globalClass = 'decision-big cmd-watch';
+}
+
+safeSetClass('globalCommandCard', globalClass);
+safeSetText('globalCommandTitle', globalTitle);
+safeSetText('globalCommandReason', globalReason);
+safeSetText('globalCommandHint', globalHint);
+
+const harvestLine = actionable.length
+  ? actionable.map(x => x.replace(/^[^：]+：/, '')).join(' ｜ ')
+  : '今日無收割';
+const reboundLine = harvestCount > 0
+  ? (battle.key === 'war' || battle.key === 'lock'
+      ? '100% 回水庫'
+      : reboundTarget
+        ? `50% 回水庫｜50% 灌 ${reboundTarget.name}`
+        : '50% 回水庫｜50% 灌最弱王')
+  : '今日無回灌';
+const addLine = recommend > 0
+  ? `${formatMoney(recommend)} 元｜候選：${lastTriggeredCandidateNames.join('、') || '—'}`
+  : '今日不加碼';
+const blockedKings = kingStats.filter(x => (x.cooldownRemain && x.cooldownRemain.remaining > 0) || x.decision.signal === '月限鎖' || x.decision.signal === '保護鎖');
+const blockedLine = blockedKings.length
+  ? blockedKings.map(x => {
+      if (x.cooldownRemain && x.cooldownRemain.remaining > 0) return `${x.name} 冷卻 ${x.cooldownRemain.remaining} 天`;
+      if (x.decision.signal === '月限鎖') return `${x.name} 月限鎖`;
+      return `${x.name} 保護鎖`;
+    }).join(' ｜ ')
+  : '今日無禁止王';
+
+safeSetText('commandHarvestLine', harvestLine);
+safeSetText('commandReboundLine', reboundLine);
+safeSetText('commandAddLine', addLine);
+safeSetText('commandBlockedLine', blockedLine);
+
+safeSetText('commandBlockSummary', blockedKings.length ? `今日共有 ${blockedKings.length} 王不可動` : '今日沒有禁止王');
+safeSetText('commandBlockReason', blockedLine);
 
         safeSetHTML('threeKingDecisionBoard', decisionLines.length ? decisionLines.join('<br>') : '等待資料');
 
@@ -1727,6 +2022,8 @@
           if (fw) fw.checked = String(data[k.code+'_firstwave']) === 'true' || data[k.code+'_firstwave'] === true;
           safeSetValue(k.code+'_trigger', data[k.code+'_trigger'] ?? k.defaultTrigger);
           safeSetValue(k.code+'_lastHarvestDate', data[k.code+'_lastHarvestDate'] || '');
+          setMonthlyHarvestCount(k.code, data[getHarvestCountField(k.code)] || 0);
+          safeSetValue(k.code+'_lastHarvestCountedDate', data[k.code+'_lastHarvestCountedDate'] || '');
         }
 
         resetMonthlyIfNeeded(true);
