@@ -142,6 +142,44 @@
     }
     .cmd-line .k{color:#94a3b8;font-weight:800;min-width:60px}
     .cmd-line .v{font-weight:900;text-align:right;flex:1}
+
+    body.alert-red{
+      background:
+        radial-gradient(circle at 15% 0%, rgba(251,113,133,.22), transparent 24%),
+        radial-gradient(circle at 100% 10%, rgba(239,68,68,.18), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(127,29,29,.16), transparent 20%),
+        linear-gradient(180deg,#1a070d,#230a12,#2a0c14);
+    }
+    body.alert-red .glass{
+      border-color: rgba(251,113,133,.18);
+      box-shadow: 0 14px 40px rgba(127,29,29,.28);
+    }
+    body.alert-red .hero{
+      background:
+        radial-gradient(circle at 0% 0%, rgba(251,113,133,.18), transparent 28%),
+        linear-gradient(180deg, rgba(35,7,14,.94), rgba(27,8,14,.94));
+    }
+    .alert-banner{
+      display:none;
+      padding:14px 16px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(127,29,29,.55), rgba(76,29,49,.38));
+      border:1px solid rgba(251,113,133,.28);
+      color:#ffe4e8;
+      font-size:14px;
+      line-height:1.7;
+      font-weight:900;
+      margin-top:12px;
+    }
+    .alert-banner.show{display:block}
+    .alert-banner .small{
+      display:block;
+      margin-top:6px;
+      color:#fecdd6;
+      font-size:12px;
+      font-weight:700;
+      line-height:1.6;
+    }
   </style>
 </head>
 <body>
@@ -150,6 +188,10 @@
       <div class="pill">FEIYU MOBILE · V23.2</div>
       <h1>肥瑜投資系統 V23.2</h1>
       <p>本系統為小資金專用飛輪：收割採延後機制（+15%收10% / +20%收20%），避免過早獲利了結。加碼由超底王自動執行，當基金跌幅達設定門檻即自動扣款，雙王若同時達標會同時加碼；使用者僅需設定跌幅與每月次數。整體策略核心為：延後收割＋自動加碼，讓資產穩定放大。</p>
+      <div id="redAlertBanner" class="alert-banner">
+        🚨 紅色警報模式：先保命，再談收益
+        <span id="redAlertBannerText" class="small">等待資料</span>
+      </div>
     </section>
 
     <section class="glass section">
@@ -434,7 +476,7 @@ function getBattleZone(reservoir){
     return {
       chipText:'🟡 過渡鎖定區',
       chipClass:'chip warn',
-      rule:'15萬～18萬：仍偏保守，取消 +10% 微收割；收割先補水，雙王同時觸發時只打一王。'
+      rule:'15萬～18萬：仍偏保守，取消 +10% 微收割；收割先補水。超底王加碼仍依平台條件自動執行。'
     };
   }
   return {
@@ -561,6 +603,36 @@ function setSync(text, ok=true){
   safeSetText('syncBadge', text);
   if(badge) badge.style.color = ok ? '#67e8f9' : '#fda4af';
 }
+
+function setRedAlertMode(reservoir, ammoRemain, triggerRemain){
+  const body = document.body;
+  const banner = safeEl('redAlertBanner');
+  const bannerText = safeEl('redAlertBannerText');
+
+  let active = false;
+  let text = '目前未進入紅色警報。';
+
+  if(reservoir < 100000){
+    active = true;
+    text = '水庫低於 10 萬。請立刻停止主動擴張，收割優先回水庫，並檢查是否需要去鉅亨關閉本月加碼。';
+  } else if(triggerRemain <= 0){
+    active = true;
+    text = '本月加碼次數已達上限。請去鉅亨關閉本月加碼，避免雙王後續再自動扣款。';
+  } else if(ammoRemain <= 3000){
+    active = true;
+    text = '本月彈藥只剩最後一發。今天若非必要，不要再開額外風險。';
+  }
+
+  if(active){
+    body.classList.add('alert-red');
+    if(banner) banner.classList.add('show');
+    if(bannerText) bannerText.textContent = text;
+  }else{
+    body.classList.remove('alert-red');
+    if(banner) banner.classList.remove('show');
+    if(bannerText) bannerText.textContent = '目前未進入紅色警報。';
+  }
+}
 function ensureKingCards(){
   if(isBuildingCards) return;
   isBuildingCards = true;
@@ -677,10 +749,13 @@ function updateVisuals(){
   }
   safeSetText('monthStatusText', monthStatusText);
   safeSetText('monthStatusHint', monthStatusHint);
+  setRedAlertMode(reservoir, ammoRemain, triggerRemain);
 
   const warnings = [];
   if(monthlyInput !== 6000) warnings.push('妹妹版每月定投應維持 6000。');
   if(reservoir < 150000) warnings.push('水庫已跌回 15 萬以下，請把收割優先補水。');
+  if(reservoir < 100000) warnings.push('🚨 紅色警報：水庫低於 10 萬，請先保命。');
+  if(triggerRemain <= 0) warnings.push('🚨 紅色警報：本月加碼次數已達上限，請去鉅亨關閉本月加碼。');
   if(totalAssets < 500000) warnings.push('目前仍在模式一，重點不是衝快，而是先活下來。');
 
   const recommendLines = [];
@@ -798,7 +873,7 @@ function updateVisuals(){
   if(triggeredCandidates.length > 0 && triggerRemain > 0 && ammoRemain > 0){
     const chosen = triggeredCandidates[0];
     recommend = Math.min(3000, ammoRemain);
-    recommendText = `超底王為自動加碼機制。若只有一王達標，本次主要觀察 ${chosen.name}；若雙王同時達標，平台會依各自條件同步自動扣款。建議你重點檢查本月剩餘次數與水庫彈藥。`;
+    recommendText = `超底王為自動加碼機制。若只有一王達標，本次主要觀察 ${chosen.name}；若雙王同時達標，平台會依各自條件同步自動扣款。建議你重點檢查本月剩餘次數、水庫彈藥，以及是否需要去鉅亨關閉本月加碼。`;
     lastTriggeredCandidateCodes = [chosen.code];
     lastTriggeredCandidateNames = [chosen.name];
   }
@@ -827,7 +902,7 @@ function updateVisuals(){
   safeSetText('todaySummary',
     `${harvestCount > 0 ? `今天先做 ${harvestCount} 筆收割。` : '今天沒有收割。'} ` +
     `${harvestCount > 0 ? `分流：${reboundLine}。` : ''}` +
-    `${recommend > 0 ? `若加碼，只打 ${lastTriggeredCandidateNames.join('、')}，金額 ${formatMoney(recommend)} 元。` : '今天不加碼。'} ` +
+    `${recommend > 0 ? `若出現自動加碼，請重點觀察 ${lastTriggeredCandidateNames.join('、')}，單筆基準為 ${formatMoney(recommend)} 元。` : '今天不加碼。'} ` +
     `${blockedKings.length ? `禁止王：${blockedKings.map(x => x.name).join('、')}。` : '今天沒有禁止王。'}`
   );
 
@@ -848,8 +923,8 @@ function updateVisuals(){
     globalClass = 'decision cooldown';
   } else if(recommend > 0){
     globalTitle = `👉 今日可加碼，建議 ${formatMoney(recommend)} 元`;
-    globalReason = `已有王達到 10日跌幅觸發門檻，且本月仍有彈藥與次數。`;
-    globalHint = `候選：${lastTriggeredCandidateNames.join('、')}`;
+    globalReason = `已有王達到 10日跌幅觸發門檻，若超底王條件成立，平台可能自動扣款；請先檢查本月剩餘次數與彈藥。`;
+    globalHint = `重點觀察：${lastTriggeredCandidateNames.join('、')}｜若不想再扣，請到鉅亨關閉本月加碼。`;
     globalClass = 'decision watch';
   }
 
@@ -970,7 +1045,7 @@ function bindGlobalEvents(){
     safeSetValue('usedAmmo', Number(safeEl('usedAmmo').value || 0) + lastRecommendValue);
     safeSetValue('monthlyTriggerCount', Number(safeEl('monthlyTriggerCount').value || 0) + 1);
     const noteEl = safeEl('notes');
-    const line = `[${getNowText()}] 套用建議 ${formatMoney(lastRecommendValue)} 元｜只打 ${lastTriggeredCandidateNames.join('、') || '無'}`;
+    const line = `[${getNowText()}] 套用建議觀察 ${formatMoney(lastRecommendValue)} 元｜重點觀察 ${lastTriggeredCandidateNames.join('、') || '無'}｜超底王仍依平台條件自動扣款`;
     noteEl.value = noteEl.value ? `${noteEl.value}\n${line}` : line;
     updateVisuals();
     setSync('已套用待儲存', true);
