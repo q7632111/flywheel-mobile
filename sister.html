@@ -3,22 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>肥瑜投資系統 V22</title>
+  <title>肥瑜投資系統 V23.2</title>
   <style>
     :root{
-      --bg1:#04101d;
-      --bg2:#0a1426;
-      --bg3:#0f1b33;
-      --card:rgba(15,23,42,.84);
-      --line:rgba(255,255,255,.08);
-      --text:#f8fafc;
-      --muted:#94a3b8;
-      --cyan:#22d3ee;
-      --emerald:#34d399;
-      --amber:#fbbf24;
-      --rose:#fb7185;
-      --violet:#a78bfa;
-      --sky:#38bdf8;
+      --bg1:#04101d; --bg2:#0a1426; --bg3:#0f1b33;
+      --card:rgba(15,23,42,.84); --line:rgba(255,255,255,.08);
+      --text:#f8fafc; --muted:#94a3b8; --cyan:#22d3ee; --emerald:#34d399;
+      --amber:#fbbf24; --rose:#fb7185; --violet:#a78bfa; --sky:#38bdf8;
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
     html,body{
@@ -34,12 +25,8 @@
     body{min-height:100vh;padding:14px 14px 34px}
     .shell{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
     .glass{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:0 14px 40px rgba(0,0,0,.28);
-      backdrop-filter:blur(14px);
-      overflow:hidden;
+      background:var(--card); border:1px solid var(--line); border-radius:24px;
+      box-shadow:0 14px 40px rgba(0,0,0,.28); backdrop-filter:blur(14px); overflow:hidden;
     }
     .hero{
       padding:18px;
@@ -59,9 +46,7 @@
     .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
     .box,.mini,.stat{
       background:linear-gradient(180deg,rgba(5,10,24,.9),rgba(8,16,31,.9));
-      border:1px solid rgba(255,255,255,.06);
-      border-radius:18px;
-      padding:12px;
+      border:1px solid rgba(255,255,255,.06); border-radius:18px; padding:12px;
     }
     .label{font-size:12px;color:var(--muted);margin-bottom:6px}
     .value{font-weight:900;font-size:20px;line-height:1.15}
@@ -78,12 +63,6 @@
     }
     button.dark,.btn-link.dark{
       background:rgba(255,255,255,.04);color:var(--text);border:1px solid rgba(255,255,255,.08);box-shadow:none;
-    }
-    button.action-harvest{
-      background:linear-gradient(180deg,#ff8aa1,#fb7185);color:#1b0b12;box-shadow:0 12px 28px rgba(251,113,133,.22);
-    }
-    button.action-add{
-      background:linear-gradient(180deg,#6ee7b7,#34d399);color:#041b12;box-shadow:0 12px 28px rgba(52,211,153,.22);
     }
     input,textarea,select{
       width:100%;background:rgba(2,6,23,.76);border:1px solid rgba(148,163,184,.18);color:white;
@@ -155,14 +134,22 @@
       padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
       color:#e2e8f0;font-size:12px;line-height:1.7;
     }
+    .cmd-list{display:grid;gap:8px;margin-top:10px}
+    .cmd-line{
+      display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+      padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+      font-size:13px;line-height:1.6;
+    }
+    .cmd-line .k{color:#94a3b8;font-weight:800;min-width:60px}
+    .cmd-line .v{font-weight:900;text-align:right;flex:1}
   </style>
 </head>
 <body>
   <div class="shell">
     <section class="glass hero">
-      <div class="pill">FEIYU MOBILE · V22</div>
-      <h1>肥瑜投資系統 V22</h1>
-      <p>手機版專注在「打開就知道今天該做什麼」。固定雙王：統一奔騰 + 摩根環球品牌。每月各 3000，總共 6000。保留你熟悉的手機版外觀，但換成妹妹專屬邏輯。</p>
+      <div class="pill">FEIYU MOBILE · V23.2</div>
+      <h1>肥瑜投資系統 V23.2</h1>
+      <p>保留你妹熟悉的手機版外觀，但將收割改為延後收割：取消 +10% 微收割，改為 +15% 收10% / +20% 收20%，讓小資金部位有機會長大，不再被過早切斷。</p>
     </section>
 
     <section class="glass section">
@@ -200,6 +187,17 @@
         <div id="globalCommandReason">系統正在整理雙王與水庫狀態。</div>
         <div id="globalCommandHint" class="note" style="margin-top:10px">讀取後，這裡會直接告訴你今天是收割、加碼還是不動。</div>
       </div>
+      <div class="cmd-list">
+        <div class="cmd-line"><div class="k">收割</div><div id="commandHarvestLine" class="v">等待資料</div></div>
+        <div class="cmd-line"><div class="k">回灌</div><div id="commandReboundLine" class="v">等待資料</div></div>
+        <div class="cmd-line"><div class="k">加碼</div><div id="commandAddLine" class="v">等待資料</div></div>
+        <div class="cmd-line"><div class="k">禁止</div><div id="commandBlockedLine" class="v">等待資料</div></div>
+      </div>
+    </section>
+
+    <section class="glass section">
+      <h2>今日總結</h2>
+      <div id="todaySummary" class="summary">等待資料</div>
     </section>
 
     <section class="glass section">
@@ -315,12 +313,31 @@ function safeSetText(id, value){ const el=safeEl(id); if(el) el.textContent=valu
 function safeSetHTML(id, value){ const el=safeEl(id); if(el) el.innerHTML=value; }
 function safeSetValue(id, value){ const el=safeEl(id); if(el) el.value=value; }
 function formatMoney(v){ return Number(v || 0).toLocaleString(); }
+function formatDisplayTime(value){
+  if(!value) return '—';
+  try{
+    const d = new Date(value);
+    if(!Number.isNaN(d.getTime())){
+      const tw = new Date(d.getTime() + 8*60*60*1000);
+      const yyyy = tw.getFullYear();
+      const mm = String(tw.getMonth()+1).padStart(2,'0');
+      const dd = String(tw.getDate()).padStart(2,'0');
+      const hh = String(tw.getHours()).padStart(2,'0');
+      const mi = String(tw.getMinutes()).padStart(2,'0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+    }
+  }catch(err){}
+  return String(value).replace('T',' ').replace('.000Z','').replace('Z','');
+}-${dd} ${hh}:${mi}`;
+    }
+  }catch(err){}
+  return String(value).replace('T',' ').replace(/\.\d{3}Z$/,'').replace(/Z$/,'');
+}
 
 function getCurrentMonthKey(){
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 }
-
 function getNowText(){
   const now = new Date();
   const yyyy = now.getFullYear();
@@ -331,7 +348,6 @@ function getNowText(){
   const ss = String(now.getSeconds()).padStart(2,'0');
   return `${yyyy}-${mm}-${dd} ${hh}:${mi}:${ss}`;
 }
-
 function parsePrices(text){
   return String(text || '')
     .replace(/[；;｜|]/g, ' ')
@@ -341,7 +357,6 @@ function parsePrices(text){
     .map(v => Number(String(v).trim()))
     .filter(n => !Number.isNaN(n) && n > 0);
 }
-
 function calcDeviation(prices){
   if(prices.length < 20) return null;
   const recent20 = prices.slice(-20);
@@ -350,7 +365,6 @@ function calcDeviation(prices){
   const deviation = ((current - ma20) / ma20) * 100;
   return { current, ma20, deviation };
 }
-
 function calcTenDayTrigger(prices, triggerPercent){
   if(prices.length < 11) return null;
   const today = prices[prices.length - 1];
@@ -358,7 +372,6 @@ function calcTenDayTrigger(prices, triggerPercent){
   const change = ((today - prev10) / prev10) * 100;
   return { change, triggered: change <= triggerPercent };
 }
-
 function getBusinessDaysPassed(dateStr){
   if(!dateStr) return null;
   const start = new Date(dateStr + 'T00:00:00');
@@ -388,7 +401,7 @@ function getMode(totalAssets){
       split:'100% 回水庫',
       bottom:75,
       addCountBase:3,
-      summary:'50萬以下先活下來，任何收割優先補水庫。'
+      summary:'50萬以下先活下來，收割先補水，不做 +10% 微收割。'
     };
   }
   if(totalAssets < 1500000){
@@ -399,7 +412,7 @@ function getMode(totalAssets){
       split:'70% 水庫 / 30% 回原王',
       bottom:75,
       addCountBase:4,
-      summary:'50萬到150萬，補水庫，也要讓王開始長大。'
+      summary:'50萬到150萬，延後收割，讓小部位先長大。'
     };
   }
   return {
@@ -409,8 +422,8 @@ function getMode(totalAssets){
     split:'50% 水庫 / 50% 回原王',
     bottom:80,
     addCountBase:5,
-    summary:'150萬到500萬，正式進入穩定複利。'
-  };
+    summary:'150萬到500萬，延後收割、保留更多底倉。'
+    };
 }
 
 function getBattleZone(reservoir){
@@ -418,23 +431,22 @@ function getBattleZone(reservoir){
     return {
       chipText:'🔴 戰時狀態',
       chipClass:'chip danger',
-      rule:'水庫 < 15萬：加碼固定 3000，雙王合計次數嚴控；所有收割優先補水。'
+      rule:'水庫 < 15萬：加碼固定 3000，雙王合計次數嚴控；收割只看 +15% / +20%，且獲利 100% 回水庫。'
     };
   }
   if(reservoir < 180000){
     return {
       chipText:'🟡 過渡鎖定區',
       chipClass:'chip warn',
-      rule:'15萬～18萬：仍偏保守，收割先補水，雙王同時觸發時只打一王。'
+      rule:'15萬～18萬：仍偏保守，取消 +10% 微收割；收割先補水，雙王同時觸發時只打一王。'
     };
   }
   return {
     chipText:'⚡ 點火擴張區',
     chipClass:'chip ok',
-    rule:'水庫 > 18萬：開始允許依模式做收割分流，但加碼仍固定 3000。'
+    rule:'水庫 > 18萬：取消 +10% 微收割；統一改為 +15% 收10% / +20% 收20%。'
   };
 }
-
 function getMaxAddCount(totalAssets, reservoir){
   const mode = getMode(totalAssets);
   if(reservoir < 80000) return 1;
@@ -447,13 +459,13 @@ function getHarvestAction(dev, mode, cooldownRemain){
   if(cooldownRemain !== null && cooldownRemain > 0) return `冷卻中 ${cooldownRemain} 天`;
   if(dev == null) return '—';
   if(dev >= 20) return `收割 20%｜底倉 ${mode.bottom}%｜${mode.split}`;
-  if(dev >= 15) return `收割 15%｜底倉 ${mode.bottom}%｜${mode.split}`;
-  if(dev >= 10) return `收割 10%｜底倉 ${mode.bottom}%｜${mode.split}`;
-  if(dev >= 5) return '接近收割區，先觀察';
+  if(dev >= 15) return `收割 10%｜底倉 ${mode.bottom}%｜${mode.split}`;
+  if(dev >= 10) return '接近收割區，先觀察';
+  if(dev >= 5) return '轉強觀察中';
   return '未達收割區';
 }
 
-const OP_LOG_KEY = 'feiyu_mobile_v22_logs';
+const OP_LOG_KEY = 'feiyu_mobile_v23_2_logs';
 function getOperationLogs(){
   try{
     const raw = localStorage.getItem(OP_LOG_KEY);
@@ -526,7 +538,6 @@ function clearOperationLogs(){
   localStorage.removeItem(OP_LOG_KEY);
   renderOperationLogs();
 }
-
 function appendTodayValue(code){
   const today = prompt('輸入今天淨值');
   if(!today) return;
@@ -539,7 +550,6 @@ function appendTodayValue(code){
   el.value = arr.join(' ');
   updateVisuals();
 }
-
 function resetMonthlyIfNeeded(){
   const currentMonthKey = getCurrentMonthKey();
   const savedMonthKey = String(safeEl('monthKey')?.value || '');
@@ -550,13 +560,11 @@ function resetMonthlyIfNeeded(){
   }
   safeSetText('monthKeyText', currentMonthKey);
 }
-
 function setSync(text, ok=true){
   const badge = safeEl('syncBadge');
   safeSetText('syncBadge', text);
   if(badge) badge.style.color = ok ? '#67e8f9' : '#fda4af';
 }
-
 function ensureKingCards(){
   if(isBuildingCards) return;
   isBuildingCards = true;
@@ -627,7 +635,6 @@ function ensureKingCards(){
     isBuildingCards = false;
   }
 }
-
 function updateBalanceRatio(totalAssets, reservoir){
   const attack = Math.max(0, totalAssets - reservoir);
   const attackPct = totalAssets > 0 ? Math.round((attack / totalAssets) * 100) : 0;
@@ -754,20 +761,30 @@ function updateVisuals(){
       cls = 'cooldown';
       reason = `${k.name} 正在冷卻中，今天禁止收割。`;
       cooldownCount++;
-    } else if(calc.deviation >= 10){
+    } else if(calc.deviation >= 15){
       signal = '收割';
-      cls = calc.deviation >= 15 ? 'harvest' : 'watch';
-      reason = `${k.name} 已達收割區，請依模式分流：${mode.split}。`;
+      cls = calc.deviation >= 20 ? 'harvest' : 'watch';
+      reason = `${k.name} 已達延後收割區，請依模式分流：${mode.split}。`;
       harvestCount++;
     } else if(triggerCheck && triggerCheck.triggered && triggerRemain > 0 && ammoRemain > 0){
       signal = '加碼';
       cls = 'watch';
       reason = `${k.name} 已達 10日跌幅門檻，可列入加碼候選。`;
+    } else if(calc.deviation >= 10){
+      signal = '觀察';
+      cls = 'watch';
+      reason = `${k.name} 已接近收割區，但妹妹版取消 +10% 微收割，先觀察。`;
     }
 
     safeSetText('signal_'+k.code, signal);
-    safeEl('signal_'+k.code).className = signal === '收割' ? 'chip danger' : signal === '加碼' ? 'chip warn' : signal === '冷卻' ? 'chip warn' : 'chip idle';
-    safeSetText('decision_'+k.code, signal === '收割' ? harvestText : signal === '加碼' ? '🟡 可加碼｜固定 3000' : signal === '冷卻' ? `❄️ 冷卻中：還剩 ${cooldownRemain} 個交易日` : '⚪ 未達收割區，維持紀律');
+    safeEl('signal_'+k.code).className = signal === '收割' ? 'chip danger' : (signal === '加碼' || signal === '觀察') ? 'chip warn' : signal === '冷卻' ? 'chip warn' : 'chip idle';
+    safeSetText('decision_'+k.code,
+      signal === '收割' ? harvestText :
+      signal === '加碼' ? '🟡 可加碼｜固定 3000' :
+      signal === '冷卻' ? `❄️ 冷卻中：還剩 ${cooldownRemain} 個交易日` :
+      signal === '觀察' ? '🟡 已接近收割區｜取消 +10% 微收割，先觀察' :
+      '⚪ 未達收割區，維持紀律'
+    );
     safeEl('decision_'+k.code).className = `decision ${cls}`;
     safeSetText('action_'+k.code, reason);
 
@@ -793,6 +810,31 @@ function updateVisuals(){
   safeSetText('ammoRecommend', formatMoney(recommend));
   safeSetHTML('recommendBoard', recommendText);
 
+  const harvestLine = harvestCount > 0 ? recommendLines.join(' ｜ ') : '今日無收割';
+  const reboundLine = harvestCount > 0
+    ? (mode.key === 'mode1' ? '100% 回水庫' : mode.split)
+    : '今日無回灌';
+  const addLine = recommend > 0
+    ? `${formatMoney(recommend)} 元｜候選：${lastTriggeredCandidateNames.join('、') || '—'}`
+    : '今日不加碼';
+
+  const blockedKings = kingDefs
+    .map(k => ({ code:k.code, name:k.name, sig:safeEl('signal_'+k.code)?.textContent || '' }))
+    .filter(x => x.sig.includes('冷卻'));
+  const blockedLine = blockedKings.length ? blockedKings.map(x => `${x.name} 冷卻中`).join(' ｜ ') : '今日無禁止王';
+
+  safeSetText('commandHarvestLine', harvestLine);
+  safeSetText('commandReboundLine', reboundLine);
+  safeSetText('commandAddLine', addLine);
+  safeSetText('commandBlockedLine', blockedLine);
+
+  safeSetText('todaySummary',
+    `${harvestCount > 0 ? `今天先做 ${harvestCount} 筆收割。` : '今天沒有收割。'} ` +
+    `${harvestCount > 0 ? `分流：${reboundLine}。` : ''}` +
+    `${recommend > 0 ? `若加碼，只打 ${lastTriggeredCandidateNames.join('、')}，金額 ${formatMoney(recommend)} 元。` : '今天不加碼。'} ` +
+    `${blockedKings.length ? `禁止王：${blockedKings.map(x => x.name).join('、')}。` : '今天沒有禁止王。'}`
+  );
+
   let globalTitle = '👉 今日維持紀律，不動作';
   let globalReason = '目前沒有必須立刻執行的操作，照常定投並觀察即可。';
   let globalHint = '今天重點：照常定投，收盤後再檢核。';
@@ -800,7 +842,7 @@ function updateVisuals(){
 
   if(harvestCount > 0){
     globalTitle = `👉 今日執行 ${harvestCount} 筆收割`;
-    globalReason = `已有雙王中的 ${harvestCount} 王達到收割門檻，請依模式分流：${mode.split}。`;
+    globalReason = `已有雙王中的 ${harvestCount} 王達到延後收割門檻。妹妹版已取消 +10% 微收割。`;
     globalHint = recommendLines.join(' ｜ ') || '請查看雙王卡片。';
     globalClass = 'decision harvest';
   } else if(cooldownCount > 0){
@@ -835,7 +877,7 @@ function updateVisuals(){
 
   safeEl('warningBoard').innerHTML = warnings.length
     ? warnings.map(x => `<div class="warn-item">${x}</div>`).join('')
-    : `<div class="ok-item">目前輸入與妹妹法典一致：雙王穩定版、每月 6000、加碼固定 3000、收割依模式分流。</div>`;
+    : `<div class="ok-item">目前輸入與妹妹法典一致：雙王穩定版、每月 6000、加碼固定 3000、取消 +10% 微收割。</div>`;
 
   renderOperationLogs();
 }
@@ -845,7 +887,6 @@ async function parseJsonResponse(res){
   try{ return JSON.parse(text); }
   catch{ throw new Error('後端回傳不是 JSON：' + text); }
 }
-
 async function loadData(){
   try{
     setSync('讀取中...', true);
@@ -870,7 +911,7 @@ async function loadData(){
     });
 
     resetMonthlyIfNeeded();
-    safeSetText('lastSyncTime', data.lastSyncTime || '—');
+    safeSetText('lastSyncTime', formatDisplayTime(data.lastSyncTime || '—'));
     updateVisuals();
     setSync('已同步', true);
   }catch(err){
@@ -879,7 +920,6 @@ async function loadData(){
     alert('讀取失敗：' + err.message);
   }
 }
-
 async function saveData(){
   try{
     resetMonthlyIfNeeded();
@@ -911,7 +951,7 @@ async function saveData(){
     });
 
     const data = await parseJsonResponse(res);
-    safeSetText('lastSyncTime', data.lastSyncTime || payload.lastSyncTime);
+    safeSetText('lastSyncTime', formatDisplayTime(data.lastSyncTime || payload.lastSyncTime));
     setSync('已儲存', true);
   }catch(err){
     console.error(err);
@@ -919,7 +959,6 @@ async function saveData(){
     alert('儲存失敗：' + err.message);
   }
 }
-
 function bindGlobalEvents(){
   safeEl('reloadBtn').addEventListener('click', loadData);
   safeEl('saveBtn').addEventListener('click', saveData);
@@ -950,7 +989,6 @@ function bindGlobalEvents(){
   document.addEventListener('input', (e)=>{ if(e.target && e.target.id !== 'notes') updateVisuals(); });
   document.addEventListener('change', (e)=>{ if(e.target && e.target.id !== 'notes') updateVisuals(); });
 }
-
 bindGlobalEvents();
 ensureKingCards();
 safeSetValue('monthKey', getCurrentMonthKey());
