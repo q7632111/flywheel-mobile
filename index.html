@@ -146,7 +146,7 @@
     <section class="glass hero">
       <div class="pill">FLYWHEEL MOBILE · V23.5</div>
       <h1>飛輪操盤系統</h1>
-      <p>沿用你的手機版外觀，但同步到攻擊型飛輪邏輯：收割後撤、不對稱回灌、55% 保護鎖、今日總結與回灌目標清楚顯示。原始手機版仍是舊版 `+10% 收割 / 回原王 / 60% 鎖` 邏輯。fileciteturn12file0</p>
+      <p>沿用你的手機版外觀，但同步到攻擊型飛輪邏輯：收割後撤、不對稱回灌、55% 保護鎖、今日總結與回灌目標清楚顯示。原始手機版仍是舊版 `+10% 收割 / 回原王 / 60% 鎖` 邏輯。</p>
     </section>
 
     <section class="glass section">
@@ -335,6 +335,23 @@ function safeSetText(id, value){ const el=safeEl(id); if(el) el.textContent=valu
 function safeSetHTML(id, value){ const el=safeEl(id); if(el) el.innerHTML=value; }
 function safeSetValue(id, value){ const el=safeEl(id); if(el) el.value=value; }
 function formatMoney(v){ return Number(v || 0).toLocaleString(); }
+
+function formatDisplayTime(value){
+  if(!value) return '—';
+  try{
+    const d = new Date(value);
+    if(!Number.isNaN(d.getTime())){
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mi = String(d.getMinutes()).padStart(2,'0');
+      return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
+    }
+  }catch(err){}
+  const s = String(value).replace('T',' ').replace(/\.\d{3}Z$/,'').replace(/Z$/,'');
+  return s;
+}
 
 function getCurrentMonthKey(){
   const now = new Date();
@@ -980,7 +997,7 @@ function updateVisuals(){
       if(warnings.length){
         warningBoard.innerHTML = warnings.map(x => `<div class="warn-item">${x}</div>`).join('');
       } else {
-        warningBoard.innerHTML = `<div class="ok-item">手機版已同步到攻擊型飛輪邏輯：收割後撤、灌最弱王、55% 保護鎖、動態冷卻。fileciteturn12file0</div>`;
+        warningBoard.innerHTML = `<div class="ok-item">手機版已同步到攻擊型飛輪邏輯：收割後撤、灌最弱王、55% 保護鎖、動態冷卻。</div>`;
       }
     }
   } catch(err){
@@ -1018,7 +1035,7 @@ async function loadData(){
     });
 
     resetMonthlyIfNeeded();
-    safeSetText('lastSyncTime', data.lastSyncTime || '—');
+    safeSetText('lastSyncTime', formatDisplayTime(data.lastSyncTime || '—'));
     updateVisuals();
     setSync('已同步', true);
   }catch(err){
@@ -1061,7 +1078,7 @@ async function saveData(){
 
     const data = await parseJsonResponse(res);
     if(data && (data.status === 'ok' || data.status === 'success' || data.ok === true)){
-      safeSetText('lastSyncTime', data.lastSyncTime || payload.lastSyncTime || '—');
+      safeSetText('lastSyncTime', formatDisplayTime(data.lastSyncTime || payload.lastSyncTime || '—'));
       setSync('已儲存', true);
     } else {
       throw new Error(data.error || '儲存失敗');
