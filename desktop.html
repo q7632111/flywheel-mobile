@@ -325,7 +325,13 @@
           <div class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
             <div class="text-xs text-slate-300">備份模式</div>
             <div id="backupModeTop" class="mt-1 text-sm font-black text-white">本地 + 雲端</div>
-          </div>
+          
+<div class="exec-order" style="margin-top:12px;">
+  <div class="tag">TODAY SUMMARY</div>
+  <div id="todaySummary" class="headline">等待資料</div>
+</div>
+
+        </div>
         </div>
       </div>
 
@@ -664,6 +670,15 @@
     function safeSetClass(id, value){ const el = safeEl(id); if (el) el.className = value; }
     function safeSetWidth(id, value){ const el = safeEl(id); if (el) el.style.width = value; }
     function formatMoney(v){ return Number(v || 0).toLocaleString(); }
+
+    function setLastRecordStamp(value){
+      try{
+        const stamp = value || getNowText();
+        localStorage.setItem('flywheel_last_record_stamp', String(stamp));
+      }catch(err){
+        console.warn('setLastRecordStamp failed', err);
+      }
+    }
 
     function getHarvestCountField(code){ return `${code}_monthlyHarvestCount`; }
     function getMonthlyHarvestCount(code){ return Number(safeEl(getHarvestCountField(code))?.value || 0); }
@@ -2061,6 +2076,41 @@ if (attackLock) {
 safeSetText('execOrderHeadline', execHeadline);
 safeSetHTML('execOrderSteps', execSteps.join(''));
 
+const todaySummaryParts = [];
+if (attackLock) {
+  todaySummaryParts.push('今天先保攻擊力，不做收割。');
+} else if (harvestCount > 0) {
+  todaySummaryParts.push(`今天先做 ${harvestCount} 筆收割。`);
+} else {
+  todaySummaryParts.push('今天沒有收割指令。');
+}
+
+if (harvestCount > 0) {
+  if (battle.key === 'war' || battle.key === 'lock') {
+    todaySummaryParts.push('收割獲利 100% 回水庫。');
+  } else if (reboundTarget) {
+    todaySummaryParts.push(`收割後 50% 回水庫，50% 灌 ${reboundTarget.name}。`);
+  } else {
+    todaySummaryParts.push('收割後 50% 回水庫，50% 灌最弱王。');
+  }
+} else {
+  todaySummaryParts.push('今天無回灌動作。');
+}
+
+if (recommend > 0) {
+  todaySummaryParts.push(`若出現加碼時機，建議金額 ${formatMoney(recommend)} 元。`);
+} else {
+  todaySummaryParts.push('今天不加碼。');
+}
+
+if (blockedKings.length) {
+  todaySummaryParts.push(`禁止王：${blockedKings.map(x => x.name).join('、')}。`);
+} else {
+  todaySummaryParts.push('今天沒有禁止王。');
+}
+
+safeSetText('todaySummary', todaySummaryParts.join(' '));
+
         safeSetHTML('threeKingDecisionBoard', decisionLines.length ? decisionLines.join('<br>') : '等待資料');
 
         const summary = [];
@@ -2226,6 +2276,8 @@ safeSetHTML('execOrderSteps', execSteps.join(''));
       updateVisuals();
     }
     loadData();
-  </script>
+  
+
+</script>
 </body>
 </html>
