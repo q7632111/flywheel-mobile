@@ -195,6 +195,51 @@
       font-weight:900;
       color:#fff;
     }
+    .command-line .v strong{
+      color:#67e8f9;
+      font-weight:900;
+    }
+    .exec-order{
+      border-radius:18px;
+      border:1px solid rgba(34,211,238,.18);
+      background:linear-gradient(180deg, rgba(6,25,41,.92), rgba(5,15,28,.9));
+      padding:16px;
+    }
+    .exec-order .tag{
+      font-size:12px;
+      letter-spacing:.16em;
+      font-weight:900;
+      color:#a5f3fc;
+    }
+    .exec-order .headline{
+      margin-top:8px;
+      font-size:22px;
+      line-height:1.4;
+      font-weight:900;
+      color:#fff;
+    }
+    .exec-order .steps{
+      margin-top:10px;
+      display:grid;
+      gap:8px;
+      font-size:13px;
+      line-height:1.7;
+      color:#cbd5e1;
+    }
+    .step-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:28px;
+      height:28px;
+      padding:0 8px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      color:#082f49;
+      background:linear-gradient(180deg,#a5f3fc,#22d3ee);
+      margin-right:8px;
+    }
     .command-stack{
       display:grid;
       gap:10px;
@@ -317,25 +362,33 @@
 
           <div class="command-list">
             <div class="command-line">
-              <div class="k">TODAY · 收割</div>
+              <div class="k">STEP 1 · 收割</div>
               <div id="commandHarvestLine" class="v">等待資料</div>
             </div>
             <div class="command-line">
-              <div class="k">TODAY · 回灌</div>
+              <div class="k">STEP 2 · 回灌</div>
               <div id="commandReboundLine" class="v">等待資料</div>
             </div>
             <div class="command-line">
-              <div class="k">TODAY · 加碼</div>
+              <div class="k">STEP 3 · 加碼</div>
               <div id="commandAddLine" class="v">等待資料</div>
             </div>
             <div class="command-line">
-              <div class="k">TODAY · 禁止</div>
+              <div class="k">STEP 4 · 禁止</div>
               <div id="commandBlockedLine" class="v">等待資料</div>
             </div>
           </div>
         </div>
 
         <div class="command-side">
+          <div class="exec-order">
+            <div class="tag">EXECUTION ORDER</div>
+            <div id="execOrderHeadline" class="headline">先看收割，再看回灌，最後檢查禁止清單</div>
+            <div id="execOrderSteps" class="steps">
+              <div><span class="step-pill">1</span>等待資料</div>
+            </div>
+          </div>
+
           <div class="decision-card">
             <div class="text-xs font-black tracking-[0.18em] text-emerald-200">飛輪戰區</div>
             <div id="battleZoneBadge" class="mt-3 decision-state state-ignite">⚡ 點火擴張區</div>
@@ -1930,7 +1983,7 @@ if (attackLock) {
 } else if (triggeredCandidates.length > 0 && recommend > 0) {
   globalTitle = `👉 今日可加碼，建議 ${formatMoney(recommend)} 元`;
   globalReason = `有 ${triggeredCandidates.length} 王達到 10 日跌幅觸發門檻，但只照排序與額度出手。`;
-  globalHint = recommendText.replace(/<br>/g, '｜');
+  globalHint = `先照上面 4 行做，不需要自己推理。`;
   globalClass = 'decision-big cmd-watch';
 }
 
@@ -1940,34 +1993,73 @@ safeSetText('globalCommandReason', globalReason);
 safeSetText('globalCommandHint', globalHint);
 
 const harvestLine = actionable.length
-  ? actionable.map(x => x.replace(/^[^：]+：/, '')).join(' ｜ ')
-  : '今日無收割';
+  ? actionable.map(x => {
+      const parts = x.split('：');
+      return parts.length > 1 ? `<strong>${parts[0]}</strong> → ${parts.slice(1).join('：')}` : x;
+    }).join(' ｜ ')
+  : '今日 <strong>無收割</strong>';
 const reboundLine = harvestCount > 0
   ? (battle.key === 'war' || battle.key === 'lock'
-      ? '100% 回水庫'
+      ? '<strong>100%</strong> 回水庫'
       : reboundTarget
-        ? `50% 回水庫｜50% 灌 ${reboundTarget.name}`
-        : '50% 回水庫｜50% 灌最弱王')
-  : '今日無回灌';
+        ? `<strong>50%</strong> 回水庫 ｜ <strong>50%</strong> 灌 <strong>${reboundTarget.name}</strong>`
+        : '<strong>50%</strong> 回水庫 ｜ <strong>50%</strong> 灌最弱王')
+  : '今日 <strong>無回灌</strong>';
 const addLine = recommend > 0
-  ? `${formatMoney(recommend)} 元｜候選：${lastTriggeredCandidateNames.join('、') || '—'}`
-  : '今日不加碼';
+  ? `<strong>${formatMoney(recommend)}</strong> 元 ｜ 候選：<strong>${lastTriggeredCandidateNames.join('、') || '—'}</strong>`
+  : '今日 <strong>不加碼</strong>';
 const blockedKings = kingStats.filter(x => (x.cooldownRemain && x.cooldownRemain.remaining > 0) || x.decision.signal === '月限鎖' || x.decision.signal === '保護鎖');
 const blockedLine = blockedKings.length
   ? blockedKings.map(x => {
-      if (x.cooldownRemain && x.cooldownRemain.remaining > 0) return `${x.name} 冷卻 ${x.cooldownRemain.remaining} 天`;
-      if (x.decision.signal === '月限鎖') return `${x.name} 月限鎖`;
-      return `${x.name} 保護鎖`;
+      if (x.cooldownRemain && x.cooldownRemain.remaining > 0) {
+        const why = x.cooldownRemain.days >= 10 ? '因大收割進入 10 天冷卻' : '因標準收割進入 5 天冷卻';
+        return `<strong>${x.name}</strong> 冷卻 ${x.cooldownRemain.remaining} 天（${why}）`;
+      }
+      if (x.decision.signal === '月限鎖') return `<strong>${x.name}</strong> 本月停收`;
+      return `<strong>${x.name}</strong> 保護鎖啟動`;
     }).join(' ｜ ')
-  : '今日無禁止王';
+  : '今日 <strong>無禁止王</strong>';
 
-safeSetText('commandHarvestLine', harvestLine);
-safeSetText('commandReboundLine', reboundLine);
-safeSetText('commandAddLine', addLine);
-safeSetText('commandBlockedLine', blockedLine);
+safeSetHTML('commandHarvestLine', harvestLine);
+safeSetHTML('commandReboundLine', reboundLine);
+safeSetHTML('commandAddLine', addLine);
+safeSetHTML('commandBlockedLine', blockedLine);
 
 safeSetText('commandBlockSummary', blockedKings.length ? `今日共有 ${blockedKings.length} 王不可動` : '今日沒有禁止王');
-safeSetText('commandBlockReason', blockedLine);
+safeSetText('commandBlockReason', blockedKings.length ? '先看禁止清單，再照今日唯一指令執行。' : '今天沒有冷卻或鎖定，照順序做即可。');
+
+let execHeadline = '先看收割，再看回灌，最後檢查禁止清單';
+let execSteps = [
+  '<div><span class="step-pill">1</span>先看 <strong>收割</strong>：今天到底收哪一王、收幾%。</div>',
+  '<div><span class="step-pill">2</span>再看 <strong>回灌</strong>：收下來的錢是回水庫，還是灌最弱王。</div>',
+  '<div><span class="step-pill">3</span>最後看 <strong>禁止</strong>：冷卻王、月限鎖、保護鎖都不能碰。</div>'
+];
+
+if (attackLock) {
+  execHeadline = '今天先保攻擊力，不做任何收割';
+  execSteps = [
+    '<div><span class="step-pill">1</span>今天所有收割暫停。</div>',
+    '<div><span class="step-pill">2</span>只允許觀察，若有加碼指令再執行。</div>',
+    '<div><span class="step-pill">3</span>等攻擊資產比例回到安全區，再恢復正常收割。</div>'
+  ];
+} else if (harvestCount > 0) {
+  execHeadline = `今天先做 ${harvestCount} 筆收割，再照規則回灌`;
+  execSteps = [
+    `<div><span class="step-pill">1</span>先執行 <strong>${harvestCount} 筆收割</strong>，直接照各王卡上的百分比做。</div>`,
+    `<div><span class="step-pill">2</span>再照 <strong>${battle.key === 'war' || battle.key === 'lock' ? '100% 回水庫' : reboundTarget ? `50% 回水庫 / 50% 灌 ${reboundTarget.name}` : '50% 回水庫 / 50% 灌最弱王'}</strong> 分流。</div>`,
+    `<div><span class="step-pill">3</span>最後檢查禁止王，今天不要去碰冷卻中的王。</div>`
+  ];
+} else if (recommend > 0) {
+  execHeadline = `今天有加碼，金額 ${formatMoney(recommend)} 元`;
+  execSteps = [
+    `<div><span class="step-pill">1</span>今天 <strong>不收割</strong>，先處理加碼。</div>`,
+    `<div><span class="step-pill">2</span>照排序只打 <strong>${lastTriggeredCandidateNames.join('、')}</strong> 候選王。</div>`,
+    '<div><span class="step-pill">3</span>加碼後更新本月已用彈藥與觸發次數。</div>'
+  ];
+}
+
+safeSetText('execOrderHeadline', execHeadline);
+safeSetHTML('execOrderSteps', execSteps.join(''));
 
         safeSetHTML('threeKingDecisionBoard', decisionLines.length ? decisionLines.join('<br>') : '等待資料');
 
