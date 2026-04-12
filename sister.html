@@ -360,16 +360,19 @@ function formatDisplayTime(value){
   try{
     const d = new Date(value);
     if(!Number.isNaN(d.getTime())){
-      const tw = new Date(d.getTime() + 8*60*60*1000);
-      const yyyy = tw.getFullYear();
-      const mm = String(tw.getMonth()+1).padStart(2,'0');
-      const dd = String(tw.getDate()).padStart(2,'0');
-      const hh = String(tw.getHours()).padStart(2,'0');
-      const mi = String(tw.getMinutes()).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      const hh = String(d.getHours()).padStart(2,'0');
+      const mi = String(d.getMinutes()).padStart(2,'0');
       return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
     }
   }catch(err){}
-  return String(value).replace('T',' ').replace(/\.\d{3}Z$/,'').replace(/Z$/,'');
+  return String(value)
+    .replace('T',' ')
+    .replace(/\.\d{3}Z$/,'')
+    .replace(/Z$/,'')
+    .slice(0,16);
 }
 
 function getCurrentMonthKey(){
