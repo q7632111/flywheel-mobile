@@ -327,10 +327,6 @@ function formatDisplayTime(value){
       return `${yyyy}-${mm}-${dd} ${hh}:${mi}`;
     }
   }catch(err){}
-  return String(value).replace('T',' ').replace('.000Z','').replace('Z','');
-}-${dd} ${hh}:${mi}`;
-    }
-  }catch(err){}
   return String(value).replace('T',' ').replace(/\.\d{3}Z$/,'').replace(/Z$/,'');
 }
 
@@ -802,7 +798,7 @@ function updateVisuals(){
   if(triggeredCandidates.length > 0 && triggerRemain > 0 && ammoRemain > 0){
     const chosen = triggeredCandidates[0];
     recommend = Math.min(3000, ammoRemain);
-    recommendText = `今天若要加碼，只打一王：${chosen.name}。建議金額 ${formatMoney(recommend)} 元。雙王同時觸發時，固定優先打跌更深那一王。`;
+    recommendText = `超底王為自動加碼機制。若只有一王達標，本次主要觀察 ${chosen.name}；若雙王同時達標，平台會依各自條件同步自動扣款。建議你重點檢查本月剩餘次數與水庫彈藥。`;
     lastTriggeredCandidateCodes = [chosen.code];
     lastTriggeredCandidateNames = [chosen.name];
   }
@@ -815,7 +811,7 @@ function updateVisuals(){
     ? (mode.key === 'mode1' ? '100% 回水庫' : mode.split)
     : '今日無回灌';
   const addLine = recommend > 0
-    ? `${formatMoney(recommend)} 元｜候選：${lastTriggeredCandidateNames.join('、') || '—'}`
+    ? `自動加碼觀察中｜重點：${lastTriggeredCandidateNames.join('、') || '—'}`
     : '今日不加碼';
 
   const blockedKings = kingDefs
